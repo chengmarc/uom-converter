@@ -40,24 +40,37 @@ Before shipping:
 
 ## Layout
 
+The maths lives in `src/`: plain TypeScript with no DOM, each tested in a matching file (`conductors.ts` ↔ `conductors.test.ts`). The page lives in `web/`.
+
 | Path | What it is |
 |---|---|
-| `src/reference.ts` | The conversions, computed from definitions rather than copied tables: E/C/M pricing and mix-up detection, price per length, discount chains, margin/markup, packs and put-ups, AWG/kcmil ↔ mm², conductor weight and resistance, voltage drop, conduit trade sizes and knockout punches, kVA/kW/amps, line ↔ neutral voltage, Ohm's law, energy cost, power factor correction, motor speed/slip, transformer fault current, fractional inches, and unit factors |
-| `src/uom.ts` | UN/ECE Rec 20 unit codes (Rec 21 package codes, X-prefixed) and alias lookup, spec values to metric for ETIM, price quantity to unit price |
+| `src/units.ts` | Exact unit factors, temperature, fractions of an inch |
+| `src/pricing.ts` | E/C/M price units and mix-up detection, price per length, discount chains, margin/markup, packs and put-ups, price quantity to unit price |
+| `src/conductors.ts` | AWG/kcmil ↔ mm², North American building-wire sizes, conductor weight and resistance, voltage drop |
+| `src/conduit.ts` | Conduit trade sizes ↔ metric designators, knockout punch sizes |
+| `src/electrical.ts` | kVA/kW/amps, line ↔ neutral voltage, Ohm's law, energy cost, power factor correction, motor speed/slip, transformer fault current |
+| `src/uom.ts` | UN/ECE Rec 20 unit codes (Rec 21 package codes, X-prefixed) and alias lookup, spec values to metric for ETIM |
 | `src/gtin.ts` | GTIN check digits and parsing; builds pack-level GTIN-14s for the Packaging levels converter |
-| `web/main.ts` | Every converter: fields, examples, result rows, diagrams |
+| `src/region.ts` | The `Region` type (US, Canada, Europe) |
+| `web/main.ts` | The page: audience and region pickers, sidebar, URL and saved choices |
+| `web/converters/` | One file per converter (fields, examples, result rows, diagrams); `index.ts` lists them in display order |
+| `web/converters/checks.ts`, `electrical-fields.ts`, `wire.ts` | Input checks, phase/voltage fields, and conductor metal and weight rows shared by several converters |
+| `web/ui.ts` | The converter model (fields, rows, examples) and the layout every converter renders with |
+| `web/unit-converter.ts` | The simple converter shape: a value and unit in, every other unit out |
+| `web/format.ts` | Number formatting, money and parsing per region |
 | `web/audiences.ts` | Who the page serves and which converters each audience sees, in order |
 | `web/regions.ts` | US / Canada / Europe defaults |
-| `web/ui.ts` | The shared converter layout, number formatting and parsing per region |
 | `web/visuals.ts`, `web/icons.ts` | Inline SVG diagrams and line icons |
 | `electron/` | Desktop shell and app icon (`web/icon.svg` is the source) |
 
 ## Adding things
 
-- **An audience:** add an entry to `web/audiences.ts` (label, description, converter ids in order).
-  A startup check fails if an id doesn't exist.
-- **A converter:** add it to `web/main.ts` with region-aware examples, put its maths in
-  `src/reference.ts` with tests, and list it in the audiences that need it.
+- **An audience:** add its id to `AudienceId` and an entry to `web/audiences.ts` (label, description,
+  converter ids in order), and an icon in `web/icons.ts`. The typecheck fails without the icon;
+  `web/audiences.test.ts` fails if a converter id doesn't exist.
+- **A converter:** add a file to `web/converters/` with region-aware examples and list it in
+  `web/converters/index.ts`. Put its maths in the matching `src/` file with tests, and list it
+  in the audiences that need it. `web/converters/index.test.ts` checks every example sets real fields.
 
 Conversions stay formula-based. Code-table lookups (ampacity, conduit fill, motor full-load
 amps) are left out on purpose; the one copied table, knockout punch sizes, cites its source.
