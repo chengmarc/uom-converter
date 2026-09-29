@@ -1,9 +1,11 @@
 // Simple 24×24 line icons, drawn for this page. Stroke uses currentColor so they take the text
 // colour of wherever they sit.
 
+import type { AudienceId } from "./audiences";
 import type { Topic } from "./ui";
 
-const AUDIENCES: Record<string, string> = {
+// Typed like topics, so a new audience can't ship without an icon.
+const AUDIENCES: Record<AudienceId, string> = {
   all: "M4 4h7v7H4z M13 4h7v7h-7z M4 13h7v7H4z M13 13h7v7h-7z",
   supplier: "M3 21V11l5 3v-3l5 3v-3l5 3V5h3v16z M7 17h2 M12 17h2 M17 17h1",
   distributor: "M2 6h12v10H2z M14 9h4l3 4v3h-7z M6.5 19.5a1.5 1.5 0 1 0 0-.01 M17.5 19.5a1.5 1.5 0 1 0 0-.01",
@@ -23,7 +25,7 @@ const TOPICS: Record<Topic, string> = {
 };
 
 export function icon(name: string): SVGSVGElement | undefined {
-  const d = AUDIENCES[name] ?? TOPICS[name as Topic];
+  const d = AUDIENCES[name as AudienceId] ?? TOPICS[name as Topic];
   if (!d) return undefined;
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("viewBox", "0 0 24 24");

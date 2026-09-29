@@ -2,8 +2,11 @@
 // that order, and the buttons follow the order of this list. Adding an audience is a data change
 // here, nothing else.
 
+/** "all" is the Everything view. Each id has an icon in icons.ts. */
+export type AudienceId = "all" | "supplier" | "distributor" | "counter" | "electrician" | "engineer" | "pim";
+
 export interface Audience {
-  id: string;
+  id: AudienceId;
   label: string;
   description: string;
   tools: string[];
