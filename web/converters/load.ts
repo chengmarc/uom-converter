@@ -1,8 +1,8 @@
-import { ampsToKva, kvaToAmps, type Phase } from "../../src/electrical";
+import { ampsToKva, kvaToAmps } from "../../src/electrical";
 import { fmt, plain, typed } from "../format";
 import { byRegion, type Converter, type RegionExamples } from "../ui";
 import { isNum, invalid } from "./checks";
-import { phaseName, phaseField, voltsField } from "./electrical-fields";
+import { phaseField, phaseName, readPhase, voltsField } from "./electrical-fields";
 
 const LOAD_UNITS = [
   { value: "kVA", label: "kVA", name: "Apparent power" },
@@ -53,7 +53,7 @@ export const load: Converter = {
     if (bad.length) return { error: "Enter numbers; volts more than 0, power factor between 0 and 1.", fields: bad };
     if (n === undefined) return undefined;
     const unit = v.str("unit");
-    const phase = Number(v.str("phase")) as Phase;
+    const phase = readPhase(v);
     const kva = unit === "kVA" ? n : unit === "kW" ? n / pf! : ampsToKva(n, volts!, phase);
     const values: Record<string, [number, string]> = {
       kVA: [kva, `${fmt(kva, 2)} kVA`],

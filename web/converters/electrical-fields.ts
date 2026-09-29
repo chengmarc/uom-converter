@@ -18,6 +18,9 @@ export const phaseField = (value: string, advanced = false) => ({
   ],
 });
 
+/** The phase chosen in a phaseField. */
+export const readPhase = (v: Values) => Number(v.str("phase")) as Phase;
+
 /** A voltage field offering the region's voltages, preset to its load or branch-circuit voltage. */
 export const voltsField = (label: string, preset: "loadVolts" | "branchVolts" = "loadVolts") => ({
   kind: "number" as const,

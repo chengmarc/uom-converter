@@ -2,7 +2,7 @@
 
 import { conductorKgPerKm, kgPerKmToLbPerKft, type Metal } from "../../src/conductors";
 import { fmt, plain } from "../format";
-import type { Row } from "../ui";
+import type { Row, Values } from "../ui";
 
 export const metalField = {
   kind: "choice" as const,
@@ -14,6 +14,9 @@ export const metalField = {
     { value: "Al", label: "Aluminum" },
   ],
 };
+
+/** The metal chosen in a metalField. */
+export const readMetal = (v: Values) => v.str("metal") as Metal;
 
 export function weightRows(areaMm2: number, metal: Metal): Row[] {
   const kgKm = conductorKgPerKm(areaMm2, metal);

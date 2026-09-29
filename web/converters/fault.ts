@@ -1,8 +1,8 @@
-import { transformerFaultAmps, type Phase } from "../../src/electrical";
+import { transformerFaultAmps } from "../../src/electrical";
 import { fmt, plain, typed } from "../format";
 import { byRegion, type Converter, type RegionExamples } from "../ui";
 import { isNum, invalid } from "./checks";
-import { phaseName, phaseField, voltsField } from "./electrical-fields";
+import { phaseField, phaseName, readPhase, voltsField } from "./electrical-fields";
 
 export const fault: Converter = {
   id: "fault",
@@ -42,7 +42,7 @@ export const fault: Converter = {
     ]);
     if (bad.length) return { error: "Enter numbers above 0; impedance is a percentage.", fields: bad };
     if (kva === undefined || z === undefined) return undefined;
-    const phase = Number(v.str("phase")) as Phase;
+    const phase = readPhase(v);
     const r = transformerFaultAmps(kva, volts!, phase, z);
     return {
       heading: `${fmt(kva, 1)} kVA, ${fmt(volts!, 1)} V ${phaseName(phase)}, ${fmt(z, 2)}%Z`,

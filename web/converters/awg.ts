@@ -1,8 +1,8 @@
-import { conductorInfo, NA_BUILDING_SIZES, type Metal } from "../../src/conductors";
+import { conductorInfo, NA_BUILDING_SIZES } from "../../src/conductors";
 import { fmt, plain } from "../format";
 import type { Converter } from "../ui";
 import { crossSections } from "../visuals";
-import { metalField, weightRows, WIRE_FORMULA } from "./wire";
+import { metalField, readMetal, weightRows, WIRE_FORMULA } from "./wire";
 
 export const awg: Converter = {
   id: "awg",
@@ -43,7 +43,7 @@ export const awg: Converter = {
         ...(c.solidDiameterMm === undefined
           ? []
           : [{ group: "Area", label: "Diameter, solid conductor", detail: "stranded is larger", value: `${fmt(c.solidDiameterMm, 3)} mm`, copy: plain(c.solidDiameterMm, 3) }]),
-        ...weightRows(c.areaMm2, v.str("metal") as Metal),
+        ...weightRows(c.areaMm2, readMetal(v)),
       ],
       visual: crossSections([
         { label: c.label, sub: `${fmt(c.areaMm2, 2)} mm²`, areaMm2: c.areaMm2, kind: "input" },

@@ -1,8 +1,8 @@
-import { kvaToAmps, pfCorrectionKvar, type Phase } from "../../src/electrical";
+import { kvaToAmps, pfCorrectionKvar } from "../../src/electrical";
 import { fmt, plain, typed } from "../format";
 import type { Converter, Example, Row } from "../ui";
 import { isNum, invalid } from "./checks";
-import { phaseName, phaseField, voltsField } from "./electrical-fields";
+import { phaseField, phaseName, readPhase, voltsField } from "./electrical-fields";
 
 export const pf: Converter = {
   id: "pf",
@@ -47,7 +47,7 @@ export const pf: Converter = {
       { group: "Before → after", label: "Apparent power", detail: `${fmt(((kva1 - kva2) / kva1) * 100, 1)}% less`, value: `${fmt(kva1, 1)} → ${fmt(kva2, 1)} kVA`, status: "good" },
     ];
     if (volts !== undefined) {
-      const phase = Number(v.str("phase")) as Phase;
+      const phase = readPhase(v);
       const a1 = kvaToAmps(kva1, volts, phase);
       const a2 = kvaToAmps(kva2, volts, phase);
       rows.push({ group: "Before → after", label: "Line current", detail: `at ${fmt(volts, 1)} V ${phaseName(phase)}`, value: `${fmt(a1, 1)} → ${fmt(a2, 1)} A`, status: "good" });

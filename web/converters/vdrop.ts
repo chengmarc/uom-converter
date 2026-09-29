@@ -1,13 +1,12 @@
-import { conductorInfo, conductorOhmsPerKm, METRIC_SIZES_MM2, NA_BUILDING_SIZES, smallestSizeForDrop, voltageDrop, type Metal } from "../../src/conductors";
-import type { Phase } from "../../src/electrical";
+import { conductorInfo, conductorOhmsPerKm, METRIC_SIZES_MM2, NA_BUILDING_SIZES, smallestSizeForDrop, voltageDrop } from "../../src/conductors";
 import type { Region } from "../../src/region";
 import { ftToM } from "../../src/units";
 import { fmt, parseNumber, plain, typed } from "../format";
 import { byRegion, type Converter, type RegionExamples, type Status, type Values } from "../ui";
 import { gauge } from "../visuals";
 import { isNum, invalid } from "./checks";
-import { phaseName, phaseField, voltsField } from "./electrical-fields";
-import { metalField } from "./wire";
+import { phaseField, phaseName, readPhase, voltsField } from "./electrical-fields";
+import { metalField, readMetal } from "./wire";
 
 const VDROP_NOTE: Record<Region, string> = {
   us: "An estimate from DC resistance that ignores reactance, so it reads a little low for large conductors. NEC informational notes suggest at most 3% for a branch circuit or feeder and 5% overall.",
@@ -107,10 +106,10 @@ export const vdrop: Converter = {
       label = `${fmt(n, 3)} mm²`;
     }
 
-    const metal = v.str("metal") as Metal;
+    const metal = readMetal(v);
     const unit = lengthUnit(v);
     const lengthM = unit === "ft" ? ftToM(len) : len;
-    const phase = Number(v.str("phase")) as Phase;
+    const phase = readPhase(v);
     const run = { metal, lengthM, amps, volts: volts!, phase };
     const d = voltageDrop({ ...run, areaMm2 });
     const ohmsKm = conductorOhmsPerKm(areaMm2, metal);
