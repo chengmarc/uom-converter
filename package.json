@@ -5,11 +5,11 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "main": "electron/main.cjs",
+  "main": "src/electron/main.cjs",
   "scripts": {
-    "dev": "vite web",
-    "build": "vite build web --outDir ../dist --emptyOutDir --base ./",
-    "preview": "vite preview web --outDir ../dist",
+    "dev": "vite src/web",
+    "build": "vite build src/web --outDir ../../dist --emptyOutDir --base ./",
+    "preview": "vite preview src/web --outDir ../../dist",
     "test": "vitest run",
     "typecheck": "tsc",
     "app": "npm run build && electron .",
@@ -28,7 +28,7 @@
     "productName": "UOM Converter",
     "files": [
       "dist/**",
-      "electron/**",
+      "src/electron/**",
       "package.json"
     ],
     "directories": {
@@ -40,7 +40,7 @@
         "nsis",
         "portable"
       ],
-      "icon": "electron/icon.png"
+      "icon": "src/electron/icon.png"
     },
     "nsis": {
       "oneClick": false,
