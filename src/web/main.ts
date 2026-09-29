@@ -66,7 +66,8 @@ function buildNav() {
   const visible = audience.tools.map((id) => byId.get(id)!);
   // Groups in order of their first tool, tools in the audience's priority order.
   const groups = [...new Set(visible.map((t) => t.topic))];
-  sidebar.replaceChildren();
+  // What this audience is for, at the head of its list (under the tabs instead on narrow screens).
+  sidebar.replaceChildren(Object.assign(document.createElement("p"), { className: "sidebar-desc", textContent: audience.description }));
   picker.replaceChildren();
   for (const g of groups) {
     const section = document.createElement("div");
