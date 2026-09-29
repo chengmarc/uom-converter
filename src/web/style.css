@@ -69,7 +69,7 @@ body {
   gap: 1rem;
   width: min(20rem, 100%);
   height: 32px;
-  margin: 0 auto;
+  margin: 0;
   padding: 0 6px 0 10px;
   border: 1px solid var(--line);
   border-radius: 6px;
@@ -90,7 +90,7 @@ kbd {
   font-size: 0.75rem;
 }
 
-.region { display: flex; align-items: center; gap: 0.5rem; }
+.region { display: flex; align-items: center; gap: 0.5rem; margin-left: auto; }
 .region .label { color: var(--muted); font-weight: 400; }
 
 .audience {
@@ -100,7 +100,8 @@ kbd {
   gap: 0.35rem 0.75rem;
   padding: 0 12px 8px;
 }
-.audience > .label { color: var(--muted); font-weight: 400; }
+/* Named for screen readers; the tabs and the description line say it visually. */
+.audience > .label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .audience-desc { flex: 1; min-width: 12rem; margin: 0; font-size: 0.875rem; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .layout { display: grid; grid-template-columns: 15rem minmax(0, 1fr); }
@@ -389,6 +390,8 @@ tr.hit td { background: var(--accent-soft); color: var(--accent); font-weight: 6
 .tabs .icon { color: var(--accent); }
 .seg { display: flex; gap: 2px; padding: 2px; border: 1px solid var(--line); border-radius: 8px; }
 .seg button { height: 26px; }
+/* The audience selector is the main choice on the page, so it reads larger than the other controls. */
+.tabs button { height: 39px; gap: 0.5rem; padding: 0 0.75rem; font-size: 1.17rem; }
 
 /* Code list table */
 table.wide { max-width: none; }
@@ -404,7 +407,7 @@ tr.cat td {
 /* Icons */
 .icon { width: 1.1em; height: 1.1em; flex: none; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
 .nav-group h2 { display: flex; align-items: center; gap: 0.4rem; }
-.nav-group h2 .icon { width: 1rem; height: 1rem; color: var(--accent); }
+.nav-group h2 .icon { width: 1.3rem; height: 1.3rem; color: var(--accent); }
 
 /* Examples */
 .examples { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; margin: -0.25rem 0 1rem; }
