@@ -118,6 +118,7 @@ kbd {
   color: var(--muted);
 }
 .nav-group a {
+  position: relative;
   padding: 0.3rem 0.6rem;
   border-radius: 5px;
   color: var(--text);
@@ -125,7 +126,9 @@ kbd {
   font-size: 0.95rem;
 }
 .nav-group a:hover { background: var(--hover); }
+/* Selected converter: filled row with an accent pill on the left (side navigation). */
 .nav-group a[aria-current] { background: var(--surface); color: var(--accent); font-weight: 600; box-shadow: 0 1px 2px rgb(0 0 0 / 0.08); }
+.nav-group a[aria-current]::before { content: ""; position: absolute; left: 0; top: 25%; bottom: 25%; width: 3px; border-radius: 2px; background: var(--accent); }
 .nav-group a:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .sidebar-hint { margin: 0.5rem 0.6rem 0; font-size: 0.8125rem; color: var(--muted); }
 
@@ -391,7 +394,11 @@ tr.hit td { background: var(--accent-soft); color: var(--accent); font-weight: 6
 .seg { display: flex; gap: 2px; padding: 2px; border: 1px solid var(--line); border-radius: 8px; }
 .seg button { height: 26px; }
 /* The audience selector is the main choice on the page, so it reads larger than the other controls. */
-.tabs button { height: 39px; gap: 0.5rem; padding: 0 0.75rem; font-size: 1.17rem; }
+.tabs button { position: relative; height: 39px; gap: 0.5rem; padding: 0 0.75rem; font-size: 1.17rem; }
+/* Selected role: no box, bold text on an accent underline (top-level tabs), unlike the boxed region switch and sidebar. */
+.tabs button[aria-pressed="true"] { background: transparent; border-color: transparent; box-shadow: none; }
+.tabs button[aria-pressed="true"]::after { content: ""; position: absolute; left: 0.75rem; right: 0.75rem; bottom: 1px; height: 3px; border-radius: 2px; background: var(--accent); }
+.tabs button[aria-pressed="true"]:hover { background: var(--hover); }
 
 /* Code list table */
 table.wide { max-width: none; }
