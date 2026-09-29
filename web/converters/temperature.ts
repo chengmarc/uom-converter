@@ -1,10 +1,10 @@
-import { cToF, fToC } from "../../src/reference";
-import { unitConverter } from "../ui";
+import { cToF, fToC } from "../../src/units";
+import { unitConverter } from "../unit-converter";
 import { temperatureScale } from "../visuals";
 
 export const temperature = unitConverter({
   id: "temperature",
-  group: "Units",
+  topic: "Units",
   title: "Temperature",
   blurb: "Conductor insulation and termination ratings are 60, 75 and 90 °C.",
   defaultUnit: { ca: "C", eu: "C" },

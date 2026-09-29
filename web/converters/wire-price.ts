@@ -1,10 +1,11 @@
-import { METRES_PER_PRICE_UNIT } from "../../src/reference";
-import { linear, money, unitConverter } from "../ui";
+import { METRES_PER_PRICE_UNIT } from "../../src/pricing";
+import { money } from "../format";
+import { linear, unitConverter } from "../unit-converter";
 
 export const wirePrice = unitConverter({
   id: "wire-price",
   counterpart: { ft: "m", Cft: "m", Mft: "m", m: "Mft", km: "Mft" },
-  group: "Pricing",
+  topic: "Pricing",
   title: "Wire price per ft ↔ m",
   blurb: "Wire price per ft, per 100 ft (C), per 1,000 ft (M), per metre and per km.",
   defaultUnit: { us: "Mft", ca: "Mft", eu: "m" },

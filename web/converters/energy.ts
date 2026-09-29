@@ -1,11 +1,12 @@
-import { energyUse } from "../../src/reference";
+import { energyUse } from "../../src/electrical";
 import { regionInfo } from "../regions";
-import { fmt, money, plain, type Converter, type Example, type Row } from "../ui";
+import { fmt, money, plain } from "../format";
+import type { Converter, Example, Row } from "../ui";
 import { isNum, invalid } from "./shared";
 
 export const energy: Converter = {
   id: "energy",
-  group: "Electrical",
+  topic: "Electrical",
   title: "Energy cost",
   blurb: "What a load costs to run, and what a retrofit saves.",
   empty: "Enter the load in watts and the hours it runs per day.",

@@ -1,5 +1,6 @@
-import { ampsToKva, kvaToAmps, type Phase } from "../../src/reference";
-import { fmt, plain, typed, type Converter } from "../ui";
+import { ampsToKva, kvaToAmps, type Phase } from "../../src/electrical";
+import { fmt, plain, typed } from "../format";
+import type { Converter } from "../ui";
 import { isNum, invalid, byRegion, phaseName, phaseField, voltsField, type RegionExamples } from "./shared";
 
 const LOAD_UNITS = [
@@ -10,7 +11,7 @@ const LOAD_UNITS = [
 
 export const load: Converter = {
   id: "load",
-  group: "Electrical",
+  topic: "Electrical",
   title: "kVA · kW · amps",
   blurb: "Transformer, generator and UPS sizing. Three-phase uses line-to-line volts.",
   empty: "Enter a value in kVA, kW or amps.",

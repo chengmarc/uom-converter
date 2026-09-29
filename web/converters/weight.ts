@@ -1,9 +1,9 @@
-import { LB_PER_KG } from "../../src/reference";
-import { linear, unitConverter } from "../ui";
+import { LB_PER_KG } from "../../src/units";
+import { linear, unitConverter } from "../unit-converter";
 
 export const weight = unitConverter({
   id: "weight",
-  group: "Units",
+  topic: "Units",
   title: "Weight",
   blurb: "Pounds and kilograms.",
   defaultUnit: { eu: "kg" },

@@ -1,5 +1,6 @@
-import { ohmsLaw } from "../../src/reference";
-import { fmt, plain, type Converter } from "../ui";
+import { ohmsLaw } from "../../src/electrical";
+import { fmt, plain } from "../format";
+import type { Converter } from "../ui";
 import { byRegion, type RegionExamples } from "./shared";
 
 const OHM_FIELDS = [
@@ -11,7 +12,7 @@ const OHM_FIELDS = [
 
 export const ohm: Converter = {
   id: "ohm",
-  group: "Electrical",
+  topic: "Electrical",
   title: "Ohm's law",
   blurb: "Enter any two of volts, amps, ohms and watts to get the other two.",
   empty: "Fill in any two boxes.",

@@ -1,10 +1,10 @@
-import { FT_PER_M, MM_PER_IN } from "../../src/reference";
-import { linear, unitConverter } from "../ui";
+import { FT_PER_M, MM_PER_IN } from "../../src/units";
+import { linear, unitConverter } from "../unit-converter";
 
 export const length = unitConverter({
   id: "length",
   counterpart: { ft: "m", m: "ft", in: "mm", mm: "in" },
-  group: "Units",
+  topic: "Units",
   title: "Length",
   blurb: "Feet, metres, inches and millimetres.",
   defaultUnit: { eu: "m" },

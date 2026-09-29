@@ -1,10 +1,11 @@
-import { marginToMarkup, markupToMargin, sellFromCostAtMargin } from "../../src/reference";
-import { fmt, money, plain, type Converter, type Example, type Row } from "../ui";
+import { marginToMarkup, markupToMargin, sellFromCostAtMargin } from "../../src/pricing";
+import { fmt, money, plain } from "../format";
+import type { Converter, Example, Row } from "../ui";
 import { isNum, invalid } from "./shared";
 
 export const margin: Converter = {
   id: "margin",
-  group: "Pricing",
+  topic: "Pricing",
   title: "Margin ↔ markup",
   blurb: "Margin is profit as a % of the sell price; markup is profit as a % of cost. 25% margin = 33.3% markup.",
   empty: "Enter a margin or markup percentage.",

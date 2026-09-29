@@ -1,11 +1,12 @@
-import { unitsToOrder } from "../../src/reference";
-import { fmt, money, plain, typed, type Converter, type Example, type Row } from "../ui";
+import { unitsToOrder } from "../../src/pricing";
+import { fmt, money, plain, typed } from "../format";
+import type { Converter, Example, Row } from "../ui";
 import { packs as packsVisual } from "../visuals";
 import { invalid } from "./shared";
 
 export const packs: Converter = {
   id: "packs",
-  group: "Pricing",
+  topic: "Pricing",
   title: "Boxes & packs",
   blurb: "How many packs to order for a quantity, and price per each ↔ per pack.",
   empty: "Enter a quantity and pack size, or a price and pack size.",

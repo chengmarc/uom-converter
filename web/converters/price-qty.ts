@@ -1,10 +1,11 @@
-import { unitPrice } from "../../src/uom";
-import { fmt, money, plain, type Converter, type Example, type Row } from "../ui";
+import { unitPrice } from "../../src/pricing";
+import { fmt, money, plain } from "../format";
+import type { Converter, Example, Row } from "../ui";
 import { isNum, invalid } from "./shared";
 
 export const priceQty: Converter = {
   id: "price-qty",
-  group: "Product data",
+  topic: "Product data",
   title: "Price quantity → unit price",
   blurb: "Price files give a price for a price quantity of order units, and an order unit can hold several content units (a box of 100 connectors).",
   empty: "Enter a price and its price quantity.",

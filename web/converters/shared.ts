@@ -1,5 +1,8 @@
-import { conductorInfo, conductorKgPerKm, kgPerKmToLbPerKft, type ConductorInfo, type Metal, type Phase, type Region } from "../../src/reference";
-import { fmt, plain, type Example, type Row, type Values } from "../ui";
+import { conductorInfo, conductorKgPerKm, kgPerKmToLbPerKft, type ConductorInfo, type Metal } from "../../src/conductors";
+import type { Phase } from "../../src/electrical";
+import type { Region } from "../../src/region";
+import { fmt, plain } from "../format";
+import type { Example, Row, Values } from "../ui";
 import { regionInfo } from "../regions";
 
 export const isNum = (n: number | undefined): n is number => n !== undefined && !Number.isNaN(n);

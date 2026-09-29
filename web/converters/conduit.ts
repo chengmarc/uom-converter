@@ -1,9 +1,11 @@
-import { CONDUIT_TRADE_SIZES, conduitSize, KNOCKOUT_PUNCH_IN, MM_PER_IN } from "../../src/reference";
-import { fmt, plain, type Converter, type Example, type Row } from "../ui";
+import { CONDUIT_TRADE_SIZES, conduitSize, KNOCKOUT_PUNCH_IN } from "../../src/conduit";
+import { MM_PER_IN } from "../../src/units";
+import { fmt, plain } from "../format";
+import type { Converter, Example, Row } from "../ui";
 
 export const conduit: Converter = {
   id: "conduit",
-  group: "Wire & conduit",
+  topic: "Wire & conduit",
   title: "Conduit & knockouts",
   blurb: (v) =>
     v.region === "eu"

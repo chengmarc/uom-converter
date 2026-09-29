@@ -1,9 +1,9 @@
-import { LUX_PER_FC } from "../../src/reference";
-import { linear, unitConverter } from "../ui";
+import { LUX_PER_FC } from "../../src/units";
+import { linear, unitConverter } from "../unit-converter";
 
 export const light = unitConverter({
   id: "light",
-  group: "Units",
+  topic: "Units",
   title: "Light level",
   blurb: "Foot-candles and lux.",
   defaultUnit: { eu: "lx" },

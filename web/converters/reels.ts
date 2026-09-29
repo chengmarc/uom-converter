@@ -1,5 +1,6 @@
-import { unitsToOrder } from "../../src/reference";
-import { fmt, plain, type Converter, type Values } from "../ui";
+import { unitsToOrder } from "../../src/pricing";
+import { fmt, plain } from "../format";
+import type { Converter, Values } from "../ui";
 import { packs as packsVisual } from "../visuals";
 import { invalid, byRegion, type RegionExamples } from "./shared";
 
@@ -8,7 +9,7 @@ const reelUnit = (v: Values) => v.str("unit") as "ft" | "m";
 
 export const reels: Converter = {
   id: "reels",
-  group: "Pricing",
+  topic: "Pricing",
   title: "Wire coils & reels",
   blurb: "Coils or reels needed to cover a run. Three wires pulled 200 ft is 600 ft of wire.",
   empty: "Enter the run length and the coil or reel length.",

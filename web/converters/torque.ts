@@ -1,10 +1,10 @@
-import { NM_PER_LBF_IN } from "../../src/reference";
-import { linear, unitConverter } from "../ui";
+import { NM_PER_LBF_IN } from "../../src/units";
+import { linear, unitConverter } from "../unit-converter";
 
 export const torque = unitConverter({
   id: "torque",
   counterpart: { lbin: "nm", lbft: "nm", nm: "lbin" },
-  group: "Units",
+  topic: "Units",
   title: "Torque",
   blurb: "Lug and breaker termination torque.",
   defaultUnit: { eu: "nm" },

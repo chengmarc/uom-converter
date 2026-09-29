@@ -1,5 +1,9 @@
-import { conductorInfo, conductorOhmsPerKm, ftToM, METRIC_SIZES_MM2, NA_BUILDING_SIZES, smallestSizeForDrop, voltageDrop, type Metal, type Phase, type Region } from "../../src/reference";
-import { fmt, parseNumber, plain, typed, type Converter, type Status, type Values } from "../ui";
+import { conductorInfo, conductorOhmsPerKm, METRIC_SIZES_MM2, NA_BUILDING_SIZES, smallestSizeForDrop, voltageDrop, type Metal } from "../../src/conductors";
+import type { Phase } from "../../src/electrical";
+import type { Region } from "../../src/region";
+import { ftToM } from "../../src/units";
+import { fmt, parseNumber, plain, typed } from "../format";
+import type { Converter, Status, Values } from "../ui";
 import { gauge } from "../visuals";
 import { isNum, invalid, byRegion, phaseName, info, phaseField, metalField, voltsField, type RegionExamples } from "./shared";
 
@@ -14,7 +18,7 @@ const lengthUnit = (v: Values) => v.str("lenUnit") as "ft" | "m";
 
 export const vdrop: Converter = {
   id: "vdrop",
-  group: "Electrical",
+  topic: "Electrical",
   title: "Voltage drop",
   blurb: "Voltage drop on a run, and the smallest wire that keeps it within your target.",
   empty: "Enter the wire size, run length and load current.",

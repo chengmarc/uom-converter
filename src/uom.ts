@@ -1,17 +1,8 @@
-// Product-data (PIM) unit handling: UN/ECE unit codes, normalizing imperial spec values to
-// the metric units ETIM features use, and price-quantity arithmetic.
+// Product-data (PIM) unit handling: UN/ECE unit codes, and normalizing imperial spec values to
+// the metric units ETIM features use.
 
-import {
-  BTUH_PER_W,
-  conductorInfo,
-  fToC,
-  LB_PER_KG,
-  LUX_PER_FC,
-  MM_PER_IN,
-  NM_PER_LBF_IN,
-  parseInches,
-  W_PER_HP,
-} from "./reference";
+import { conductorInfo } from "./conductors";
+import { BTUH_PER_W, CM3_PER_IN3, fToC, LB_PER_KG, LUX_PER_FC, M_PER_FT, MM_PER_IN, NM_PER_LBF_IN, parseInches, W_PER_HP } from "./units";
 
 // ---------- UN/ECE unit codes ----------
 
@@ -168,11 +159,11 @@ interface Rule {
 
 const RULES: Rule[] = [
   { units: ["in", "in.", "inch", "inches", '"', "″"], to: "mm", code: "MMT", convert: (n) => n * MM_PER_IN, from: "in" },
-  { units: ["ft", "ft.", "feet", "foot", "'", "′"], to: "m", code: "MTR", convert: (n) => n * 0.3048, from: "ft" },
+  { units: ["ft", "ft.", "feet", "foot", "'", "′"], to: "m", code: "MTR", convert: (n) => n * M_PER_FT, from: "ft" },
   { units: ["yd", "yds", "yard", "yards"], to: "m", code: "MTR", convert: (n) => n * 0.9144, from: "yd" },
   { units: ["sq in", "in2", "in²", "square inch", "square inches"], to: "mm²", code: "MMK", convert: (n) => n * MM_PER_IN ** 2, from: "in²" },
   { units: ["sq ft", "ft2", "ft²", "square foot", "square feet"], to: "m²", code: "MTK", convert: (n) => n * 0.09290304, from: "ft²" },
-  { units: ["cu in", "in3", "in³", "cubic inch", "cubic inches"], to: "cm³", code: "CMQ", convert: (n) => n * 16.387064, from: "in³" },
+  { units: ["cu in", "in3", "in³", "cubic inch", "cubic inches"], to: "cm³", code: "CMQ", convert: (n) => n * CM3_PER_IN3, from: "in³" },
   { units: ["lb", "lbs", "lb.", "pound", "pounds"], to: "kg", code: "KGM", convert: (n) => n / LB_PER_KG, from: "lb" },
   { units: ["oz", "ounce", "ounces"], to: "g", code: "GRM", convert: (n) => (n / LB_PER_KG / 16) * 1000, from: "oz" },
   { units: ["°f", "f", "deg f", "degf", "º f", "ºf", "° f"], to: "°C", code: "CEL", convert: fToC, from: "°F" },
@@ -226,15 +217,4 @@ export function toMetric(raw: string): MetricValue | { error: string } {
   if (n === undefined || Number.isNaN(n)) return { error: "Can't read the number" };
   const value = minus ? -n : n;
   return { value: rule.convert(value), unit: rule.to, code: rule.code, readAs: `${minus ?? ""}${num} ${rule.from}` };
-}
-
-// ---------- Price quantity ----------
-
-/**
- * Price files (BMEcat, most ERPs) give a price for a *price quantity* of *order units*, and
- * each order unit can hold several *content units* (e.g. a box of 100 connectors).
- */
-export function unitPrice(price: number, priceQuantity = 1, contentUnitsPerOrderUnit = 1) {
-  const perOrderUnit = price / priceQuantity;
-  return { perOrderUnit, perContentUnit: perOrderUnit / contentUnitsPerOrderUnit };
 }

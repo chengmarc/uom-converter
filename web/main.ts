@@ -1,9 +1,10 @@
-import type { Region } from "../src/reference";
+import type { Region } from "../src/region";
 import { AUDIENCES, type Audience } from "./audiences";
 import { TOOLS } from "./converters";
 import { icon } from "./icons";
 import { guessRegion, regionInfo, REGIONS } from "./regions";
-import { renderConverter, setNumberStyle } from "./ui";
+import { setNumberStyle } from "./format";
+import { renderConverter } from "./ui";
 
 const byId = new Map(TOOLS.map((t) => [t.id, t]));
 
@@ -61,7 +62,7 @@ function buildControls() {
 function buildNav() {
   const visible = audience.tools.map((id) => byId.get(id)!);
   // Groups in order of their first tool, tools in the audience's priority order.
-  const groups = [...new Set(visible.map((t) => t.group))];
+  const groups = [...new Set(visible.map((t) => t.topic))];
   sidebar.replaceChildren();
   picker.replaceChildren();
   for (const g of groups) {
@@ -73,7 +74,7 @@ function buildNav() {
     h.append(g);
     section.append(h);
     const og = Object.assign(document.createElement("optgroup"), { label: g });
-    for (const t of visible.filter((x) => x.group === g)) {
+    for (const t of visible.filter((x) => x.topic === g)) {
       const a = Object.assign(document.createElement("a"), { href: `#${t.id}`, textContent: t.title });
       a.dataset.id = t.id;
       section.append(a);

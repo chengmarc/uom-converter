@@ -1,9 +1,9 @@
 import { lookupUom, UOM_CODES } from "../../src/uom";
-import { type Converter } from "../ui";
+import type { Converter } from "../ui";
 
 export const uomCodes: Converter = {
   id: "uom-codes",
-  group: "Product data",
+  topic: "Product data",
   title: "UOM codes",
   blurb: "Unit as it appears in a supplier file or ERP (EA, ft, box, lbs…) to its UN/ECE Recommendation 20 code, as used in BMEcat, ETIM and e-invoicing.",
   empty: "Enter a unit or code, like EA, pcs, ft, box or in-lb.",

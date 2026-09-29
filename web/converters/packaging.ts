@@ -1,10 +1,11 @@
 import { makePackGtin14, parseGtin } from "../../src/gtin";
-import { fmt, type Converter, type Example, type Row } from "../ui";
+import { fmt } from "../format";
+import type { Converter, Example, Row } from "../ui";
 import { isNum, invalid } from "./shared";
 
 export const packaging: Converter = {
   id: "packaging",
-  group: "Product data",
+  topic: "Product data",
   title: "Packaging levels",
   blurb: "Each → inner pack → case → pallet quantities, with GTIN-14s for the pack levels built from the item GTIN.",
   empty: "Enter at least the each-per-case quantity.",

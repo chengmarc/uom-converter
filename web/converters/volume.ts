@@ -1,9 +1,9 @@
-import { CM3_PER_IN3 } from "../../src/reference";
-import { linear, unitConverter } from "../ui";
+import { CM3_PER_IN3 } from "../../src/units";
+import { linear, unitConverter } from "../unit-converter";
 
 export const volume = unitConverter({
   id: "volume",
-  group: "Units",
+  topic: "Units",
   title: "Box fill volume",
   blurb: "The NEC uses cubic inches, the CEC uses millilitres.",
   defaultUnit: { ca: "ml", eu: "ml" },

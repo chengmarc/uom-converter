@@ -1,60 +1,12 @@
 // A tiny framework: every converter is declared as inputs ("from") plus a compute function
 // that returns labelled result rows ("to"), and is rendered with the same layout.
 
-import type { Region } from "../src/reference";
-
-// ---------- Numbers (region-aware) ----------
-
-export interface NumberStyle {
-  /** Intl locale for display, e.g. "en-US" or "de-DE". */
-  locale: string;
-  /** Input uses "," as the decimal separator (1.234,5). */
-  decimalComma: boolean;
-  currency: string;
-  /** "12,50 €" rather than "$12.50". */
-  currencyAfter: boolean;
-}
-
-let style: NumberStyle = { locale: "en-US", decimalComma: false, currency: "$", currencyAfter: false };
-
-export function setNumberStyle(s: NumberStyle) {
-  style = s;
-}
-
-export const fmt = (n: number, max: number, min = 0) =>
-  new Intl.NumberFormat(style.locale, { minimumFractionDigits: min, maximumFractionDigits: max }).format(n);
-
-/** Plain number for the clipboard: no thousands separators, the region's decimal mark. */
-export const plain = (n: number, max: number) =>
-  new Intl.NumberFormat(style.locale, { maximumFractionDigits: max, useGrouping: false }).format(n);
-
-/** A number as the user would type it in this region, for example values: 2.5 → "2,5" in Europe. */
-export const typed = (n: number) => plain(n, 6);
-
-/** About six significant digits, never fewer than 2 decimals: $0.00123, $1.47638, $1,476.38. */
-export const money = (n: number) => {
-  const mag = n === 0 ? 0 : Math.floor(Math.log10(Math.abs(n)));
-  const num = fmt(n, Math.min(5, Math.max(2, 5 - mag)), 2);
-  return style.currencyAfter ? `${num} ${style.currency}` : `${style.currency}${num}`;
-};
-
-/**
- * Accepts "1,250.50" / "1.250,50" (per the region), "$0.45", "12 €", and "-40" when `signed`.
- * A dot is always read as a decimal point when there's no comma, since spreadsheets and UK
- * users write 1.5 everywhere. Returns undefined for blank, NaN for anything else.
- */
-export function parseNumber(raw: string, signed = false): number | undefined {
-  let s = raw.replace(/[$€£\s  ]/g, "");
-  if (s === "") return undefined;
-  if (style.decimalComma && s.includes(",")) s = s.replace(/\./g, "").replace(",", ".");
-  else s = s.replace(/,/g, "");
-  const re = signed ? /^-?(\d*\.?\d+|\d+\.)$/ : /^(\d*\.?\d+|\d+\.)$/;
-  return re.test(s) ? Number(s) : NaN;
-}
+import type { Region } from "../src/region";
+import { numberStyle, parseNumber } from "./format";
 
 // ---------- Converter model ----------
 
-type Dyn<T> = T | ((v: Values) => T);
+export type Dyn<T> = T | ((v: Values) => T);
 
 interface FieldBase {
   id: string;
@@ -111,9 +63,12 @@ export interface Example {
   set: Record<string, string>;
 }
 
+/** The sidebar sections. Each has an icon in icons.ts. */
+export type Topic = "Pricing" | "Wire & conduit" | "Electrical" | "Units" | "Product data";
+
 export interface Converter {
   id: string;
-  group: string;
+  topic: Topic;
   title: string;
   blurb: Dyn<string>;
   fields: Field[];
@@ -152,7 +107,7 @@ export class Values {
   }
 }
 
-const dyn = <T>(d: Dyn<T>, v: Values) => (typeof d === "function" ? (d as (v: Values) => T)(v) : d);
+export const dyn = <T>(d: Dyn<T>, v: Values) => (typeof d === "function" ? (d as (v: Values) => T)(v) : d);
 
 export function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: string) {
   const e = document.createElement(tag);
@@ -225,7 +180,7 @@ export function renderConverter(conv: Converter, region: Region): HTMLElement {
     const lab = el("label", "field");
     const labelText = el("span", "label");
     const box = el("span", "text-input");
-    const cur = f.currency ? style : undefined;
+    const cur = f.currency ? numberStyle() : undefined;
     if (f.prefix) box.append(el("span", "affix", f.prefix));
     if (cur && !cur.currencyAfter) box.append(el("span", "affix", cur.currency));
     const input = el("input");
@@ -405,89 +360,4 @@ async function copy(row: HTMLElement, hint: HTMLElement, text: string) {
   } catch {
     // Clipboard blocked (insecure context or permissions): nothing to do.
   }
-}
-
-// ---------- Simple unit converters ----------
-
-export interface Unit {
-  key: string;
-  /** Full name for result rows, e.g. "Metres". */
-  name: string;
-  /** Symbol shown next to numbers, e.g. "m". */
-  symbol: string;
-  toBase: (n: number) => number;
-  fromBase: (n: number) => number;
-  digits: number;
-}
-
-/** A unit where `perBase` of it make one base unit. */
-export const linear = (key: string, name: string, symbol: string, perBase: number, digits = 4): Unit => ({
-  key,
-  name,
-  symbol,
-  toBase: (n) => n / perBase,
-  fromBase: (n) => n * perBase,
-  digits,
-});
-
-/** Value + unit picker on the left, every other unit on the right. */
-export function unitConverter(opts: {
-  id: string;
-  group: string;
-  title: string;
-  blurb: Dyn<string>;
-  units: Unit[];
-  /** Unit selected at first, per region; defaults to the first unit. */
-  defaultUnit?: Partial<Record<Region, string>>;
-  /** [value, unit key] pairs; labels are generated. */
-  examples: Dyn<[number, string][]>;
-  signed?: boolean;
-  note?: Dyn<string>;
-  format?: (n: number, u: Unit) => string;
-  /** Definitions behind the conversion, e.g. "1 ft = 0.3048 m exactly". */
-  formula?: string[];
-  /** The unit people expect as the answer for each input unit (mm → in, ft → m); shown first. */
-  counterpart?: Record<string, string>;
-  visual?: (value: number, from: Unit, v: Values) => Element | undefined;
-}): Converter {
-  const format = opts.format ?? ((n, u) => `${fmt(n, u.digits)} ${u.symbol}`);
-  const unit = (key: string) => opts.units.find((u) => u.key === key)!;
-  return {
-    id: opts.id,
-    group: opts.group,
-    title: opts.title,
-    blurb: opts.blurb,
-    note: opts.note,
-    empty: "Enter a value to convert.",
-    examples: (v) => dyn(opts.examples, v).map(([n, key]) => ({ label: format(n, unit(key)), set: { value: typed(n), unit: key } })),
-    fields: [
-      { kind: "number", id: "value", label: "Value", placeholder: "0", signed: opts.signed },
-      {
-        kind: "choice",
-        id: "unit",
-        label: "Unit",
-        options: opts.units.map((u) => ({ value: u.key, label: u.symbol })),
-        value: (v) => opts.defaultUnit?.[v.region] ?? opts.units[0].key,
-      },
-    ],
-    compute(v) {
-      const n = v.num("value");
-      if (n === undefined) return undefined;
-      if (Number.isNaN(n)) return { error: "Enter a number.", fields: ["value"] };
-      const from = unit(v.str("unit"));
-      const base = from.toBase(n);
-      return {
-        heading: `${format(n, from)} equals`,
-        rows: opts.units
-          .filter((u) => u !== from)
-          .sort((a, b) => Number(b.key === opts.counterpart?.[from.key]) - Number(a.key === opts.counterpart?.[from.key]))
-          .map((u) => {
-            const out = u.fromBase(base);
-            return { label: u.name, value: format(out, u), copy: plain(out, u.digits) };
-          }),
-        formula: opts.formula,
-        visual: opts.visual?.(n, from, v),
-      };
-    },
-  };
 }

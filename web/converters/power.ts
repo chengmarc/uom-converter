@@ -1,10 +1,10 @@
-import { BTUH_PER_W, W_PER_HP } from "../../src/reference";
-import { linear, unitConverter } from "../ui";
+import { BTUH_PER_W, W_PER_HP } from "../../src/units";
+import { linear, unitConverter } from "../unit-converter";
 
 export const power = unitConverter({
   id: "power",
   counterpart: { hp: "kW", kW: "hp", W: "btu", btu: "W" },
-  group: "Units",
+  topic: "Units",
   title: "Power",
   blurb: "Horsepower, kilowatts and BTU per hour (electric heat).",
   note: "Horsepower here is output power. It is not motor current; use the code tables for full-load amps.",

@@ -1,11 +1,12 @@
-import { METRIC_SIZES_MM2, metricToNorthAmerican, mm2ToKcmil, type Metal } from "../../src/reference";
-import { fmt, plain, typed, type Converter } from "../ui";
+import { METRIC_SIZES_MM2, metricToNorthAmerican, mm2ToKcmil, type Metal } from "../../src/conductors";
+import { fmt, plain, typed } from "../format";
+import type { Converter } from "../ui";
 import { crossSections } from "../visuals";
 import { info, metalField, weightRows, WIRE_FORMULA } from "./shared";
 
 export const mm2: Converter = {
   id: "mm2",
-  group: "Wire & conduit",
+  topic: "Wire & conduit",
   title: "mm² → AWG / kcmil",
   blurb: "Metric wire area to the matching North American building-wire size.",
   empty: "Enter an area in mm², like 2.5 or 120.",

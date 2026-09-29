@@ -1,7 +1,8 @@
 // Small inline-SVG diagrams for results. Colours come from CSS classes (see style.css), so they
 // follow light and dark mode. Each returns a <svg> with a text alternative.
 
-import { fmt, type Status } from "./ui";
+import { fmt } from "./format";
+import type { Status } from "./ui";
 
 const NS = "http://www.w3.org/2000/svg";
 

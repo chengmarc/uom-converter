@@ -1,10 +1,11 @@
-import { transformerFaultAmps, type Phase } from "../../src/reference";
-import { fmt, plain, typed, type Converter } from "../ui";
+import { transformerFaultAmps, type Phase } from "../../src/electrical";
+import { fmt, plain, typed } from "../format";
+import type { Converter } from "../ui";
 import { isNum, invalid, byRegion, phaseName, phaseField, voltsField, type RegionExamples } from "./shared";
 
 export const fault: Converter = {
   id: "fault",
-  group: "Electrical",
+  topic: "Electrical",
   title: "Transformer fault current",
   blurb: "Full-load current and the maximum fault current at a transformer's secondary terminals, from kVA and nameplate impedance.",
   empty: "Enter the transformer kVA and its impedance (%Z).",

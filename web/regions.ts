@@ -1,5 +1,5 @@
-import type { Region } from "../src/reference";
-import type { NumberStyle } from "./ui";
+import type { Region } from "../src/region";
+import type { NumberStyle } from "./format";
 
 export interface RegionInfo {
   id: Region;

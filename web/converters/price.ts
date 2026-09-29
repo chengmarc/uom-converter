@@ -1,5 +1,6 @@
-import { convertPrice, type PriceUom } from "../../src/reference";
-import { money, plain, typed, type Converter, type Example } from "../ui";
+import { convertPrice, type PriceUom } from "../../src/pricing";
+import { money, plain, typed } from "../format";
+import type { Converter, Example } from "../ui";
 
 const PRICE_UNITS: { uom: PriceUom; name: string; short: string }[] = [
   { uom: "E", name: "Per each (E)", short: "each" },
@@ -9,7 +10,7 @@ const PRICE_UNITS: { uom: PriceUom; name: string; short: string }[] = [
 
 export const price: Converter = {
   id: "price",
-  group: "Pricing",
+  topic: "Pricing",
   title: "Price per E / C / M",
   blurb: "Distributor price units: E is per each, C is per 100, M is per 1,000. Wire is usually priced per M feet.",
   empty: "Enter a price to see it per each, per 100 and per 1,000.",

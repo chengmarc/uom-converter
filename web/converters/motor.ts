@@ -1,11 +1,12 @@
-import { motorSlip, polesForRpm, syncSpeedRpm } from "../../src/reference";
+import { motorSlip, polesForRpm, syncSpeedRpm } from "../../src/electrical";
 import { regionInfo } from "../regions";
-import { fmt, plain, type Converter, type Row } from "../ui";
+import { fmt, plain } from "../format";
+import type { Converter, Row } from "../ui";
 import { isNum, invalid, byRegion, type RegionExamples } from "./shared";
 
 export const motor: Converter = {
   id: "motor",
-  group: "Electrical",
+  topic: "Electrical",
   title: "Motor speed & slip",
   blurb: "Synchronous speed from frequency and poles, slip from the nameplate speed, and the same motor on the other frequency.",
   empty: "Enter the poles, the nameplate speed, or both.",

@@ -1,53 +1,9 @@
 import { describe, expect, it } from "vitest";
-import {
-  ampsToKva,
-  BTUH_PER_W,
-  conductorInfo,
-  conductorKgPerKm,
-  conductorOhmsPerKm,
-  CONDUIT_TRADE_SIZES,
-  conduitSize,
-  convertLengthPrice,
-  convertPrice,
-  cToF,
-  discountToMultiplier,
-  energyUse,
-  extendedPrice,
-  fToC,
-  ftToM,
-  kcmilToMm2,
-  kgPerKmToLbPerKft,
-  KNOCKOUT_PUNCH_IN,
-  kvaToAmps,
-  lineToLine,
-  lineToNeutral,
-  LUX_PER_FC,
-  marginToMarkup,
-  markupToMargin,
-  metricToNorthAmerican,
-  motorSlip,
-  mToFt,
-  multiplierToDiscount,
-  NA_BUILDING_SIZES,
-  NM_PER_LBF_IN,
-  ohmsLaw,
-  parseConductor,
-  parseInches,
-  parseUom,
-  pfCorrectionKvar,
-  polesForRpm,
-  sellFromCostAtMargin,
-  smallestSizeForDrop,
-  suspectUomMismatch,
-  syncSpeedRpm,
-  toFraction,
-  transformerFaultAmps,
-  unitsToOrder,
-  voltageDrop,
-  W_PER_HP,
-  wyeSystem,
-  type ConductorInfo,
-} from "./reference";
+import { conductorInfo, conductorKgPerKm, conductorOhmsPerKm, kcmilToMm2, kgPerKmToLbPerKft, metricToNorthAmerican, NA_BUILDING_SIZES, parseConductor, smallestSizeForDrop, voltageDrop, type ConductorInfo } from "./conductors";
+import { CONDUIT_TRADE_SIZES, conduitSize, KNOCKOUT_PUNCH_IN } from "./conduit";
+import { ampsToKva, energyUse, kvaToAmps, lineToLine, lineToNeutral, motorSlip, ohmsLaw, pfCorrectionKvar, polesForRpm, syncSpeedRpm, transformerFaultAmps, wyeSystem } from "./electrical";
+import { convertLengthPrice, convertPrice, discountToMultiplier, extendedPrice, marginToMarkup, markupToMargin, multiplierToDiscount, parseUom, sellFromCostAtMargin, suspectUomMismatch, unitsToOrder } from "./pricing";
+import { BTUH_PER_W, cToF, fToC, ftToM, LUX_PER_FC, mToFt, NM_PER_LBF_IN, parseInches, toFraction, W_PER_HP } from "./units";
 
 const info = (s: string) => conductorInfo(s) as ConductorInfo;
 

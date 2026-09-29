@@ -1,9 +1,10 @@
 import { toMetric } from "../../src/uom";
-import { fmt, plain, type Converter } from "../ui";
+import { fmt, plain } from "../format";
+import type { Converter } from "../ui";
 
 export const metricSpec: Converter = {
   id: "metric",
-  group: "Product data",
+  topic: "Product data",
   title: "Spec value → metric (ETIM)",
   blurb: "ETIM features take metric values. Type a spec as the supplier wrote it, with its unit, and get the metric value and unit code.",
   empty: "Enter a value with its unit: 12 AWG, 3/4 in, 75 ft, 167 °F, 35 lb-in.",

@@ -1,11 +1,12 @@
-import { lineToLine, lineToNeutral, wyeSystem } from "../../src/reference";
+import { lineToLine, lineToNeutral, wyeSystem } from "../../src/electrical";
 import { regionInfo } from "../regions";
-import { fmt, plain, type Converter } from "../ui";
+import { fmt, plain } from "../format";
+import type { Converter } from "../ui";
 import { byRegion, type RegionExamples } from "./shared";
 
 export const volts: Converter = {
   id: "volts",
-  group: "Electrical",
+  topic: "Electrical",
   title: "Line ↔ neutral voltage",
   blurb: "Three-phase wye systems: line-to-neutral = line-to-line ÷ √3.",
   empty: "Enter a voltage, like 208 or 347.",

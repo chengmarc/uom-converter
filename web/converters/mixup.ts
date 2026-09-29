@@ -1,5 +1,6 @@
-import { suspectUomMismatch } from "../../src/reference";
-import { fmt, money, plain, typed, type Converter, type Example, type Status } from "../ui";
+import { suspectUomMismatch } from "../../src/pricing";
+import { fmt, money, plain, typed } from "../format";
+import type { Converter, Example, Status } from "../ui";
 import { priceGap } from "../visuals";
 import { invalid } from "./shared";
 
@@ -11,7 +12,7 @@ const MIXUP_MEANING: Record<number, string> = {
 
 export const mixup: Converter = {
   id: "mixup",
-  group: "Product data",
+  topic: "Product data",
   title: "UOM mix-up check",
   blurb: "Compare the same item's price from two sources. About 10×, 100× or 1000× apart almost always means one was loaded in the wrong UOM.",
   empty: "Enter both prices.",

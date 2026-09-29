@@ -1,11 +1,12 @@
-import { conductorInfo, NA_BUILDING_SIZES, type Metal } from "../../src/reference";
-import { fmt, plain, type Converter } from "../ui";
+import { conductorInfo, NA_BUILDING_SIZES, type Metal } from "../../src/conductors";
+import { fmt, plain } from "../format";
+import type { Converter } from "../ui";
 import { crossSections } from "../visuals";
 import { metalField, weightRows, WIRE_FORMULA } from "./shared";
 
 export const awg: Converter = {
   id: "awg",
-  group: "Wire & conduit",
+  topic: "Wire & conduit",
   title: "AWG / kcmil → mm²",
   blurb: "North American wire size to metric area and the matching IEC 60228 size.",
   empty: "Enter a wire size, like 12, 1/0 or 250 kcmil.",

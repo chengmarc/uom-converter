@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { lookupUom, toMetric, unitPrice, UOM_CODES, type MetricValue } from "./uom";
+import { unitPrice } from "./pricing";
+import { lookupUom, toMetric, UOM_CODES, type MetricValue } from "./uom";
 
 const metric = (s: string) => toMetric(s) as MetricValue;
 

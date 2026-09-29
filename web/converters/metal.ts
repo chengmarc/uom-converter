@@ -1,9 +1,10 @@
-import { LB_PER_KG } from "../../src/reference";
-import { linear, money, unitConverter } from "../ui";
+import { LB_PER_KG } from "../../src/units";
+import { money } from "../format";
+import { linear, unitConverter } from "../unit-converter";
 
 export const metal = unitConverter({
   id: "metal",
-  group: "Units",
+  topic: "Units",
   title: "Metal price",
   blurb: "Copper and aluminum prices per pound ↔ per kilogram, for surcharges.",
   defaultUnit: { eu: "kg" },

@@ -1,10 +1,11 @@
-import { MM_PER_IN, parseInches, toFraction } from "../../src/reference";
-import { fmt, parseNumber, plain, typed, type Converter, type Example, type Status } from "../ui";
+import { MM_PER_IN, parseInches, toFraction } from "../../src/units";
+import { fmt, parseNumber, plain, typed } from "../format";
+import type { Converter, Example, Status } from "../ui";
 import { ruler } from "../visuals";
 
 export const fraction: Converter = {
   id: "fraction",
-  group: "Units",
+  topic: "Units",
   title: "Fractions of an inch",
   blurb: "Fractional inches ↔ decimal inches ↔ millimetres, for drill bits, punches and enclosure sizes.",
   empty: "Enter a size like 1-23/32, 0.885 or 22.5 mm.",

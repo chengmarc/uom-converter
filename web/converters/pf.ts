@@ -1,10 +1,11 @@
-import { kvaToAmps, pfCorrectionKvar, type Phase } from "../../src/reference";
-import { fmt, plain, typed, type Converter, type Example, type Row } from "../ui";
+import { kvaToAmps, pfCorrectionKvar, type Phase } from "../../src/electrical";
+import { fmt, plain, typed } from "../format";
+import type { Converter, Example, Row } from "../ui";
 import { isNum, invalid, phaseName, phaseField, voltsField } from "./shared";
 
 export const pf: Converter = {
   id: "pf",
-  group: "Electrical",
+  topic: "Electrical",
   title: "Power factor correction",
   blurb: "Capacitor kvar needed to raise a load's power factor, and what it does to kVA and current.",
   empty: "Enter the load in kW and its present power factor.",

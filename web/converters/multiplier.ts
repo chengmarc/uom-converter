@@ -1,10 +1,11 @@
-import { discountToMultiplier, multiplierToDiscount } from "../../src/reference";
-import { fmt, money, parseNumber, plain, typed, type Converter, type Example, type Row } from "../ui";
+import { discountToMultiplier, multiplierToDiscount } from "../../src/pricing";
+import { fmt, money, parseNumber, plain, typed } from "../format";
+import type { Converter, Example, Row } from "../ui";
 import { isNum } from "./shared";
 
 export const multiplier: Converter = {
   id: "multiplier",
-  group: "Pricing",
+  topic: "Pricing",
   title: "List × multiplier",
   blurb: 'Net price from list price. Discounts can be chained: "50/10" is 50% off, then 10% off that.',
   empty: "Enter a multiplier or a discount.",
