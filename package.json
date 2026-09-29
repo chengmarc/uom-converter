@@ -1,0 +1,56 @@
+{
+  "name": "uom-converter",
+  "productName": "UOM Converter",
+  "description": "Unit-of-measure conversions for the electrical industry.",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "dev": "vite web",
+    "build": "vite build web --outDir ../dist --emptyOutDir --base ./",
+    "preview": "vite preview web --outDir ../dist",
+    "test": "vitest run",
+    "typecheck": "tsc",
+    "app": "npm run build && electron .",
+    "app:dev": "electron . --dev",
+    "dist:win": "npm run build && electron-builder --win"
+  },
+  "devDependencies": {
+    "electron": "^44.4.5",
+    "electron-builder": "^26.15.3",
+    "typescript": "^5.6.0",
+    "vite": "^7.3.0",
+    "vitest": "^3.2.0"
+  },
+  "build": {
+    "appId": "com.uomconverter.app",
+    "productName": "UOM Converter",
+    "files": [
+      "dist/**",
+      "electron/**",
+      "package.json"
+    ],
+    "directories": {
+      "output": "release"
+    },
+    "electronDist": "node_modules/electron/dist",
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "electron/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "shortcutName": "UOM Converter",
+      "artifactName": "UOM-Converter-Setup-${version}.exe"
+    },
+    "portable": {
+      "artifactName": "UOM-Converter-${version}-portable.exe"
+    }
+  }
+}
