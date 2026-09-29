@@ -2,13 +2,56 @@
 // (dist/), served from a private app:// scheme so it gets a real origin: browser storage and
 // clipboard behave exactly as on the web, and nothing can load from outside the app.
 
-const { app, BrowserWindow, Menu, nativeTheme, net, protocol, shell } = require("electron");
+const { app, BrowserWindow, Menu, nativeTheme, net, protocol, screen, shell } = require("electron");
+const fs = require("node:fs");
+const os = require("node:os");
 const path = require("node:path");
 const { pathToFileURL } = require("node:url");
 
 const DIST = path.join(__dirname, "..", "..", "dist");
 const DEV_URL = "http://localhost:5173";
 const isDev = process.argv.includes("--dev");
+
+/**
+ * The page's frame colours (--chrome and --text in style.css, light and dark), for the title bar
+ * buttons Windows draws and for the window behind the page. theme.test.ts checks they match.
+ */
+const FRAME = {
+  light: { chrome: "#ecebe6", text: "#1c1b19" },
+  dark: { chrome: "#1b1a18", text: "#edebe6" },
+};
+const frame = () => (nativeTheme.shouldUseDarkColors ? FRAME.dark : FRAME.light);
+const TITLE_BAR_HEIGHT = 40;
+
+// Windows 11 22H2 (build 22621) and later draw Mica behind the page's transparent frame; older
+// Windows gets the solid frame colour instead.
+const MICA = process.platform === "win32" && Number(os.release().split(".")[2]) >= 22621;
+const titleBarOverlay = () => ({ color: MICA ? "#00000000" : frame().chrome, symbolColor: frame().text, height: TITLE_BAR_HEIGHT });
+
+// ---------- Window size and position, kept between runs ----------
+
+const stateFile = () => path.join(app.getPath("userData"), "window-state.json");
+
+function loadWindowState() {
+  try {
+    const { bounds, maximized } = JSON.parse(fs.readFileSync(stateFile(), "utf8"));
+    // A position on a screen that's since been unplugged would open the window out of sight.
+    const onScreen = screen.getAllDisplays().some(({ workArea: a }) =>
+      bounds.x < a.x + a.width && bounds.x + bounds.width > a.x && bounds.y < a.y + a.height && bounds.y + bounds.height > a.y,
+    );
+    return { bounds: onScreen ? bounds : { width: bounds.width, height: bounds.height }, maximized };
+  } catch {
+    return undefined; // First run, or an unreadable file: use the defaults.
+  }
+}
+
+function saveWindowState(win) {
+  try {
+    fs.writeFileSync(stateFile(), JSON.stringify({ bounds: win.getNormalBounds(), maximized: win.isMaximized() }));
+  } catch {
+    // Not worth failing a quit over.
+  }
+}
 
 protocol.registerSchemesAsPrivileged([
   { scheme: "app", privileges: { standard: true, secure: true, supportFetchAPI: true } },
@@ -25,16 +68,22 @@ function serveApp() {
 }
 
 function createWindow() {
+  const state = loadWindowState();
   const win = new BrowserWindow({
     width: 1200,
     height: 860,
+    ...state?.bounds,
     minWidth: 420,
     minHeight: 560,
     title: "UOM Converter",
     icon: path.join(__dirname, "icon.png"),
     show: false,
-    // Matches the page background, so there's no white flash while it loads.
-    backgroundColor: nativeTheme.shouldUseDarkColors ? "#141412" : "#f6f5f2",
+    // The page draws its own title bar; Windows keeps the minimize / maximize / close buttons.
+    titleBarStyle: "hidden",
+    titleBarOverlay: titleBarOverlay(),
+    backgroundMaterial: MICA ? "mica" : undefined,
+    // Behind the page's transparent frame, so there's no white flash while it loads.
+    backgroundColor: MICA ? "#00000000" : frame().chrome,
     autoHideMenuBar: true,
     webPreferences: {
       contextIsolation: true,
@@ -44,7 +93,36 @@ function createWindow() {
     },
   });
 
+  if (state?.maximized) win.maximize();
   win.once("ready-to-show", () => win.show());
+  win.on("close", () => saveWindowState(win));
+
+  const followTheme = () => {
+    win.setTitleBarOverlay(titleBarOverlay());
+    if (!MICA) win.setBackgroundColor(frame().chrome);
+  };
+  nativeTheme.on("updated", followTheme);
+  win.on("closed", () => nativeTheme.off("updated", followTheme));
+
+  // Right-click: the usual edit menu in text boxes, Copy on selected text.
+  win.webContents.on("context-menu", (_event, p) => {
+    const f = p.editFlags;
+    const items = p.isEditable
+      ? [
+          { role: "undo", enabled: f.canUndo },
+          { role: "redo", enabled: f.canRedo },
+          { type: "separator" },
+          { role: "cut", enabled: f.canCut },
+          { role: "copy", enabled: f.canCopy },
+          { role: "paste", enabled: f.canPaste },
+          { type: "separator" },
+          { role: "selectAll", enabled: f.canSelectAll },
+        ]
+      : p.selectionText.trim()
+        ? [{ role: "copy" }]
+        : [];
+    if (items.length) Menu.buildFromTemplate(items).popup({ window: win });
+  });
 
   // Only the app itself opens inside the window; any web link goes to the default browser.
   const own = (url) => url.startsWith("app://") || (isDev && url.startsWith(DEV_URL));

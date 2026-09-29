@@ -21,6 +21,13 @@ Links open a specific view: `?for=engineer&region=eu#vdrop`.
 The same page, wrapped in Electron (`src/electron/main.cjs`). It is served from a private `app://`
 scheme, with no Node access in the page, a sandboxed renderer and a content security policy.
 
+It behaves like a Windows app rather than a browser tab: the page's header is the title bar
+(Windows still draws minimize / maximize / close), the frame shows Mica on Windows 11 22H2 and
+later, right-click gives the usual edit menu, and the window reopens where you left it. The page
+switches to this look itself when Electron draws the window controls over it (`.desktop` in
+`style.css`). On both the web and the desktop, Ctrl+K finds a converter by name or description,
+and the arrow keys move through the sidebar.
+
 ```
 npm run app        # build the page and open it in the desktop shell
 npm run app:dev    # desktop shell on the live dev server (run `npm run dev` first)
