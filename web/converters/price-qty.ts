@@ -1,7 +1,7 @@
 import { unitPrice } from "../../src/pricing";
 import { fmt, money, plain } from "../format";
 import type { Converter, Example, Row } from "../ui";
-import { isNum, invalid } from "./shared";
+import { isNum, invalid } from "./checks";
 
 export const priceQty: Converter = {
   id: "price-qty",

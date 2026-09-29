@@ -1,8 +1,8 @@
 import { unitsToOrder } from "../../src/pricing";
 import { fmt, plain } from "../format";
-import type { Converter, Values } from "../ui";
+import { byRegion, type Converter, type RegionExamples, type Values } from "../ui";
 import { packs as packsVisual } from "../visuals";
-import { invalid, byRegion, type RegionExamples } from "./shared";
+import { invalid } from "./checks";
 
 const REEL_SUGGESTIONS = { ft: ["100", "250", "500", "1000", "2500", "5000"], m: ["75", "150", "300", "500", "1000"] };
 const reelUnit = (v: Values) => v.str("unit") as "ft" | "m";

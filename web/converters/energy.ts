@@ -2,7 +2,7 @@ import { energyUse } from "../../src/electrical";
 import { regionInfo } from "../regions";
 import { fmt, money, plain } from "../format";
 import type { Converter, Example, Row } from "../ui";
-import { isNum, invalid } from "./shared";
+import { isNum, invalid } from "./checks";
 
 export const energy: Converter = {
   id: "energy",

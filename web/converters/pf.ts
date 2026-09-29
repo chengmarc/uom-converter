@@ -1,7 +1,8 @@
 import { kvaToAmps, pfCorrectionKvar, type Phase } from "../../src/electrical";
 import { fmt, plain, typed } from "../format";
 import type { Converter, Example, Row } from "../ui";
-import { isNum, invalid, phaseName, phaseField, voltsField } from "./shared";
+import { isNum, invalid } from "./checks";
+import { phaseName, phaseField, voltsField } from "./electrical-fields";
 
 export const pf: Converter = {
   id: "pf",

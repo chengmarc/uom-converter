@@ -1,7 +1,7 @@
 import { makePackGtin14, parseGtin } from "../../src/gtin";
 import { fmt } from "../format";
 import type { Converter, Example, Row } from "../ui";
-import { isNum, invalid } from "./shared";
+import { isNum, invalid } from "./checks";
 
 export const packaging: Converter = {
   id: "packaging",

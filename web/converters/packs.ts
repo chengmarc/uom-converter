@@ -2,7 +2,7 @@ import { unitsToOrder } from "../../src/pricing";
 import { fmt, money, plain, typed } from "../format";
 import type { Converter, Example, Row } from "../ui";
 import { packs as packsVisual } from "../visuals";
-import { invalid } from "./shared";
+import { invalid } from "./checks";
 
 export const packs: Converter = {
   id: "packs",

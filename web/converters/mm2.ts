@@ -2,7 +2,7 @@ import { METRIC_SIZES_MM2, metricToNorthAmerican, mm2ToKcmil, type Metal } from 
 import { fmt, plain, typed } from "../format";
 import type { Converter } from "../ui";
 import { crossSections } from "../visuals";
-import { info, metalField, weightRows, WIRE_FORMULA } from "./shared";
+import { info, metalField, weightRows, WIRE_FORMULA } from "./wire";
 
 export const mm2: Converter = {
   id: "mm2",

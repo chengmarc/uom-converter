@@ -2,7 +2,7 @@ import { suspectUomMismatch } from "../../src/pricing";
 import { fmt, money, plain, typed } from "../format";
 import type { Converter, Example, Status } from "../ui";
 import { priceGap } from "../visuals";
-import { invalid } from "./shared";
+import { invalid } from "./checks";
 
 const MIXUP_MEANING: Record<number, string> = {
   10: "a per-10 or pack-of-10 price",

@@ -1,7 +1,8 @@
 import { transformerFaultAmps, type Phase } from "../../src/electrical";
 import { fmt, plain, typed } from "../format";
-import type { Converter } from "../ui";
-import { isNum, invalid, byRegion, phaseName, phaseField, voltsField, type RegionExamples } from "./shared";
+import { byRegion, type Converter, type RegionExamples } from "../ui";
+import { isNum, invalid } from "./checks";
+import { phaseName, phaseField, voltsField } from "./electrical-fields";
 
 export const fault: Converter = {
   id: "fault",

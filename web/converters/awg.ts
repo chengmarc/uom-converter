@@ -2,7 +2,7 @@ import { conductorInfo, NA_BUILDING_SIZES, type Metal } from "../../src/conducto
 import { fmt, plain } from "../format";
 import type { Converter } from "../ui";
 import { crossSections } from "../visuals";
-import { metalField, weightRows, WIRE_FORMULA } from "./shared";
+import { metalField, weightRows, WIRE_FORMULA } from "./wire";
 
 export const awg: Converter = {
   id: "awg",

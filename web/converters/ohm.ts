@@ -1,7 +1,6 @@
 import { ohmsLaw } from "../../src/electrical";
 import { fmt, plain } from "../format";
-import type { Converter } from "../ui";
-import { byRegion, type RegionExamples } from "./shared";
+import { byRegion, type Converter, type RegionExamples } from "../ui";
 
 const OHM_FIELDS = [
   { id: "volts", label: "Volts", unit: "V", digits: 3 },

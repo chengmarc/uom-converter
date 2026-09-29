@@ -1,8 +1,7 @@
 import { lineToLine, lineToNeutral, wyeSystem } from "../../src/electrical";
 import { regionInfo } from "../regions";
 import { fmt, plain } from "../format";
-import type { Converter } from "../ui";
-import { byRegion, type RegionExamples } from "./shared";
+import { byRegion, type Converter, type RegionExamples } from "../ui";
 
 export const volts: Converter = {
   id: "volts",

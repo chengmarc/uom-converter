@@ -1,7 +1,7 @@
 import { discountToMultiplier, multiplierToDiscount } from "../../src/pricing";
 import { fmt, money, parseNumber, plain, typed } from "../format";
 import type { Converter, Example, Row } from "../ui";
-import { isNum } from "./shared";
+import { isNum } from "./checks";
 
 export const multiplier: Converter = {
   id: "multiplier",

@@ -1,8 +1,8 @@
 import { motorSlip, polesForRpm, syncSpeedRpm } from "../../src/electrical";
 import { regionInfo } from "../regions";
 import { fmt, plain } from "../format";
-import type { Converter, Row } from "../ui";
-import { isNum, invalid, byRegion, type RegionExamples } from "./shared";
+import { byRegion, type Converter, type RegionExamples, type Row } from "../ui";
+import { isNum, invalid } from "./checks";
 
 export const motor: Converter = {
   id: "motor",

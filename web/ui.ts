@@ -63,6 +63,18 @@ export interface Example {
   set: Record<string, string>;
 }
 
+/**
+ * Examples that differ by region; regions left out use the US ones. Built when a converter
+ * renders, so numbers in labels use that region's format.
+ */
+export type RegionExamples = Partial<Record<Region, Example[]>> & { us: Example[] };
+export const byRegion =
+  (ex: () => RegionExamples) =>
+  (v: Values): Example[] => {
+    const all = ex();
+    return all[v.region] ?? all.us;
+  };
+
 /** The sidebar sections. Each has an icon in icons.ts. */
 export type Topic = "Pricing" | "Wire & conduit" | "Electrical" | "Units" | "Product data";
 

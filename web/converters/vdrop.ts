@@ -3,9 +3,11 @@ import type { Phase } from "../../src/electrical";
 import type { Region } from "../../src/region";
 import { ftToM } from "../../src/units";
 import { fmt, parseNumber, plain, typed } from "../format";
-import type { Converter, Status, Values } from "../ui";
+import { byRegion, type Converter, type RegionExamples, type Status, type Values } from "../ui";
 import { gauge } from "../visuals";
-import { isNum, invalid, byRegion, phaseName, info, phaseField, metalField, voltsField, type RegionExamples } from "./shared";
+import { isNum, invalid } from "./checks";
+import { phaseName, phaseField, voltsField } from "./electrical-fields";
+import { info, metalField } from "./wire";
 
 const VDROP_NOTE: Record<Region, string> = {
   us: "An estimate from DC resistance that ignores reactance, so it reads a little low for large conductors. NEC informational notes suggest at most 3% for a branch circuit or feeder and 5% overall.",
