@@ -3,12 +3,15 @@ import { CONDUIT_TRADE_SIZES, conduitSize, KNOCKOUT_PUNCH_IN } from "./conduit";
 
 describe("conduit trade sizes", () => {
   it("converts both ways, however it's written", () => {
-    for (const s of ['1-1/4"', "1 1/4", "1-1/4 in", "1.25", "35", "M35", "35 mm"]) {
-      expect(conduitSize(s), s).toEqual({ inch: "1-1/4", metric: 35 });
+    for (const s of ['1-1/4"', "1 1/4", "1-1/4 in", "1.25"]) {
+      expect(conduitSize(s), s).toEqual({ inch: "1-1/4", metric: 35, typed: "inch" });
     }
-    expect(conduitSize("3/4")).toEqual({ inch: "3/4", metric: 21 });
-    expect(conduitSize("1")).toEqual({ inch: "1", metric: 27 });
-    expect(conduitSize("4")).toEqual({ inch: "4", metric: 103 });
+    for (const s of ["35", "M35", "35 mm"]) {
+      expect(conduitSize(s), s).toEqual({ inch: "1-1/4", metric: 35, typed: "metric" });
+    }
+    expect(conduitSize("3/4")).toMatchObject({ inch: "3/4", metric: 21 });
+    expect(conduitSize("1")).toMatchObject({ inch: "1", metric: 27, typed: "inch" });
+    expect(conduitSize("4")).toMatchObject({ inch: "4", metric: 103 });
   });
 
   it("rejects non-standard sizes", () => {

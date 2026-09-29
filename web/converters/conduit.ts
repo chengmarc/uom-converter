@@ -29,7 +29,7 @@ export const conduit: Converter = {
     if ("error" in c) return { error: c.error + ".", fields: ["size"] };
     const ko = KNOCKOUT_PUNCH_IN[c.inch];
     // Answer in the system the user didn't type.
-    const typedMetric = /^m?\s*\d+(\s*mm)?$/i.test(raw.trim()) && Number(raw.replace(/\D/g, "")) >= 12;
+    const typedMetric = c.typed === "metric";
     const inchRow: Row = { label: "Inch trade size", value: `${c.inch}"`, copy: c.inch };
     const metricRow: Row = { label: "Metric designator", value: String(c.metric) };
     return {

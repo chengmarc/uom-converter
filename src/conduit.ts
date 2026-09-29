@@ -24,20 +24,20 @@ export const CONDUIT_TRADE_SIZES: { inch: string; metric: number }[] = [
 /**
  * Look up a conduit size given either form: '1-1/4"', "1 1/4 in", "1.25",
  * "35", "M35", "35 mm". Bare numbers from 12 up are read as metric designators
- * (no conduit is 12 inches), smaller ones as inches.
+ * (no conduit is 12 inches), smaller ones as inches. `typed` says which system the input was in.
  */
-export function conduitSize(raw: string): { inch: string; metric: number } | { error: string } {
+export function conduitSize(raw: string): { inch: string; metric: number; typed: "inch" | "metric" } | { error: string } {
   let s = raw.trim().toLowerCase().replace(/(["″]|\s*(in|inch|inches)\.?)$/, "").trim();
   const metricMarked = /^m\s*\d+$/.test(s) || /\d\s*mm$/.test(s);
   s = s.replace(/^m\s*/, "").replace(/\s*mm$/, "").trim();
 
   if (metricMarked || (/^\d+$/.test(s) && Number(s) >= 12)) {
     const hit = CONDUIT_TRADE_SIZES.find((c) => c.metric === Number(s));
-    return hit ?? { error: `No conduit trade size with metric designator ${s}` };
+    return hit ? { ...hit, typed: "metric" } : { error: `No conduit trade size with metric designator ${s}` };
   }
   const v = parseInches(s);
   const hit = v === undefined ? undefined : CONDUIT_TRADE_SIZES.find((c) => Math.abs(parseInches(c.inch)! - v) < 1e-9);
-  return hit ?? { error: `Not a standard conduit trade size: ${raw}` };
+  return hit ? { ...hit, typed: "inch" } : { error: `Not a standard conduit trade size: ${raw}` };
 }
 
 // ---------- Knockouts ----------
