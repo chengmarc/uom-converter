@@ -81,22 +81,28 @@ function metricNeighbours(areaMm2: number) {
   return { nearestMetricMm2, nextLargerMetricMm2 };
 }
 
+export interface NaSize {
+  /** "12 AWG", "1/0 AWG", "250 kcmil". */
+  label: string;
+  areaMm2: number;
+}
+
 /** Standard AWG/kcmil sizes used in building wire, smallest to largest. */
-export const NA_BUILDING_SIZES = [
+export const NA_BUILDING_SIZES: NaSize[] = [
   "18", "16", "14", "12", "10", "8", "6", "4", "3", "2", "1", "1/0", "2/0", "3/0", "4/0",
   "250 kcmil", "300 kcmil", "350 kcmil", "400 kcmil", "500 kcmil", "600 kcmil", "750 kcmil", "1000 kcmil",
-];
+].map((s) => {
+  const c = conductorInfo(s);
+  if ("error" in c) throw new Error(`Bad building-wire size ${s}`);
+  return { label: c.label, areaMm2: c.areaMm2 };
+});
 
 /** Metric -> North American: nearest size by area, and the smallest size at least as large. */
-export function metricToNorthAmerican(mm2: number): { nearest: string; nextLarger?: string } {
-  const sized = NA_BUILDING_SIZES.map((label) => {
-    const info = conductorInfo(label) as ConductorInfo;
-    return { label: info.label, area: info.areaMm2 };
-  });
-  const nearest = sized.reduce((best, s) =>
-    Math.abs(Math.log(s.area / mm2)) < Math.abs(Math.log(best.area / mm2)) ? s : best,
+export function metricToNorthAmerican(mm2: number): { nearest: NaSize; nextLarger?: NaSize } {
+  const nearest = NA_BUILDING_SIZES.reduce((best, s) =>
+    Math.abs(Math.log(s.areaMm2 / mm2)) < Math.abs(Math.log(best.areaMm2 / mm2)) ? s : best,
   );
-  return { nearest: nearest.label, nextLarger: sized.find((s) => s.area >= mm2 * 0.999)?.label };
+  return { nearest, nextLarger: NA_BUILDING_SIZES.find((s) => s.areaMm2 >= mm2 * 0.999) };
 }
 
 // ---------- Conductor weight ----------

@@ -17,7 +17,7 @@ export const awg: Converter = {
       id: "size",
       label: "Wire size",
       placeholder: "12, 1/0, 250 kcmil",
-      list: NA_BUILDING_SIZES.map((s) => (s.includes("kcmil") ? s : `${s} AWG`)),
+      list: NA_BUILDING_SIZES.map((s) => s.label),
     },
     metalField,
   ],

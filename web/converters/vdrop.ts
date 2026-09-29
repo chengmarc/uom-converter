@@ -7,7 +7,7 @@ import { byRegion, type Converter, type RegionExamples, type Status, type Values
 import { gauge } from "../visuals";
 import { isNum, invalid } from "./checks";
 import { phaseName, phaseField, voltsField } from "./electrical-fields";
-import { info, metalField } from "./wire";
+import { metalField } from "./wire";
 
 const VDROP_NOTE: Record<Region, string> = {
   us: "An estimate from DC resistance that ignores reactance, so it reads a little low for large conductors. NEC informational notes suggest at most 3% for a branch circuit or feeder and 5% overall.",
@@ -46,7 +46,7 @@ export const vdrop: Converter = {
       id: "size",
       label: (v) => (sizeSystem(v) === "mm2" ? "Wire size (mm²)" : "Wire size (AWG / kcmil)"),
       placeholder: (v) => (sizeSystem(v) === "mm2" ? typed(2.5) : "12, 1/0, 250 kcmil"),
-      list: (v) => (sizeSystem(v) === "mm2" ? METRIC_SIZES_MM2.map((m) => typed(m)) : NA_BUILDING_SIZES.map((s) => (s.includes("kcmil") ? s : `${s} AWG`))),
+      list: (v) => (sizeSystem(v) === "mm2" ? METRIC_SIZES_MM2.map((m) => typed(m)) : NA_BUILDING_SIZES.map((s) => s.label)),
     },
     { kind: "number", id: "len", label: "One-way length of the run", suffix: lengthUnit, placeholder: "100" },
     { kind: "number", id: "amps", label: "Load current", suffix: "A", placeholder: "16" },
@@ -116,12 +116,12 @@ export const vdrop: Converter = {
     const ohmsKm = conductorOhmsPerKm(areaMm2, metal);
     const fit =
       sys === "na"
-        ? smallestSizeForDrop(NA_BUILDING_SIZES, (s) => info(s).areaMm2, target!, run)
+        ? smallestSizeForDrop(NA_BUILDING_SIZES, (s) => s.areaMm2, target!, run)
         : smallestSizeForDrop(METRIC_SIZES_MM2, (m) => m, target!, run);
     const fitLabel =
       fit === undefined
         ? sys === "na" ? "Over 1000 kcmil" : "Over 1000 mm²"
-        : typeof fit === "number" ? `${fmt(fit, 2)} mm²` : info(fit).label;
+        : typeof fit === "number" ? `${fmt(fit, 2)} mm²` : fit.label;
     const limit = Math.max(5, target!);
     const status: Status = d.percent <= target! ? "good" : d.percent <= limit ? "warn" : "bad";
     const verdict = status === "good" ? `within your ${fmt(target!, 2)}% target` : status === "warn" ? `over your ${fmt(target!, 2)}% target` : `over ${fmt(limit, 2)}%`;

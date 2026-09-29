@@ -2,7 +2,7 @@ import { METRIC_SIZES_MM2, metricToNorthAmerican, mm2ToKcmil, type Metal } from 
 import { fmt, plain, typed } from "../format";
 import type { Converter } from "../ui";
 import { crossSections } from "../visuals";
-import { info, metalField, weightRows, WIRE_FORMULA } from "./wire";
+import { metalField, weightRows, WIRE_FORMULA } from "./wire";
 
 export const mm2: Converter = {
   id: "mm2",
@@ -21,20 +21,19 @@ export const mm2: Converter = {
     if (Number.isNaN(a) || a === 0) return { error: "Enter an area in mm², like 2.5 or 120.", fields: ["area"] };
     const na = metricToNorthAmerican(a);
     const kcmil = mm2ToKcmil(a);
-    const near = info(na.nearest);
-    const next = na.nextLarger ? info(na.nextLarger) : undefined;
+    const next = na.nextLarger;
     return {
       heading: `${fmt(a, 3)} mm² equals`,
       rows: [
-        { label: "Nearest AWG / kcmil size", value: na.nearest },
-        { label: "Smallest size at least as big", value: na.nextLarger ?? "None, over 1000 kcmil", copy: na.nextLarger ?? "", status: na.nextLarger ? undefined : "warn" },
+        { label: "Nearest AWG / kcmil size", value: na.nearest.label },
+        { label: "Smallest size at least as big", value: na.nextLarger?.label ?? "None, over 1000 kcmil", copy: na.nextLarger?.label ?? "", status: na.nextLarger ? undefined : "warn" },
         { label: "Thousand circular mils", value: `${fmt(kcmil, 2)} kcmil`, copy: plain(kcmil, 2) },
         ...weightRows(a, v.str("metal") as Metal),
       ],
       visual: crossSections([
         { label: `${fmt(a, 2)} mm²`, sub: "entered", areaMm2: a, kind: "input" },
-        { label: near.label, sub: `nearest · ${fmt(near.areaMm2, 2)} mm²`, areaMm2: near.areaMm2, kind: "match" },
-        ...(next && next.label !== near.label ? [{ label: next.label, sub: `next larger · ${fmt(next.areaMm2, 2)} mm²`, areaMm2: next.areaMm2, kind: "other" as const }] : []),
+        { label: na.nearest.label, sub: `nearest · ${fmt(na.nearest.areaMm2, 2)} mm²`, areaMm2: na.nearest.areaMm2, kind: "match" },
+        ...(next && next !== na.nearest ? [{ label: next.label, sub: `next larger · ${fmt(next.areaMm2, 2)} mm²`, areaMm2: next.areaMm2, kind: "other" as const }] : []),
       ]),
       formula: WIRE_FORMULA,
     };

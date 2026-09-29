@@ -37,8 +37,8 @@ describe("conductor sizes", () => {
   });
 
   it("goes metric to North American", () => {
-    expect(metricToNorthAmerican(2.5)).toEqual({ nearest: "14 AWG", nextLarger: "12 AWG" });
-    expect(metricToNorthAmerican(120)).toEqual({ nearest: "250 kcmil", nextLarger: "250 kcmil" });
+    expect(metricToNorthAmerican(2.5)).toMatchObject({ nearest: { label: "14 AWG" }, nextLarger: { label: "12 AWG" } });
+    expect(metricToNorthAmerican(120)).toMatchObject({ nearest: { label: "250 kcmil" }, nextLarger: { label: "250 kcmil" } });
   });
 });
 
@@ -73,8 +73,8 @@ describe("conductor resistance and voltage drop", () => {
 
   it("finds the smallest size for a target drop", () => {
     const run = { metal: "Cu" as const, lengthM: 30.48, amps: 16, volts: 120, phase: 1 as const };
-    const size = smallestSizeForDrop(NA_BUILDING_SIZES, (s) => info(s).areaMm2, 3, run);
-    expect(size).toBe("8"); // 10 AWG gives 3.26%, 8 AWG 2.05%
+    const size = smallestSizeForDrop(NA_BUILDING_SIZES, (s) => s.areaMm2, 3, run);
+    expect(size?.label).toBe("8 AWG"); // 10 AWG gives 3.26%, 8 AWG 2.05%
     expect(smallestSizeForDrop(["14"], (s) => info(s).areaMm2, 3, run)).toBeUndefined();
   });
 });

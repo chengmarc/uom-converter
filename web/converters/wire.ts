@@ -1,10 +1,8 @@
 // Conductor metal and weight, for the wire-size converters (awg, mm2, vdrop).
 
-import { conductorInfo, conductorKgPerKm, kgPerKmToLbPerKft, type ConductorInfo, type Metal } from "../../src/conductors";
+import { conductorKgPerKm, kgPerKmToLbPerKft, type Metal } from "../../src/conductors";
 import { fmt, plain } from "../format";
 import type { Row } from "../ui";
-
-export const info = (s: string) => conductorInfo(s) as ConductorInfo;
 
 export const metalField = {
   kind: "choice" as const,
