@@ -6,10 +6,8 @@ import { guessRegion, regionInfo, REGIONS } from "./regions";
 import { setNumberStyle } from "./format";
 import { renderConverter } from "./ui";
 
+// audiences.test.ts checks every id an audience lists exists.
 const byId = new Map(TOOLS.map((t) => [t.id, t]));
-
-// Every id an audience lists must exist, so a rename can't silently drop a tool from a view.
-for (const a of AUDIENCES) for (const id of a.tools) if (!byId.has(id)) throw new Error(`Audience ${a.id}: unknown tool ${id}`);
 
 const EVERYTHING: Audience = { id: "all", label: "Everything", description: "Every converter, grouped by topic.", tools: TOOLS.map((t) => t.id) };
 
