@@ -190,34 +190,3 @@ function addPrefixNotes(r: GtinResult, gtin14: string): void {
     r.notes.push("Issued by GS1 Mexico (prefix reflects the issuing office, not country of origin).");
   }
 }
-
-export interface BulkResult {
-  results: GtinResult[];
-  /** Index into results of the first occurrence, for rows that duplicate an earlier GTIN. */
-  duplicateOf: (number | undefined)[];
-  summary: { total: number; valid: number; invalid: number; warnings: number; duplicates: number };
-}
-
-/** Parse a pasted column of codes. Blank lines are skipped. */
-export function parseGtinList(text: string, opts: GtinOptions = {}): BulkResult {
-  const lines = text.split(/\r?\n/).filter((l) => l.trim() !== "");
-  const results = lines.map((l) => parseGtin(l, opts));
-  const firstSeen = new Map<string, number>();
-  const duplicateOf = results.map((res, i) => {
-    if (!res.gtin14) return undefined;
-    const prev = firstSeen.get(res.gtin14);
-    if (prev === undefined) firstSeen.set(res.gtin14, i);
-    return prev;
-  });
-  return {
-    results,
-    duplicateOf,
-    summary: {
-      total: results.length,
-      valid: results.filter((x) => x.valid).length,
-      invalid: results.filter((x) => !x.valid).length,
-      warnings: results.filter((x) => x.warnings.length > 0).length,
-      duplicates: duplicateOf.filter((d) => d !== undefined).length,
-    },
-  };
-}

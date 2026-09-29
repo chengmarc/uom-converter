@@ -12,21 +12,8 @@ import { M_PER_FT } from "./units";
 export type PriceUom = "E" | "C" | "M";
 export const UOM_FACTOR: Record<PriceUom, number> = { E: 1, C: 100, M: 1000 };
 
-export function parseUom(raw: string): PriceUom | undefined {
-  const s = raw.trim().toUpperCase();
-  if (["E", "EA", "EACH"].includes(s)) return "E";
-  if (["C", "CFT", "/100", "PER 100"].includes(s)) return "C";
-  if (["M", "MFT", "/1000", "PER 1000"].includes(s)) return "M";
-  return undefined;
-}
-
 export function convertPrice(price: number, from: PriceUom, to: PriceUom): number {
   return (price / UOM_FACTOR[from]) * UOM_FACTOR[to];
-}
-
-/** Extended price for a quantity (in each / feet) at a price per UOM. */
-export function extendedPrice(qty: number, price: number, uom: PriceUom): number {
-  return (qty * price) / UOM_FACTOR[uom];
 }
 
 /**
@@ -51,10 +38,6 @@ export const METRES_PER_PRICE_UNIT: Record<LengthPriceUnit, number> = {
   m: 1,
   km: 1000,
 };
-
-export function convertLengthPrice(price: number, from: LengthPriceUnit, to: LengthPriceUnit): number {
-  return (price / METRES_PER_PRICE_UNIT[from]) * METRES_PER_PRICE_UNIT[to];
-}
 
 // ---------- List × multiplier ----------
 

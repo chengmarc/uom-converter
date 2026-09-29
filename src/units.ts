@@ -6,7 +6,6 @@
 export const M_PER_FT = 0.3048;
 export const FT_PER_M = 1 / M_PER_FT;
 export const ftToM = (ft: number) => ft * M_PER_FT;
-export const mToFt = (m: number) => m / M_PER_FT;
 export const MM_PER_IN = 25.4;
 
 // ---------- Other unit factors ----------

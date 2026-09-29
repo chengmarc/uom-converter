@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { checkDigit, expandUpcE, makePackGtin14, parseGtin, parseGtinList } from "./gtin";
+import { checkDigit, expandUpcE, makePackGtin14, parseGtin } from "./gtin";
 
 describe("check digit", () => {
   it("matches published examples", () => {
@@ -103,13 +103,5 @@ describe("case/pack GTIN-14", () => {
 
   it("rejects bad indicators", () => {
     expect(() => makePackGtin14("036000291452", 9)).toThrow();
-  });
-});
-
-describe("bulk", () => {
-  it("summarizes and finds duplicates written different ways", () => {
-    const b = parseGtinList("036000291452\n36000291452\n\n036000291453\n");
-    expect(b.summary).toEqual({ total: 3, valid: 2, invalid: 1, warnings: 1, duplicates: 1 });
-    expect(b.duplicateOf[1]).toBe(0);
   });
 });

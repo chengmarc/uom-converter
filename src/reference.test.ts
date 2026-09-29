@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { conductorInfo, conductorKgPerKm, conductorOhmsPerKm, kcmilToMm2, kgPerKmToLbPerKft, metricToNorthAmerican, NA_BUILDING_SIZES, parseConductor, smallestSizeForDrop, voltageDrop, type ConductorInfo } from "./conductors";
 import { CONDUIT_TRADE_SIZES, conduitSize, KNOCKOUT_PUNCH_IN } from "./conduit";
 import { ampsToKva, energyUse, kvaToAmps, lineToLine, lineToNeutral, motorSlip, ohmsLaw, pfCorrectionKvar, polesForRpm, syncSpeedRpm, transformerFaultAmps, wyeSystem } from "./electrical";
-import { convertLengthPrice, convertPrice, discountToMultiplier, extendedPrice, marginToMarkup, markupToMargin, multiplierToDiscount, parseUom, sellFromCostAtMargin, suspectUomMismatch, unitsToOrder } from "./pricing";
-import { BTUH_PER_W, cToF, fToC, ftToM, LUX_PER_FC, mToFt, NM_PER_LBF_IN, parseInches, toFraction, W_PER_HP } from "./units";
+import { convertPrice, discountToMultiplier, marginToMarkup, markupToMargin, multiplierToDiscount, sellFromCostAtMargin, suspectUomMismatch, unitsToOrder } from "./pricing";
+import { BTUH_PER_W, cToF, fToC, ftToM, LUX_PER_FC, NM_PER_LBF_IN, parseInches, toFraction, W_PER_HP } from "./units";
 
 const info = (s: string) => conductorInfo(s) as ConductorInfo;
 
@@ -63,16 +63,9 @@ describe("conduit trade sizes", () => {
 });
 
 describe("pricing UOM", () => {
-  it("converts and extends", () => {
+  it("converts between E, C and M", () => {
     expect(convertPrice(125, "C", "E")).toBeCloseTo(1.25);
     expect(convertPrice(0.45, "E", "M")).toBeCloseTo(450);
-    expect(extendedPrice(2500, 450, "M")).toBeCloseTo(1125); // 2,500 ft of wire at $450/M
-  });
-
-  it("parses common spellings", () => {
-    expect(parseUom("ea")).toBe("E");
-    expect(parseUom("MFT")).toBe("M");
-    expect(parseUom("box")).toBeUndefined();
   });
 
   it("spots likely UOM mix-ups", () => {
@@ -83,9 +76,8 @@ describe("pricing UOM", () => {
 });
 
 describe("length", () => {
-  it("converts feet and metres", () => {
+  it("converts feet to metres", () => {
     expect(ftToM(1000)).toBeCloseTo(304.8);
-    expect(mToFt(304.8)).toBeCloseTo(1000);
   });
 });
 
@@ -136,16 +128,6 @@ describe("unit factors", () => {
     expect(fToC(167)).toBeCloseTo(75);
     expect(cToF(90)).toBeCloseTo(194);
     expect(fToC(cToF(-40))).toBeCloseTo(-40);
-  });
-});
-
-describe("price per length", () => {
-  it("converts between feet and metric price units", () => {
-    expect(convertLengthPrice(450, "Mft", "ft")).toBeCloseTo(0.45);
-    expect(convertLengthPrice(450, "Mft", "m")).toBeCloseTo(1.4764, 4);
-    expect(convertLengthPrice(1.4764, "m", "Mft")).toBeCloseTo(450, 1);
-    expect(convertLengthPrice(45, "Cft", "Mft")).toBeCloseTo(450);
-    expect(convertLengthPrice(1, "m", "km")).toBeCloseTo(1000);
   });
 });
 
