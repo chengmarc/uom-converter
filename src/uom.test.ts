@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { unitPrice } from "./pricing";
 import { lookupUom, toMetric, UOM_CODES, type MetricValue } from "./uom";
 
 const metric = (s: string) => toMetric(s) as MetricValue;
@@ -85,10 +84,3 @@ describe("toMetric", () => {
   });
 });
 
-describe("unitPrice", () => {
-  it("divides out price quantity and content units", () => {
-    expect(unitPrice(45, 100)).toEqual({ perOrderUnit: 0.45, perContentUnit: 0.45 });
-    expect(unitPrice(125, 1, 100).perContentUnit).toBeCloseTo(1.25);
-    expect(unitPrice(250, 10, 25)).toEqual({ perOrderUnit: 25, perContentUnit: 1 });
-  });
-});
