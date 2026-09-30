@@ -15,4 +15,9 @@ describe("audiences", () => {
     const ids = AUDIENCES.map((a) => a.id);
     expect(new Set(ids).size).toBe(ids.length);
   });
+
+  // Each audience opens on its first converter, so it has to have one.
+  it("each have an everyday converter to open on", () => {
+    for (const a of AUDIENCES) expect(a.tools.length, a.id).toBeGreaterThan(0);
+  });
 });
