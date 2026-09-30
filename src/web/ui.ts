@@ -265,7 +265,7 @@ export function renderConverter(conv: Converter, region: Region): HTMLElement {
 
     if (!out) {
       toTitle.textContent = "Result";
-      toBody.replaceChildren(el("p", "empty", examples.length ? `${conv.empty} Or pick an example above.` : conv.empty));
+      toBody.replaceChildren(el("p", "empty", examples.length ? `${conv.empty} Or pick an example.` : conv.empty));
     } else if ("error" in out) {
       toTitle.textContent = "Result";
       err.textContent = out.error;
@@ -301,7 +301,21 @@ export function renderConverter(conv: Converter, region: Region): HTMLElement {
   panel.addEventListener("input", () => exampleButtons.forEach((b) => b.setAttribute("aria-pressed", "false")));
   panel.addEventListener("input", update);
   panel.addEventListener("change", update);
-  update();
+  // Open on a worked answer rather than an empty form; the first click in a field selects its
+  // value, so typing replaces the example.
+  panel.querySelectorAll<HTMLInputElement>("input[data-field]").forEach((input) => {
+    let selecting = false;
+    input.addEventListener("focus", () => {
+      input.select();
+      selecting = true;
+    });
+    input.addEventListener("mouseup", (e) => {
+      if (selecting) e.preventDefault();
+      selecting = false;
+    });
+  });
+  if (exampleButtons.length) exampleButtons[0].click();
+  else update();
   return panel;
 }
 
