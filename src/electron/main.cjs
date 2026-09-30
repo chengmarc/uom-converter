@@ -30,6 +30,9 @@ const titleBarOverlay = () => ({ color: MICA ? "#00000000" : frame().chrome, sym
 
 // ---------- Window size and position, kept between runs ----------
 
+/** The smallest window the layout is designed for (a 1366 × 768 laptop screen). */
+const MIN_SIZE = { width: 1366, height: 768 };
+
 const stateFile = () => path.join(app.getPath("userData"), "window-state.json");
 
 function loadWindowState() {
@@ -69,12 +72,18 @@ function serveApp() {
 
 function createWindow() {
   const state = loadWindowState();
+  // Never larger than the screen it opens on: after the taskbar, or at 125-150% scaling, many
+  // laptops have less room than MIN_SIZE, and a window that can't fit loses its title bar.
+  const { workArea } = state?.bounds.x === undefined ? screen.getPrimaryDisplay() : screen.getDisplayMatching(state.bounds);
+  const minWidth = Math.min(MIN_SIZE.width, workArea.width);
+  const minHeight = Math.min(MIN_SIZE.height, workArea.height);
   const win = new BrowserWindow({
-    width: 1200,
-    height: 860,
     ...state?.bounds,
-    minWidth: 420,
-    minHeight: 560,
+    // A saved size from before the minimum grows to meet it.
+    width: Math.max(minWidth, state?.bounds.width ?? MIN_SIZE.width),
+    height: Math.max(minHeight, state?.bounds.height ?? Math.min(860, workArea.height)),
+    minWidth,
+    minHeight,
     title: "UOM Converter",
     icon: path.join(__dirname, "icon.png"),
     show: false,
