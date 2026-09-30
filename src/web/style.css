@@ -15,6 +15,8 @@
   --warn-soft: #fdf3d8;
   --bad: #b3261e;
   --bad-soft: #fbe9e7;
+  /* Made for screens, with even-width digits for result columns. */
+  --font: "Inter Variable", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
   color-scheme: light;
 }
 
@@ -46,7 +48,7 @@ body {
   margin: 0;
   background: var(--chrome);
   color: var(--text);
-  font: 15px/1.5 "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+  font: 16px/1.5 var(--font);
 }
 
 /* ---------- App frame ---------- */
@@ -63,24 +65,35 @@ body {
 .brand img { display: block; }
 
 .find {
+  grid-area: find;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  width: min(20rem, 100%);
-  height: 32px;
-  margin: 0;
+  gap: 0.5rem;
+  height: 36px;
+  margin: 12px 10px 4px 12px;
   padding: 0 6px 0 10px;
   border: 1px solid var(--line);
   border-radius: 6px;
   background: var(--surface);
-  color: var(--muted);
-  font: inherit;
-  font-size: 0.875rem;
-  cursor: pointer;
 }
-.find:hover { border-color: var(--accent); }
-.find:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.find:hover { border-color: var(--muted); }
+.find:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+/* Named for screen readers; the placeholder says it visually. */
+.find .label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.find input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.95rem;
+}
+.find input::placeholder { color: var(--muted); }
+/* The shortcut hint steps aside once you're in the box. */
+.find:focus-within kbd { display: none; }
 kbd {
   padding: 1px 5px;
   border: 1px solid var(--line);
@@ -102,12 +115,19 @@ kbd {
 }
 /* Named for screen readers; the tabs and the description line say it visually. */
 .audience > .label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-/* On wide windows the description heads the sidebar instead, so nothing sits between the tabs and the panels. */
+/* On wide windows each tab's tooltip gives its description, so nothing sits between the tabs and the panels. */
 .audience-desc { display: none; margin: 0; font-size: 0.875rem; color: var(--muted); }
 
-.layout { display: grid; grid-template-columns: 15rem minmax(0, 1fr); }
+.layout {
+  display: grid;
+  grid-template-columns: 15rem minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-areas: "find content" "nav content";
+}
+#sidebar { grid-area: nav; }
+#content { grid-area: content; }
 
-#sidebar { display: grid; align-content: start; gap: 1rem; padding: 8px 8px 16px 12px; }
+#sidebar { display: grid; align-content: start; gap: 1.25rem; padding: 8px 10px 16px 12px; }
 .nav-group { display: grid; gap: 1px; }
 .nav-group h2 {
   margin: 0 0 0.2rem;
@@ -119,27 +139,37 @@ kbd {
   color: var(--muted);
 }
 .nav-group a {
-  padding: 0.3rem 0.6rem;
+  position: relative;
+  padding: 0.4rem 0.75rem;
   border-radius: 5px;
   color: var(--text);
   text-decoration: none;
   font-size: 0.95rem;
 }
 .nav-group a:hover { background: var(--hover); }
-.nav-group a[aria-current] { background: var(--surface); color: var(--accent); font-weight: 600; box-shadow: 0 1px 2px rgb(0 0 0 / 0.08); }
+.nav-group a[aria-current] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.nav-group a[aria-current]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 25%;
+  bottom: 25%;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+}
 .nav-group a:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-.sidebar-desc { margin: 0 0.6rem; font-size: 0.875rem; color: var(--muted); }
 .sidebar-hint { margin: 0.5rem 0.6rem 0; font-size: 0.8125rem; color: var(--muted); }
 
 #content {
   min-width: 0;
-  padding: 24px 32px 48px;
+  padding: 28px 40px 56px;
   background: var(--bg);
   border: 1px solid var(--line);
   border-width: 1px 0 0 1px;
   border-top-left-radius: 8px;
 }
-.converter { max-width: 60rem; }
+.converter { max-width: 58rem; }
 
 /* Wide windows: fixed frame, and the sidebar and converter scroll on their own. */
 @media (min-width: 52.01rem) {
@@ -151,8 +181,8 @@ kbd {
 .picker { display: none; }
 
 @media (max-width: 52rem) {
-  .find { order: 3; width: 100%; }
-  .layout { grid-template-columns: 1fr; }
+  .find { margin: 0 12px 10px; }
+  .layout { grid-template-columns: 1fr; grid-template-rows: auto auto; grid-template-areas: "find" "content"; }
   #sidebar { display: none; }
   #content { padding: 1rem; border-radius: 0; border-width: 1px 0 0; }
   .audience-desc { display: block; flex-basis: 100%; }
@@ -169,40 +199,10 @@ kbd {
   }
 }
 
-/* Quick switcher (Ctrl+K) */
-#switcher {
-  width: min(34rem, calc(100vw - 2rem));
-  margin: 12vh auto auto;
-  padding: 0;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--surface);
-  color: var(--text);
-  box-shadow: 0 16px 48px rgb(0 0 0 / 0.25);
-}
-#switcher::backdrop { background: rgb(0 0 0 / 0.2); }
-#switcher-input {
-  width: 100%;
-  height: 44px;
-  padding: 0 14px;
-  border: 0;
-  border-bottom: 1px solid var(--line);
-  outline: 0;
-  background: transparent;
-  color: var(--text);
-  font: inherit;
-  font-size: 1rem;
-}
-#switcher-list { list-style: none; margin: 0; padding: 6px; max-height: 50vh; overflow-y: auto; }
-#switcher-list li { display: flex; justify-content: space-between; gap: 1rem; padding: 0.45rem 0.6rem; border-radius: 6px; cursor: pointer; }
-#switcher-list li small { color: var(--muted); white-space: nowrap; }
-#switcher-list li[aria-selected="true"] { background: var(--accent-soft); color: var(--accent); }
-#switcher-list .none { color: var(--muted); cursor: default; }
-
 /* ---------- Converter ---------- */
 
-.converter h2 { margin: 0; font-size: 1.3rem; font-weight: 600; }
-.blurb { margin: 0.2rem 0 1rem; color: var(--muted); max-width: 44rem; }
+.converter h2 { margin: 0; font-size: 1.6rem; font-weight: 600; line-height: 1.25; }
+.blurb { margin: 0.35rem 0 1.25rem; color: var(--muted); max-width: 44rem; }
 
 .flow {
   display: grid;
@@ -223,10 +223,10 @@ kbd {
 
 .box {
   display: grid;
-  gap: 0.85rem;
-  padding: 1rem;
+  gap: 1.1rem;
+  padding: 1.25rem;
   grid-template-columns: minmax(0, 1fr);
-  border-radius: 8px;
+  border-radius: 10px;
   min-width: 0;
   align-content: start;
 }
@@ -246,21 +246,21 @@ kbd {
 fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
 .field { display: grid; gap: 0.35rem; }
 legend.label { margin-bottom: 0.35rem; }
-.label { font-size: 0.9rem; font-weight: 600; color: var(--text); padding: 0; }
+.label { font-size: 0.95rem; font-weight: 600; color: var(--text); padding: 0; }
 
 .text-input {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  height: 2.5rem;
-  padding: 0 0.75rem;
+  height: 2.75rem;
+  padding: 0 0.9rem;
   background: var(--bg);
   border: 1px solid var(--line);
   border-radius: 6px;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
 }
 .text-input:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
-.affix { color: var(--muted); font-size: 0.9rem; white-space: nowrap; }
+.affix { color: var(--muted); font-size: 0.95rem; white-space: nowrap; }
 .text-input input {
   flex: 1;
   width: 0;
@@ -289,11 +289,11 @@ input[aria-invalid="true"] { color: var(--danger); }
 .segmented input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
 .segmented span {
   display: block;
-  padding: 0.35rem 0.4rem;
+  padding: 0.5rem 0.4rem;
   border-radius: 5px;
   text-align: center;
   color: var(--muted);
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -322,7 +322,7 @@ input[aria-invalid="true"] { color: var(--danger); }
   align-items: center;
   column-gap: 1rem;
   width: 100%;
-  padding: 0.5rem 0.8rem;
+  padding: 0.7rem 0.9rem;
   background: var(--surface);
   border: 1px solid transparent;
   border-radius: 6px;
@@ -334,11 +334,11 @@ input[aria-invalid="true"] { color: var(--danger); }
 .row:hover { border-color: var(--accent); }
 .row:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .row-label { grid-area: label; display: grid; font-size: 0.95rem; }
-.row-label small { color: var(--muted); font-size: 0.85rem; }
+.row-label small { color: var(--muted); font-size: 0.875rem; }
 .row-value {
   grid-area: value;
   justify-self: end;
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   font-weight: 650;
   font-variant-numeric: tabular-nums;
   text-align: right;
@@ -347,7 +347,7 @@ input[aria-invalid="true"] { color: var(--danger); }
 .row:hover .row-copy, .row:focus-visible .row-copy, .row.copied .row-copy { opacity: 1; }
 .row.copied .row-copy { color: var(--accent); }
 
-.note { margin: 1rem 0 0; font-size: 0.9rem; color: var(--muted); max-width: 44rem; }
+.note { margin: 1.25rem 0 0; font-size: 0.95rem; color: var(--muted); max-width: 44rem; }
 
 /* Conduit table */
 .table-wrap { margin-top: 1.25rem; }
@@ -382,18 +382,30 @@ tr.hit td { background: var(--accent-soft); color: var(--accent); font-weight: 6
   cursor: pointer;
 }
 .tabs button:hover, .seg button:hover { background: var(--hover); }
-.tabs button[aria-pressed="true"], .seg button[aria-pressed="true"] {
+.tabs button[aria-pressed="true"] {
+  position: relative;
   background: var(--surface);
   border-color: var(--line);
   font-weight: 600;
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.08);
 }
+.tabs button[aria-pressed="true"]::after {
+  content: "";
+  position: absolute;
+  left: 30%;
+  right: 30%;
+  bottom: -1px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); font-weight: 600; }
 .tabs button:focus-visible, .seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .tabs .icon { color: var(--accent); }
 .seg { display: flex; gap: 2px; padding: 2px; border: 1px solid var(--line); border-radius: 8px; }
-.seg button { height: 26px; }
-/* The audience selector is the main choice on the page, so it reads larger than the other controls. */
-.tabs button { height: 39px; gap: 0.5rem; padding: 0 0.75rem; font-size: 1.17rem; }
+/* Same outer height as the role tabs beside it. */
+.seg button { height: 30px; padding: 0 0.8rem; }
+.tabs button { height: 36px; gap: 0.5rem; padding: 0 0.85rem; font-size: 1rem; }
 
 /* Code list table */
 table.wide { max-width: none; }
@@ -412,10 +424,10 @@ tr.cat td {
 .nav-group h2 .icon { width: 1.3rem; height: 1.3rem; color: var(--accent); }
 
 /* Examples */
-.examples { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; margin: -0.25rem 0 1rem; }
+.examples { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin: -0.25rem 0 1.25rem; }
 .examples-label { font-size: 0.9rem; font-weight: 600; color: var(--accent); margin-right: 0.25rem; }
 .example {
-  padding: 0.3rem 0.75rem;
+  padding: 0.35rem 0.8rem;
   border: 1px dashed var(--accent);
   border-radius: 6px;
   background: var(--surface);
@@ -483,7 +495,7 @@ tr.cat td {
 /* Diagrams */
 .visual { margin: 0; padding: 0.75rem; background: var(--surface); border-radius: 10px; }
 .viz { display: block; width: 100%; height: auto; max-height: 11rem; overflow: visible; }
-.viz-text { font: 13px system-ui, -apple-system, "Segoe UI", sans-serif; fill: var(--muted); }
+.viz-text { font: 13px var(--font); fill: var(--muted); }
 .viz-text.strong { font-weight: 700; fill: var(--text); }
 .viz-track { fill: var(--bg); stroke: var(--line); }
 .viz-fill { fill: var(--accent); }
@@ -523,9 +535,9 @@ tr.cat td {
 }
 .desktop .titlebar button, .desktop .titlebar input { -webkit-app-region: no-drag; }
 /* Windows conventions: arrow cursor on controls, no text selection in the frame. */
-.desktop button, .desktop summary, .desktop label, .desktop .nav-group a, .desktop #switcher-list li { cursor: default; }
+.desktop button, .desktop summary, .desktop label, .desktop .nav-group a { cursor: default; }
 .desktop .titlebar, .desktop .audience, .desktop #sidebar, .desktop button, .desktop summary, .desktop label, .desktop .examples { user-select: none; }
 .desktop img { -webkit-user-drag: none; }
 
 /* Thin scrollbars that stay out of the way, as in Windows 11 apps. */
-.desktop #sidebar, .desktop #content, .desktop #switcher-list { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+.desktop #sidebar, .desktop #content { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }

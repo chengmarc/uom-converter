@@ -17,17 +17,15 @@
     <!-- The app frame: title bar and audience bar stay put; the sidebar and the converter scroll on their own. -->
     <header class="titlebar">
       <h1 class="brand"><img src="./icon.svg" alt="" width="18" height="18" />UOM Converter</h1>
-      <button type="button" id="find" class="find" aria-keyshortcuts="Control+K">
-        <span>Find a converter…</span><kbd>Ctrl K</kbd>
-      </button>
+    </header>
+    <!-- Who you are and where you work: the two choices that set up every converter. -->
+    <div class="audience">
+      <span class="label" id="audience-label">Show converters for</span>
+      <div id="audience" class="tabs" role="group" aria-labelledby="audience-label"></div>
       <div class="region">
         <span class="label" id="region-label">Region</span>
         <div id="region" class="seg" role="group" aria-labelledby="region-label"></div>
       </div>
-    </header>
-    <div class="audience">
-      <span class="label" id="audience-label">Show converters for</span>
-      <div id="audience" class="tabs" role="group" aria-labelledby="audience-label"></div>
       <p id="audience-desc" class="audience-desc"></p>
     </div>
     <label class="picker">
@@ -35,13 +33,15 @@
       <select id="picker"></select>
     </label>
     <div class="layout">
+      <!-- Heads the converter list it searches, and stays put while the list scrolls. -->
+      <label class="find">
+        <span class="label">Find a converter</span>
+        <input id="find" type="search" placeholder="Find a converter" autocomplete="off" spellcheck="false" aria-controls="sidebar" aria-keyshortcuts="Control+F" />
+        <kbd>Ctrl F</kbd>
+      </label>
       <nav id="sidebar" aria-label="Converters"></nav>
       <main id="content"></main>
     </div>
-    <dialog id="switcher" aria-label="Find a converter">
-      <input id="switcher-input" type="text" autocomplete="off" placeholder="Type a converter name, like voltage drop or AWG" role="combobox" aria-controls="switcher-list" aria-expanded="true" />
-      <ul id="switcher-list" role="listbox"></ul>
-    </dialog>
     <script type="module" src="./main.ts"></script>
   </body>
 </html>

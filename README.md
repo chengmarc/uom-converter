@@ -25,8 +25,8 @@ It behaves like a Windows app rather than a browser tab: the page's header is th
 (Windows still draws minimize / maximize / close), the frame shows Mica on Windows 11 22H2 and
 later, right-click gives the usual edit menu, and the window reopens where you left it. The page
 switches to this look itself when Electron draws the window controls over it (`.desktop` in
-`style.css`). On both the web and the desktop, Ctrl+K finds a converter by name or description,
-and the arrow keys move through the sidebar.
+`style.css`). On both the web and the desktop, the search box at the top of the sidebar (Ctrl+F)
+filters converters by name or description as you type, and the arrow keys move through the sidebar.
 
 ```
 npm run app        # build the page and open it in the desktop shell

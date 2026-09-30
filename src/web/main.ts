@@ -1,15 +1,24 @@
+// Bundled with the app: the page may only load its own files (see the CSP in index.html).
+// Weight and optical-size axes: headings and big result values get display-cut letterforms.
+import "@fontsource-variable/inter/opsz.css";
 import type { Region } from "../core/region";
 import { AUDIENCES, type Audience } from "./audiences";
 import { TOOLS } from "./converters";
 import { icon } from "./icons";
 import { guessRegion, regionInfo, REGIONS } from "./regions";
 import { setNumberStyle } from "./format";
-import { dyn, renderConverter, type Converter, type Values } from "./ui";
+import { dyn, el, renderConverter, type Converter, type Values } from "./ui";
 
 // audiences.test.ts checks every id an audience lists exists.
 const byId = new Map(TOOLS.map((t) => [t.id, t]));
 
-const EVERYTHING: Audience = { id: "all", label: "Everything", description: "Every converter, grouped by topic.", tools: TOOLS.map((t) => t.id) };
+const EVERYTHING: Audience = {
+  id: "all",
+  label: "Everything",
+  description: "Every converter, grouped by topic.",
+  tools: TOOLS.map((t) => t.id),
+};
+
 
 // ---------- Page ----------
 
@@ -62,32 +71,73 @@ function buildControls() {
   regionBar.replaceChildren(...REGIONS.map((r) => chip(r.label, r.id === region, () => setRegion(r.id), { title: `${r.code} · ${r.hz} Hz` })));
 }
 
+function navLink(id: string, text: string) {
+  const a = Object.assign(document.createElement("a"), { href: `#${id}`, textContent: text });
+  a.dataset.id = id;
+  return a;
+}
+
+const find = document.querySelector<HTMLInputElement>("#find")!;
+
+/** Converters matching the search: name matches before description matches, each in the audience's order. */
+function search(query: string): Converter[] {
+  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
+  const has = (text: string) => words.every((w) => text.toLowerCase().includes(w));
+  const byName = (t: Converter) => has(`${t.title} ${t.topic} ${t.id}`);
+  const blurb = (t: Converter) => dyn(t.blurb, { region } as Values); // descriptions only read the region
+  const rank = (t: Converter) =>
+    (byName(t) ? 0 : 2 * TOOLS.length) + (audience.tools.includes(t.id) ? audience.tools.indexOf(t.id) : TOOLS.length + TOOLS.indexOf(t));
+  return TOOLS.filter((t) => byName(t) || has(blurb(t))).sort((a, b) => rank(a) - rank(b));
+}
+
+function navGroup(title: string, tools: Converter[], topicIcon?: string) {
+  const section = el("div", "nav-group");
+  const h = el("h2");
+  const i = topicIcon ? icon(topicIcon) : undefined;
+  if (i) h.append(i);
+  h.append(title);
+  section.append(h, ...tools.map((t) => navLink(t.id, t.title)));
+  return section;
+}
+
+/** The audience's converters by topic; while searching, the matches instead, the audience's own first. */
 function buildNav() {
-  const visible = audience.tools.map((id) => byId.get(id)!);
-  // Groups in order of their first tool, tools in the audience's priority order.
-  const groups = [...new Set(visible.map((t) => t.topic))];
-  // What this audience is for, at the head of its list (under the tabs instead on narrow screens).
-  sidebar.replaceChildren(Object.assign(document.createElement("p"), { className: "sidebar-desc", textContent: audience.description }));
+  const query = find.value.trim();
+  if (query) {
+    const found = search(query);
+    const mine = found.filter((t) => audience.tools.includes(t.id));
+    const others = found.filter((t) => !audience.tools.includes(t.id));
+    sidebar.replaceChildren();
+    if (mine.length) sidebar.append(navGroup(audience === EVERYTHING ? "Matches" : `For ${audience.label}`, mine));
+    if (others.length) sidebar.append(navGroup("In Everything", others));
+    if (!found.length) sidebar.append(el("p", "sidebar-hint", "No converter matches."));
+  } else {
+    const visible = audience.tools.map((id) => byId.get(id)!);
+    // Groups in order of their first tool, tools in the audience's priority order.
+    const groups = [...new Set(visible.map((t) => t.topic))];
+    sidebar.replaceChildren(...groups.map((g) => navGroup(g, visible.filter((t) => t.topic === g), g)));
+    sidebar.append(el("p", "sidebar-hint", "Click any result to copy it."));
+  }
+  markCurrent();
+
+  // The narrow-window picker always lists the audience's converters.
   picker.replaceChildren();
-  for (const g of groups) {
-    const section = document.createElement("div");
-    section.className = "nav-group";
-    const h = document.createElement("h2");
-    const i = icon(g);
-    if (i) h.append(i);
-    h.append(g);
-    section.append(h);
+  for (const g of [...new Set(audience.tools.map((id) => byId.get(id)!.topic))]) {
     const og = Object.assign(document.createElement("optgroup"), { label: g });
-    for (const t of visible.filter((x) => x.topic === g)) {
-      const a = Object.assign(document.createElement("a"), { href: `#${t.id}`, textContent: t.title });
-      a.dataset.id = t.id;
-      section.append(a);
-      og.append(Object.assign(document.createElement("option"), { value: t.id, textContent: t.title }));
+    for (const id of audience.tools.filter((id) => byId.get(id)!.topic === g)) {
+      og.append(Object.assign(document.createElement("option"), { value: id, textContent: byId.get(id)!.title }));
     }
-    sidebar.append(section);
     picker.append(og);
   }
-  sidebar.append(Object.assign(document.createElement("p"), { className: "sidebar-hint", textContent: "Click any result to copy it." }));
+  picker.value = currentId();
+}
+
+function markCurrent() {
+  const id = currentId();
+  sidebar.querySelectorAll("a").forEach((a) => {
+    if (a.dataset.id === id) a.setAttribute("aria-current", "page");
+    else a.removeAttribute("aria-current");
+  });
 }
 
 let panels = new Map<string, HTMLElement>();
@@ -99,6 +149,7 @@ function buildPanels() {
 
 const currentId = () => {
   const hash = location.hash.slice(1);
+  // Each audience opens on the converter it uses most.
   return audience.tools.includes(hash) ? hash : audience.tools[0];
 };
 
@@ -134,10 +185,7 @@ function show(focus: boolean) {
   // The converter pane scrolls on its own, so a new converter starts at its top.
   if (id !== shown) content.scrollTop = 0;
   shown = id;
-  sidebar.querySelectorAll("a").forEach((a) => {
-    if (a.dataset.id === id) a.setAttribute("aria-current", "page");
-    else a.removeAttribute("aria-current");
-  });
+  markCurrent();
   picker.value = id;
   if (focus) panels.get(id)!.querySelector<HTMLElement>("input[data-field]")?.focus();
 }
@@ -149,96 +197,62 @@ function open(id: string, focus = true) {
   else location.hash = id;
 }
 
-// ---------- Keyboard ----------
+// ---------- Sidebar: search and keyboard ----------
 
-// Up and down arrows move through the sidebar like a list, keeping focus there.
+/** Opening a match ends the search, so the sidebar goes back to the audience's list. */
+function choose(id: string) {
+  if (find.value) {
+    find.value = "";
+    buildNav();
+  }
+  open(id);
+}
+
+sidebar.addEventListener("click", (e) => {
+  const link = (e.target as Element).closest<HTMLAnchorElement>("a[data-id]");
+  if (!link) return;
+  e.preventDefault();
+  choose(link.dataset.id!);
+});
+
+// Up and down arrows move through the sidebar like a list, keeping focus there; up from the top
+// goes back to the search box.
 sidebar.addEventListener("keydown", (e) => {
   if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
   const links = Array.from(sidebar.querySelectorAll<HTMLAnchorElement>("a[data-id]"));
-  const next = links[links.indexOf(e.target as HTMLAnchorElement) + (e.key === "ArrowDown" ? 1 : -1)];
-  if (!next) return;
+  const at = links.indexOf(e.target as HTMLAnchorElement);
+  const next = links[at + (e.key === "ArrowDown" ? 1 : -1)];
+  if (!next && !(e.key === "ArrowUp" && at === 0)) return;
   e.preventDefault();
+  if (!next) return find.focus();
   next.focus();
-  history.replaceState(null, "", `#${next.dataset.id}`);
-  show(false);
-});
-
-// Quick switcher: Ctrl+K, type part of a name, Enter.
-const switcher = document.querySelector<HTMLDialogElement>("#switcher")!;
-const switcherInput = document.querySelector<HTMLInputElement>("#switcher-input")!;
-const switcherList = document.querySelector<HTMLElement>("#switcher-list")!;
-let matches: Converter[] = [];
-let active = 0;
-let lastPointer = "";
-
-function renderMatches() {
-  const words = switcherInput.value.toLowerCase().split(/\s+/).filter(Boolean);
-  const has = (text: string) => words.every((w) => text.toLowerCase().includes(w));
-  // Name matches first, then description matches; within each, the audience's own order.
-  const byName = (t: Converter) => has(`${t.title} ${t.topic} ${t.id}`);
-  const blurb = (t: Converter) => dyn(t.blurb, { region } as Values); // descriptions only read the region
-  const rank = (t: Converter) =>
-    (byName(t) ? 0 : 2 * TOOLS.length) + (audience.tools.includes(t.id) ? audience.tools.indexOf(t.id) : TOOLS.length + TOOLS.indexOf(t));
-  matches = TOOLS.filter((t) => byName(t) || has(blurb(t))).sort((a, b) => rank(a) - rank(b));
-  switcherList.replaceChildren(
-    ...matches.map((t, i) => {
-      const li = Object.assign(document.createElement("li"), { id: `switch-${t.id}`, role: "option" });
-      const where = audience.tools.includes(t.id) ? t.topic : `${t.topic} · in Everything`;
-      li.append(t.title, Object.assign(document.createElement("small"), { textContent: where }));
-      li.addEventListener("click", () => choose(t));
-      // Chromium also fires pointermove when the list changes under a still pointer; only a real move counts.
-      li.addEventListener("pointermove", (e) => {
-        const at = `${e.screenX},${e.screenY}`;
-        if (at === lastPointer) return;
-        lastPointer = at;
-        setActive(i);
-      });
-      return li;
-    }),
-  );
-  if (!matches.length) switcherList.append(Object.assign(document.createElement("li"), { className: "none", textContent: "No converter matches." }));
-  setActive(0);
-}
-
-function setActive(i: number) {
-  active = i;
-  switcherList.querySelectorAll("[role=option]").forEach((li, j) => li.setAttribute("aria-selected", String(j === i)));
-  switcherInput.setAttribute("aria-activedescendant", matches[i] ? `switch-${matches[i].id}` : "");
-  switcherList.querySelector('[aria-selected="true"]')?.scrollIntoView({ block: "nearest" });
-}
-
-function openSwitcher() {
-  if (switcher.open) return;
-  switcherInput.value = "";
-  renderMatches();
-  switcher.showModal();
-  switcherInput.focus();
-}
-
-function choose(t: Converter) {
-  switcher.close();
-  open(t.id);
-}
-
-switcherInput.addEventListener("input", renderMatches);
-switcherInput.addEventListener("keydown", (e) => {
-  if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-    e.preventDefault();
-    if (matches.length) setActive((active + (e.key === "ArrowDown" ? 1 : -1) + matches.length) % matches.length);
-  } else if (e.key === "Enter" && matches[active]) {
-    e.preventDefault();
-    choose(matches[active]);
+  // Preview the audience's own converters as focus moves; a match from Everything opens on Enter.
+  if (audience.tools.includes(next.dataset.id!)) {
+    history.replaceState(null, "", `#${next.dataset.id}`);
+    show(false);
   }
 });
-// A click on the dimmed backdrop lands on the dialog itself: close it.
-switcher.addEventListener("click", (e) => {
-  if (e.target === switcher) switcher.close();
-});
-document.querySelector("#find")!.addEventListener("click", openSwitcher);
-document.addEventListener("keydown", (e) => {
-  if ((e.ctrlKey || e.metaKey) && !e.altKey && e.key.toLowerCase() === "k") {
+
+find.addEventListener("input", buildNav);
+find.addEventListener("keydown", (e) => {
+  const first = sidebar.querySelector<HTMLAnchorElement>("a[data-id]");
+  if (e.key === "Enter" && find.value.trim() && first) {
     e.preventDefault();
-    openSwitcher();
+    choose(first.dataset.id!);
+  } else if (e.key === "ArrowDown" && first) {
+    e.preventDefault();
+    first.focus();
+  } else if (e.key === "Escape" && find.value) {
+    e.preventDefault(); // otherwise the search box clears itself without rebuilding the list
+    find.value = "";
+    buildNav();
+  }
+});
+document.addEventListener("keydown", (e) => {
+  if ((e.ctrlKey || e.metaKey) && !e.altKey && e.key.toLowerCase() === "f") {
+    e.preventDefault();
+    find.focus();
+    find.select();
   }
 });
 
