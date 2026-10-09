@@ -134,7 +134,7 @@ async function renderListing() {
 app.on("window-all-closed", () => {});
 
 app.whenReady().then(async () => {
-  if (!fs.existsSync(path.join(DIST, "index.html"))) throw new Error("No dist/: run `npm run build` first.");
+  if (!fs.existsSync(path.join(DIST, "index.html"))) throw new Error("No dist/: run it with `npm run store:assets`, which builds the page first.");
   await renderIcon(path.join(ROOT, "src", "electron", "icon.png"), 1024, 1024, 1);
   await renderTiles();
   await renderListing();

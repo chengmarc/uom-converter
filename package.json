@@ -3,20 +3,16 @@
   "productName": "UOM Converter",
   "description": "Unit-of-measure conversions for the electrical industry.",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
   "main": "src/electron/main.cjs",
   "scripts": {
-    "dev": "vite src/web --port 5173 --strictPort",
-    "build": "vite build src/web --outDir ../../dist --emptyOutDir --base ./",
-    "preview": "vite preview src/web --outDir ../../dist",
     "test": "vitest run",
     "typecheck": "tsc",
-    "app": "npm run build && electron .",
-    "app:dev": "electron . --dev",
-    "dist:win": "npm run build && electron-builder --win",
-    "dist:store": "npm run build && electron-builder --win appx",
-    "store:assets": "npm run build && electron store/render.cjs"
+    "app": "vite build src/web --outDir ../../dist --emptyOutDir --base ./ && electron .",
+    "dist:win": "vite build src/web --outDir ../../dist --emptyOutDir --base ./ && electron-builder --win",
+    "dist:store": "vite build src/web --outDir ../../dist --emptyOutDir --base ./ && electron-builder --win appx",
+    "store:assets": "vite build src/web --outDir ../../dist --emptyOutDir --base ./ && electron store/render.cjs"
   },
   "devDependencies": {
     "@fontsource-variable/inter": "^5.3.0",

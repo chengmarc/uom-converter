@@ -20,8 +20,6 @@
 
 ```
 npm install
-npm run dev        # the page, with live reload
-npm run build      # static site in dist/
 npm test           # unit tests
 npm run typecheck
 ```
@@ -35,11 +33,10 @@ scheme, with no Node access in the page, a sandboxed renderer and a content secu
 
 ```
 npm run app        # build the page and open it in the desktop shell
-npm run app:dev    # desktop shell on the live dev server (run `npm run dev` first)
 npm run dist:win   # release/UOM-Converter-Setup-<version>.exe and a portable .exe
 ```
 
-## Microsoft Store (.msix)
+## Microsoft Store (.appx)
 
 The Store build is an MSIX package. Partner Center signs it on submission, so it needs no
 certificate of its own.

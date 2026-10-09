@@ -9,8 +9,6 @@ const path = require("node:path");
 const { pathToFileURL } = require("node:url");
 
 const DIST = path.join(__dirname, "..", "..", "dist");
-const DEV_URL = "http://localhost:5173";
-const isDev = process.argv.includes("--dev");
 
 /**
  * The page's frame colours (--chrome and --text in style.css, light and dark), for the title bar
@@ -134,18 +132,17 @@ function createWindow() {
   });
 
   // Only the app itself opens inside the window; any web link goes to the default browser.
-  const own = (url) => url.startsWith("app://") || (isDev && url.startsWith(DEV_URL));
   win.webContents.setWindowOpenHandler(({ url }) => {
     if (url.startsWith("https://")) shell.openExternal(url);
     return { action: "deny" };
   });
   win.webContents.on("will-navigate", (event, url) => {
-    if (own(url)) return;
+    if (url.startsWith("app://")) return;
     event.preventDefault();
     if (url.startsWith("https://")) shell.openExternal(url);
   });
 
-  win.loadURL(isDev ? DEV_URL : "app://uom/index.html");
+  win.loadURL("app://uom/index.html");
 }
 
 // One window is enough: a second launch focuses the running app instead.
@@ -174,12 +171,11 @@ if (!app.requestSingleInstanceLock()) {
             { role: "zoomOut" },
             { type: "separator" },
             { role: "togglefullscreen" },
-            ...(isDev ? [{ role: "toggleDevTools" }] : []),
           ],
         },
       ]),
     );
-    if (!isDev) serveApp();
+    serveApp();
     createWindow();
   });
 
