@@ -523,8 +523,10 @@ tr.cat td {
 
 /* ---------- Desktop app ---------- */
 
-/* The frame shows the window's own backdrop (Mica on Windows 11); only the converter pane is opaque. */
-.desktop { --chrome: transparent; }
+/* The frame shows the window's own backdrop (Acrylic on Windows 11) through a tint of its colour;
+   only the converter pane is opaque. Raise the 60% for less see-through, lower it for more. */
+.desktop body { background: color-mix(in srgb, var(--chrome) 60%, transparent); }
+.desktop .seg { background: var(--surface); }
 .desktop .titlebar {
   min-height: env(titlebar-area-height, 40px);
   padding-top: 0;

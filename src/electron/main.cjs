@@ -23,10 +23,10 @@ const FRAME = {
 const frame = () => (nativeTheme.shouldUseDarkColors ? FRAME.dark : FRAME.light);
 const TITLE_BAR_HEIGHT = 40;
 
-// Windows 11 22H2 (build 22621) and later draw Mica behind the page's transparent frame; older
-// Windows gets the solid frame colour instead.
-const MICA = process.platform === "win32" && Number(os.release().split(".")[2]) >= 22621;
-const titleBarOverlay = () => ({ color: MICA ? "#00000000" : frame().chrome, symbolColor: frame().text, height: TITLE_BAR_HEIGHT });
+// Windows 11 22H2 (build 22621) and later draw Acrylic, a blur of whatever is behind the window,
+// through the page wherever it is transparent; older Windows gets the solid frame colour instead.
+const ACRYLIC = process.platform === "win32" && Number(os.release().split(".")[2]) >= 22621;
+const titleBarOverlay = () => ({ color: ACRYLIC ? "#00000000" : frame().chrome, symbolColor: frame().text, height: TITLE_BAR_HEIGHT });
 
 // ---------- Window size and position, kept between runs ----------
 
@@ -90,9 +90,9 @@ function createWindow() {
     // The page draws its own title bar; Windows keeps the minimize / maximize / close buttons.
     titleBarStyle: "hidden",
     titleBarOverlay: titleBarOverlay(),
-    backgroundMaterial: MICA ? "mica" : undefined,
-    // Behind the page's transparent frame, so there's no white flash while it loads.
-    backgroundColor: MICA ? "#00000000" : frame().chrome,
+    backgroundMaterial: ACRYLIC ? "acrylic" : undefined,
+    // Behind the page's transparent areas, so there's no white flash while it loads.
+    backgroundColor: ACRYLIC ? "#00000000" : frame().chrome,
     autoHideMenuBar: true,
     webPreferences: {
       contextIsolation: true,
@@ -108,7 +108,7 @@ function createWindow() {
 
   const followTheme = () => {
     win.setTitleBarOverlay(titleBarOverlay());
-    if (!MICA) win.setBackgroundColor(frame().chrome);
+    if (!ACRYLIC) win.setBackgroundColor(frame().chrome);
   };
   nativeTheme.on("updated", followTheme);
   win.on("closed", () => nativeTheme.off("updated", followTheme));
