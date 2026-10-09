@@ -1,5 +1,5 @@
 import { METRIC_SIZES_MM2, metricToNorthAmerican, mm2ToKcmil } from "../../core/conductors";
-import { fmt, plain, typed } from "../format";
+import { amount, fmt, typed } from "../format";
 import type { Converter } from "../ui";
 import { crossSections } from "../visuals";
 import { metalField, readMetal, weightRows, WIRE_FORMULA } from "./wire";
@@ -27,7 +27,7 @@ export const mm2: Converter = {
       rows: [
         { label: "Nearest AWG / kcmil size", value: na.nearest.label },
         { label: "Smallest size at least as big", value: na.nextLarger?.label ?? "None, over 1000 kcmil", copy: na.nextLarger?.label ?? "", status: na.nextLarger ? undefined : "warn" },
-        { label: "Thousand circular mils", value: `${fmt(kcmil, 2)} kcmil`, copy: plain(kcmil, 2) },
+        { label: "Thousand circular mils", ...amount(kcmil, 2, " kcmil") },
         ...weightRows(a, readMetal(v)),
       ],
       visual: crossSections([

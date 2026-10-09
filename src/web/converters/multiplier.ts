@@ -1,5 +1,5 @@
 import { discountToMultiplier, multiplierToDiscount } from "../../core/pricing";
-import { fmt, money, parseNumber, plain, typed } from "../format";
+import { amount, fmt, money, moneyAmount, parseNumber, plain, typed } from "../format";
 import type { Converter, Example, Row } from "../ui";
 import { isNum } from "./checks";
 
@@ -51,14 +51,14 @@ export const multiplier: Converter = {
     }
     const discount = multiplierToDiscount(m);
     const rows: Row[] = [];
-    if (list !== undefined) rows.push({ label: "Net price", value: money(list * m), copy: plain(list * m, 5) });
+    if (list !== undefined) rows.push({ label: "Net price", ...moneyAmount(list * m) });
     rows.push(
       isMult
-        ? { label: "Equivalent discount", value: `${fmt(discount, 2)}% off`, copy: plain(discount, 2) }
+        ? { label: "Equivalent discount", ...amount(discount, 2, "% off") }
         : { label: "Multiplier", value: `× ${fmt(m, 4)}`, copy: plain(m, 4) },
     );
-    if (!isMult && raw.includes("/")) rows.push({ label: "Same as a single discount of", value: `${fmt(discount, 2)}%`, copy: plain(discount, 2) });
-    if (list !== undefined) rows.push({ label: "Off list", value: money(list - list * m), copy: plain(list - list * m, 5) });
+    if (!isMult && raw.includes("/")) rows.push({ label: "Same as a single discount of", ...amount(discount, 2, "%") });
+    if (list !== undefined) rows.push({ label: "Off list", ...moneyAmount(list - list * m) });
 
     const parts = isMult ? [] : raw.split("/").map((p) => 1 - Number(p.replace("%", "")) / 100);
     return {

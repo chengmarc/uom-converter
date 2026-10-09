@@ -1,5 +1,5 @@
 import { suspectUomMismatch } from "../../core/pricing";
-import { fmt, money, plain, typed } from "../format";
+import { fmt, money, moneyAmount, plain, typed } from "../format";
 import type { Converter, Example, Status } from "../ui";
 import { priceGap } from "../visuals";
 import { invalid } from "./checks";
@@ -43,7 +43,7 @@ export const mixup: Converter = {
           ? { label: "Likely UOM mix-up", detail: `If ${lo} is per each, ${hi} is probably ${MIXUP_MEANING[f]}.`, value: `${f}× apart`, status: "bad" as Status }
           : { label: "No UOM mix-up pattern", detail: "Not near 10×, 100× or 1000×: a real price difference, not a UOM problem.", value: "OK", status: "good" as Status },
         { label: "B ÷ A", value: `× ${fmt(b / a, 4)}`, copy: plain(b / a, 4) },
-        ...(f ? [{ label: `${hi} corrected`, detail: `${hi} ÷ ${f}`, value: money((b > a ? b : a) / f), copy: plain((b > a ? b : a) / f, 5) }] : []),
+        ...(f ? [{ label: `${hi} corrected`, detail: `${hi} ÷ ${f}`, ...moneyAmount((b > a ? b : a) / f) }] : []),
       ],
       visual: priceGap(a, b, f),
       formula: ["Flags a ratio within 5% of 10, 100 or 1000."],

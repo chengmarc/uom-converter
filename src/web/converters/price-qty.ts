@@ -1,5 +1,5 @@
 import { unitPrice } from "../../core/pricing";
-import { fmt, money, plain } from "../format";
+import { fmt, money, moneyAmount } from "../format";
 import type { Converter, Example, Row } from "../ui";
 import { isNum, invalid } from "./checks";
 
@@ -32,11 +32,11 @@ export const priceQty: Converter = {
     if (p === undefined) return undefined;
     const u = unitPrice(p, qty!, content!);
     const rows: Row[] = [];
-    if (content !== 1) rows.push({ label: "Per content unit (each)", value: money(u.perContentUnit), copy: plain(u.perContentUnit, 6) });
+    if (content !== 1) rows.push({ label: "Per content unit (each)", ...moneyAmount(u.perContentUnit, 6) });
     rows.push(
-      { label: "Per order unit", value: money(u.perOrderUnit), copy: plain(u.perOrderUnit, 6) },
-      { group: "Per content unit, as C / M", label: "Per 100 (C)", value: money(u.perContentUnit * 100), copy: plain(u.perContentUnit * 100, 5) },
-      { group: "Per content unit, as C / M", label: "Per 1,000 (M)", value: money(u.perContentUnit * 1000), copy: plain(u.perContentUnit * 1000, 5) },
+      { label: "Per order unit", ...moneyAmount(u.perOrderUnit, 6) },
+      { group: "Per content unit, as C / M", label: "Per 100 (C)", ...moneyAmount(u.perContentUnit * 100) },
+      { group: "Per content unit, as C / M", label: "Per 1,000 (M)", ...moneyAmount(u.perContentUnit * 1000) },
     );
     return {
       heading: `${money(p)} for ${fmt(qty!, 3)} order unit${qty === 1 ? "" : "s"}${content === 1 ? "" : ` of ${fmt(content!, 3)}`}`,

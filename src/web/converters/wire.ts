@@ -1,7 +1,7 @@
 // Conductor metal and weight, for the wire-size converters (awg, mm2, vdrop).
 
 import { conductorKgPerKm, kgPerKmToLbPerKft, type Metal } from "../../core/conductors";
-import { fmt, plain } from "../format";
+import { amount } from "../format";
 import type { Row, Values } from "../ui";
 
 export const metalField = {
@@ -23,8 +23,8 @@ export function weightRows(areaMm2: number, metal: Metal): Row[] {
   const lb = kgPerKmToLbPerKft(kgKm);
   const group = `Weight, bare ${metal === "Cu" ? "copper" : "aluminum"}`;
   return [
-    { group, label: "Pounds per 1,000 ft", value: `${fmt(lb, 1)} lb`, copy: plain(lb, 1) },
-    { group, label: "Kilograms per km", value: `${fmt(kgKm, 1)} kg`, copy: plain(kgKm, 1) },
+    { group, label: "Pounds per 1,000 ft", ...amount(lb, 1, " lb") },
+    { group, label: "Kilograms per km", ...amount(kgKm, 1, " kg") },
   ];
 }
 

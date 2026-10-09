@@ -1,5 +1,5 @@
 import { MM_PER_IN, parseInches, toFraction } from "../../core/units";
-import { fmt, parseNumber, plain, typed } from "../format";
+import { amount, fmt, parseNumber, typed } from "../format";
 import type { Converter, Example, Status } from "../ui";
 import { ruler } from "../visuals";
 
@@ -46,8 +46,8 @@ export const fraction: Converter = {
       rows: [
         ...(fromMm
           ? [{ label: "Nearest 1/64\"", detail: off(f64), value: f64.label, status: (exact(f64) ? "good" : undefined) as Status | undefined }]
-          : [{ label: "Millimetres", value: `${fmt(inches * MM_PER_IN, 2)} mm`, copy: plain(inches * MM_PER_IN, 2) }]),
-        { label: "Decimal inches", value: `${fmt(inches, 4)}"`, copy: plain(inches, 4) },
+          : [{ label: "Millimetres", ...amount(inches * MM_PER_IN, 2, " mm") }]),
+        { label: "Decimal inches", ...amount(inches, 4, "\"") },
         ...(fromMm ? [] : [{ label: "Nearest 1/64\"", detail: off(f64), value: f64.label, status: (exact(f64) ? "good" : undefined) as Status | undefined }]),
         { label: "Nearest 1/16\" (tape measure)", detail: off(f16), value: f16.label, status: exact(f16) ? "good" : undefined },
       ],

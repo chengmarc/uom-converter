@@ -1,5 +1,5 @@
 import { kvaToAmps, pfCorrectionKvar } from "../../core/electrical";
-import { fmt, plain, typed } from "../format";
+import { amount, fmt, typed } from "../format";
 import type { Converter, Example, Row } from "../ui";
 import { isNum, invalid } from "./checks";
 import { phaseField, phaseName, readPhase, voltsField } from "./electrical-fields";
@@ -43,7 +43,7 @@ export const pf: Converter = {
     const kva1 = kw / pf1;
     const kva2 = kw / pf2!;
     const rows: Row[] = [
-      { label: "Capacitor needed", value: `${fmt(kvar, 1)} kvar`, copy: plain(kvar, 1) },
+      { label: "Capacitor needed", ...amount(kvar, 1, " kvar") },
       { group: "Before → after", label: "Apparent power", detail: `${fmt(((kva1 - kva2) / kva1) * 100, 1)}% less`, value: `${fmt(kva1, 1)} → ${fmt(kva2, 1)} kVA`, status: "good" },
     ];
     if (volts !== undefined) {

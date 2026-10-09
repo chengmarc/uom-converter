@@ -84,7 +84,7 @@ function createWindow() {
     height: Math.max(minHeight, state?.bounds.height ?? Math.min(860, workArea.height)),
     minWidth,
     minHeight,
-    title: "UOM Converter",
+    title: app.name, // productName in package.json
     icon: path.join(__dirname, "icon.png"),
     show: false,
     // The page draws its own title bar; Windows keeps the minimize / maximize / close buttons.

@@ -1,6 +1,6 @@
 import { energyUse } from "../../core/electrical";
 import { regionInfo } from "../regions";
-import { fmt, money, plain } from "../format";
+import { amount, fmt, moneyAmount } from "../format";
 import type { Converter, Example, Row } from "../ui";
 import { isNum, invalid } from "./checks";
 
@@ -45,19 +45,19 @@ export const energy: Converter = {
     if (after !== undefined) {
       const saved = energyUse(watts - after, hours, days!, rate ?? 0);
       const g = `Retrofit saves (${fmt(watts, 0)} W → ${fmt(after, 0)} W)`;
-      if (rate !== undefined) rows.push({ group: g, label: "Money per year", value: money(saved.costPerYear), copy: plain(saved.costPerYear, 2), status: saved.costPerYear > 0 ? "good" : "warn" });
-      rows.push({ group: g, label: "Energy per year", value: `${fmt(saved.kwhPerYear, 0)} kWh`, copy: plain(saved.kwhPerYear, 0) });
+      if (rate !== undefined) rows.push({ group: g, label: "Money per year", ...moneyAmount(saved.costPerYear, 2), status: saved.costPerYear > 0 ? "good" : "warn" });
+      rows.push({ group: g, label: "Energy per year", ...amount(saved.kwhPerYear, 0, " kWh") });
     }
     if (rate !== undefined) {
       rows.push(
-        { group: "Cost", label: "Per year", value: money(e.costPerYear), copy: plain(e.costPerYear, 2) },
-        { group: "Cost", label: "Per month", value: money(e.costPerYear / 12), copy: plain(e.costPerYear / 12, 2) },
-        { group: "Cost", label: "Per day", value: money(e.costPerDay), copy: plain(e.costPerDay, 2) },
+        { group: "Cost", label: "Per year", ...moneyAmount(e.costPerYear, 2) },
+        { group: "Cost", label: "Per month", ...moneyAmount(e.costPerYear / 12, 2) },
+        { group: "Cost", label: "Per day", ...moneyAmount(e.costPerDay, 2) },
       );
     }
     rows.push(
-      { group: "Energy", label: "Per year", value: `${fmt(e.kwhPerYear, 0)} kWh`, copy: plain(e.kwhPerYear, 0) },
-      { group: "Energy", label: "Per day", value: `${fmt(e.kwhPerDay, 2)} kWh`, copy: plain(e.kwhPerDay, 2) },
+      { group: "Energy", label: "Per year", ...amount(e.kwhPerYear, 0, " kWh") },
+      { group: "Energy", label: "Per day", ...amount(e.kwhPerDay, 2, " kWh") },
     );
     return {
       heading: `${fmt(watts, 0)} W for ${fmt(hours, 2)} h a day, ${fmt(days!, 0)} days a year`,

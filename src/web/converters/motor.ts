@@ -1,6 +1,6 @@
 import { motorSlip, polesForRpm, syncSpeedRpm } from "../../core/electrical";
 import { regionInfo } from "../regions";
-import { fmt, plain } from "../format";
+import { amount, fmt } from "../format";
 import { byRegion, type Converter, type RegionExamples, type Row } from "../ui";
 import { isNum, invalid } from "./checks";
 
@@ -54,15 +54,15 @@ export const motor: Converter = {
     if (rpm !== undefined && rpm > sync) return { error: `A ${poles}-pole motor at ${hz} Hz can't run faster than ${fmt(sync, 0)} r/min.`, fields: ["rpm", "poles"] };
 
     const other = hz === 60 ? 50 : 60;
-    const rows: Row[] = [{ label: "Synchronous speed", value: `${fmt(sync, 0)} r/min`, copy: plain(sync, 0) }];
+    const rows: Row[] = [{ label: "Synchronous speed", ...amount(sync, 0, " r/min") }];
     if (polesIn === undefined) rows.push({ label: "Poles", detail: "worked out from the nameplate speed", value: String(poles) });
     if (rpm !== undefined) {
       const slip = motorSlip(sync, rpm);
-      rows.push({ label: "Slip", detail: `${fmt(sync - rpm, 0)} r/min below synchronous`, value: `${fmt(slip * 100, 2)}%`, copy: plain(slip * 100, 2) });
+      rows.push({ label: "Slip", detail: `${fmt(sync - rpm, 0)} r/min below synchronous`, ...amount(slip * 100, 2, "%") });
     }
     const g = `On ${other} Hz`;
-    rows.push({ group: g, label: "Synchronous speed", value: `${fmt(syncSpeedRpm(other, poles), 0)} r/min`, copy: plain(syncSpeedRpm(other, poles), 0) });
-    if (rpm !== undefined) rows.push({ group: g, label: "Running speed, about", detail: "same slip", value: `${fmt((rpm * other) / hz, 0)} r/min`, copy: plain((rpm * other) / hz, 0) });
+    rows.push({ group: g, label: "Synchronous speed", ...amount(syncSpeedRpm(other, poles), 0, " r/min") });
+    if (rpm !== undefined) rows.push({ group: g, label: "Running speed, about", detail: "same slip", ...amount((rpm * other) / hz, 0, " r/min") });
     return {
       heading: `${poles}-pole motor at ${hz} Hz${rpm !== undefined ? `, ${fmt(rpm, 0)} r/min nameplate` : ""}`,
       rows,

@@ -1,7 +1,7 @@
 import { conductorInfo, conductorOhmsPerKm, METRIC_SIZES_MM2, NA_BUILDING_SIZES, smallestSizeForDrop, voltageDrop } from "../../core/conductors";
 import type { Region } from "../../core/region";
 import { ftToM } from "../../core/units";
-import { fmt, parseNumber, plain, typed } from "../format";
+import { amount, fmt, parseNumber, typed } from "../format";
 import { byRegion, type Converter, type RegionExamples, type Status, type Values } from "../ui";
 import { gauge } from "../visuals";
 import { isNum, invalid } from "./checks";
@@ -128,9 +128,9 @@ export const vdrop: Converter = {
     return {
       heading: `${label} ${metal === "Cu" ? "copper" : "aluminum"}, ${fmt(len, 2)} ${unit}, ${fmt(amps, 2)} A at ${fmt(volts!, 1)} V ${phaseName(phase)}`,
       rows: [
-        { label: "Voltage drop", detail: verdict, value: `${fmt(d.percent, 2)}%`, copy: plain(d.percent, 2), status },
-        { label: "Drop in volts", value: `${fmt(d.volts, 2)} V`, copy: plain(d.volts, 2) },
-        { label: "Voltage at the load", value: `${fmt(d.atLoad, 1)} V`, copy: plain(d.atLoad, 1) },
+        { label: "Voltage drop", detail: verdict, ...amount(d.percent, 2, "%"), status },
+        { label: "Drop in volts", ...amount(d.volts, 2, " V") },
+        { label: "Voltage at the load", ...amount(d.atLoad, 1, " V") },
         {
           label: "Smallest size for your target",
           detail: `keeps the drop at or under ${fmt(target!, 2)}%`,

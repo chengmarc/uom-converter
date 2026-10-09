@@ -38,6 +38,15 @@ export const money = (n: number) => {
 };
 
 /**
+ * A result row's value and clipboard text from one number, so the two can't drift apart:
+ * amount(4.2, 1, " V") shows "4.2 V" and copies "4.2".
+ */
+export const amount = (n: number, digits: number, unit = "") => ({ value: `${fmt(n, digits)}${unit}`, copy: plain(n, digits) });
+
+/** The same for money: shown as money(), copied plain to `copyDigits` decimals. */
+export const moneyAmount = (n: number, copyDigits = 5) => ({ value: money(n), copy: plain(n, copyDigits) });
+
+/**
  * Accepts "1,250.50" / "1.250,50" (per the region), "$0.45", "12 €", and "-40" when `signed`.
  * A dot is always read as a decimal point when there's no comma, since spreadsheets and UK
  * users write 1.5 everywhere. Returns undefined for blank, NaN for anything else.

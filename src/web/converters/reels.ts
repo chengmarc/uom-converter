@@ -1,5 +1,5 @@
 import { unitsToOrder } from "../../core/pricing";
-import { fmt, plain } from "../format";
+import { amount, fmt } from "../format";
 import { byRegion, type Converter, type RegionExamples, type Values } from "../ui";
 import { packs as packsVisual } from "../visuals";
 import { invalid } from "./checks";
@@ -61,8 +61,8 @@ export const reels: Converter = {
       heading: `${fmt(count, 0)} × ${fmt(run, 2)} ${unit} run, ${fmt(size, 2)} ${unit} coils or reels`,
       rows: [
         { label: "Coils / reels to order", value: fmt(o.units, 0) },
-        { label: "Total wire", value: `${fmt(total, 2)} ${unit}`, copy: plain(total, 2) },
-        { label: "Left over", detail: "on the last coil or reel", value: `${fmt(o.over, 2)} ${unit}`, copy: plain(o.over, 2) },
+        { label: "Total wire", ...amount(total, 2, ` ${unit}`) },
+        { label: "Left over", detail: "on the last coil or reel", ...amount(o.over, 2, ` ${unit}`) },
       ],
       visual:
         o.units > 0

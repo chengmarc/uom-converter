@@ -1,5 +1,5 @@
 import { convertPrice, type PriceUom } from "../../core/pricing";
-import { money, plain, typed } from "../format";
+import { money, moneyAmount, typed } from "../format";
 import type { Converter, Example } from "../ui";
 
 const PRICE_UNITS: { uom: PriceUom; name: string; short: string }[] = [
@@ -42,7 +42,7 @@ export const price: Converter = {
       heading: `${money(p)} ${fromName} equals`,
       rows: PRICE_UNITS.filter((u) => u.uom !== from).map((u) => {
         const out = convertPrice(p, from, u.uom);
-        return { label: u.name, value: money(out), copy: plain(out, 5) };
+        return { label: u.name, ...moneyAmount(out) };
       }),
       formula: ["1 C = 100 each, 1 M = 1,000 each.", "Per each = per C ÷ 100 = per M ÷ 1,000."],
     };

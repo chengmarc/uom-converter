@@ -1,5 +1,5 @@
 import { marginToMarkup, markupToMargin, sellFromCostAtMargin } from "../../core/pricing";
-import { fmt, money, plain } from "../format";
+import { amount, fmt, money, moneyAmount, plain } from "../format";
 import type { Converter, Example, Row } from "../ui";
 import { isNum, invalid } from "./checks";
 
@@ -42,17 +42,17 @@ export const margin: Converter = {
     const rows: Row[] = [];
     if (cost !== undefined) {
       const sell = sellFromCostAtMargin(cost, marginF);
-      rows.push({ label: "Sell price", value: money(sell), copy: plain(sell, 5) });
+      rows.push({ label: "Sell price", ...moneyAmount(sell) });
     }
     rows.push(
       isMargin
-        ? { label: "Markup", value: `${fmt(markupF * 100, 2)}%`, copy: plain(markupF * 100, 2) }
-        : { label: "Margin", value: `${fmt(marginF * 100, 2)}%`, copy: plain(marginF * 100, 2) },
+        ? { label: "Markup", ...amount(markupF * 100, 2, "%") }
+        : { label: "Margin", ...amount(marginF * 100, 2, "%") },
       { label: "Cost multiplier", detail: "sell price = cost × this", value: `× ${fmt(1 + markupF, 4)}`, copy: plain(1 + markupF, 4) },
     );
     if (cost !== undefined) {
       const profit = sellFromCostAtMargin(cost, marginF) - cost;
-      rows.push({ label: "Profit", value: money(profit), copy: plain(profit, 5) });
+      rows.push({ label: "Profit", ...moneyAmount(profit) });
     }
     return {
       heading: `${fmt(pct, 2)}% ${isMargin ? "margin" : "markup"}${cost !== undefined ? ` on ${money(cost)} cost` : ""}`,

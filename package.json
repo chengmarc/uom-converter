@@ -26,7 +26,6 @@
   },
   "build": {
     "appId": "com.uomconverter.app",
-    "productName": "UOM Converter",
     "files": [
       "dist/**",
       "src/electron/**",
@@ -47,7 +46,6 @@
       "oneClick": false,
       "perMachine": false,
       "allowToChangeInstallationDirectory": true,
-      "shortcutName": "UOM Converter",
       "artifactName": "UOM-Converter-Setup-${version}.exe"
     },
     "portable": {

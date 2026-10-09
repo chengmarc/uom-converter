@@ -1,5 +1,5 @@
 import { toMetric } from "../../core/uom";
-import { fmt, plain } from "../format";
+import { amount } from "../format";
 import type { Converter } from "../ui";
 
 export const metricSpec: Converter = {
@@ -19,7 +19,7 @@ export const metricSpec: Converter = {
     return {
       heading: `${r.readAs} equals`,
       rows: [
-        { label: "Metric value", value: `${fmt(r.value, 4)} ${r.unit}`, copy: plain(r.value, 4) },
+        { label: "Metric value", ...amount(r.value, 4, ` ${r.unit}`) },
         { label: "Unit", value: r.unit },
         { label: "UN/ECE code", value: r.code },
       ],

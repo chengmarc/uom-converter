@@ -1,5 +1,5 @@
 import { unitsToOrder } from "../../core/pricing";
-import { fmt, money, plain, typed } from "../format";
+import { fmt, money, moneyAmount, plain, typed } from "../format";
 import type { Converter, Example, Row } from "../ui";
 import { packs as packsVisual } from "../visuals";
 import { invalid } from "./checks";
@@ -59,7 +59,7 @@ export const packs: Converter = {
           status: o.over > 0 ? "warn" : "good",
         },
       );
-      if (packPrice !== undefined) rows.push({ label: "Order total", value: money(o.units * packPrice), copy: plain(o.units * packPrice, 5) });
+      if (packPrice !== undefined) rows.push({ label: "Order total", ...moneyAmount(o.units * packPrice) });
       if (o.units > 0) {
         visual = packsVisual({
           count: o.units,
@@ -72,8 +72,8 @@ export const packs: Converter = {
     if (p !== undefined && packPrice !== undefined) {
       rows.push(
         perPack
-          ? { label: "Price per each", value: money(packPrice / size), copy: plain(packPrice / size, 5) }
-          : { label: "Price per pack", value: money(packPrice), copy: plain(packPrice, 5) },
+          ? { label: "Price per each", ...moneyAmount(packPrice / size) }
+          : { label: "Price per pack", ...moneyAmount(packPrice) },
       );
     }
     return {

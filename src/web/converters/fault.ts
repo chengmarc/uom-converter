@@ -1,5 +1,5 @@
 import { transformerFaultAmps } from "../../core/electrical";
-import { fmt, plain, typed } from "../format";
+import { amount, fmt, plain, typed } from "../format";
 import { byRegion, type Converter, type RegionExamples } from "../ui";
 import { isNum, invalid } from "./checks";
 import { phaseField, phaseName, readPhase, voltsField } from "./electrical-fields";
@@ -48,7 +48,7 @@ export const fault: Converter = {
       heading: `${fmt(kva, 1)} kVA, ${fmt(volts!, 1)} V ${phaseName(phase)}, ${fmt(z, 2)}%Z`,
       rows: [
         { label: "Maximum fault current", detail: `${fmt(r.faultAmps, 0)} A`, value: `${fmt(r.faultAmps / 1000, 1)} kA`, copy: plain(r.faultAmps, 0) },
-        { label: "Full-load current", value: `${fmt(r.fla, 1)} A`, copy: plain(r.fla, 1) },
+        { label: "Full-load current", ...amount(r.fla, 1, " A") },
       ],
       formula: [
         phase === 3 ? "Full-load amps = kVA × 1,000 ÷ (√3 × volts)." : "Full-load amps = kVA × 1,000 ÷ volts.",

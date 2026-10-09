@@ -1,6 +1,6 @@
 import { lineToLine, lineToNeutral, wyeSystem } from "../../core/electrical";
 import { regionInfo } from "../regions";
-import { fmt, plain } from "../format";
+import { amount, fmt } from "../format";
 import { byRegion, type Converter, type RegionExamples } from "../ui";
 
 export const volts: Converter = {
@@ -49,7 +49,7 @@ export const volts: Converter = {
     return {
       heading: `${fmt(n, 2)} V ${fromLL ? "line-to-line" : "line-to-neutral"} equals`,
       rows: [
-        { label: fromLL ? "Line-to-neutral" : "Line-to-line", value: `${fmt(out, 1)} V`, copy: plain(out, 1) },
+        { label: fromLL ? "Line-to-neutral" : "Line-to-line", ...amount(out, 1, " V") },
         ...(system ? [{ label: "Standard system", value: `${system[0]}/${system[1]} V`, copy: `${system[0]}/${system[1]}` }] : []),
       ],
       formula: ["Line-to-neutral = line-to-line ÷ √3 (√3 ≈ 1.732)."],

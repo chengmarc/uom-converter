@@ -1,5 +1,5 @@
 import { conductorInfo, NA_BUILDING_SIZES } from "../../core/conductors";
-import { fmt, plain } from "../format";
+import { amount, fmt, plain } from "../format";
 import type { Converter } from "../ui";
 import { crossSections } from "../visuals";
 import { metalField, readMetal, weightRows, WIRE_FORMULA } from "./wire";
@@ -30,8 +30,8 @@ export const awg: Converter = {
     return {
       heading: `${c.label} equals`,
       rows: [
-        { label: "Cross-section", value: `${fmt(c.areaMm2, 3)} mm²`, copy: plain(c.areaMm2, 3) },
-        { group: "Metric wire size (IEC)", label: "Nearest size", value: `${fmt(c.nearestMetricMm2, 2)} mm²`, copy: plain(c.nearestMetricMm2, 2) },
+        { label: "Cross-section", ...amount(c.areaMm2, 3, " mm²") },
+        { group: "Metric wire size (IEC)", label: "Nearest size", ...amount(c.nearestMetricMm2, 2, " mm²") },
         {
           group: "Metric wire size (IEC)",
           label: "Smallest size at least as big",
@@ -39,10 +39,10 @@ export const awg: Converter = {
           copy: next === undefined ? "" : plain(next, 2),
           status: next === undefined ? "warn" : undefined,
         },
-        { group: "Area", label: "Thousand circular mils", value: `${fmt(c.areaKcmil, 2)} kcmil`, copy: plain(c.areaKcmil, 2) },
+        { group: "Area", label: "Thousand circular mils", ...amount(c.areaKcmil, 2, " kcmil") },
         ...(c.solidDiameterMm === undefined
           ? []
-          : [{ group: "Area", label: "Diameter, solid conductor", detail: "stranded is larger", value: `${fmt(c.solidDiameterMm, 3)} mm`, copy: plain(c.solidDiameterMm, 3) }]),
+          : [{ group: "Area", label: "Diameter, solid conductor", detail: "stranded is larger", ...amount(c.solidDiameterMm, 3, " mm") }]),
         ...weightRows(c.areaMm2, readMetal(v)),
       ],
       visual: crossSections([
