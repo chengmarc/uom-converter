@@ -7,7 +7,7 @@
   "type": "module",
   "main": "src/electron/main.cjs",
   "scripts": {
-    "dev": "vite src/web",
+    "dev": "vite src/web --port 5173 --strictPort",
     "build": "vite build src/web --outDir ../../dist --emptyOutDir --base ./",
     "preview": "vite preview src/web --outDir ../../dist",
     "test": "vitest run",
