@@ -18,7 +18,6 @@ export type Field =
   | (FieldBase & {
       kind: "number" | "text";
       label: Dyn<string>;
-      prefix?: string;
       /** Show the region's currency symbol (before or after, as the region writes it). */
       currency?: boolean;
       suffix?: Dyn<string>;
@@ -193,7 +192,6 @@ export function renderConverter(conv: Converter, region: Region): HTMLElement {
     const labelText = el("span", "label");
     const box = el("span", "text-input");
     const cur = f.currency ? numberStyle() : undefined;
-    if (f.prefix) box.append(el("span", "affix", f.prefix));
     if (cur && !cur.currencyAfter) box.append(el("span", "affix", cur.currency));
     const input = el("input");
     input.type = "text";
