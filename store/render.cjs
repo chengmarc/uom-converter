@@ -1,7 +1,9 @@
-// Renders every Microsoft Store image from the app's own sources, so they never drift from it:
-//   appx/     tile and taskbar icons packed into the MSIX (electron-builder's buildResources)
-//   listing/  images uploaded to Partner Center: store logo, promo and screenshots
-// Run with `npm run store:assets` (builds dist/ first; screenshots are taken from it).
+// Renders every image derived from the app's own sources, so they never drift from it:
+//   src/electron/icon.png  the desktop window, taskbar and installer icon
+//   appx/                  tile and taskbar icons packed into the MSIX (electron-builder's buildResources)
+//   listing/               images uploaded to Partner Center: store logo, promo and screenshots
+// The icons come from src/web/app-icon.svg; screenshots from the built page.
+// Run with `npm run store:assets` (builds dist/ first).
 
 const { app, BrowserWindow, nativeTheme, net, protocol } = require("electron");
 const fs = require("node:fs");
@@ -10,7 +12,7 @@ const { pathToFileURL } = require("node:url");
 
 const ROOT = path.join(__dirname, "..");
 const DIST = path.join(ROOT, "dist");
-const ICON = fs.readFileSync(path.join(ROOT, "src", "web", "icon.svg"), "utf8");
+const ICON = fs.readFileSync(path.join(ROOT, "src", "web", "app-icon.svg"), "utf8");
 const SCALES = [100, 200];
 
 /**
@@ -133,6 +135,7 @@ app.on("window-all-closed", () => {});
 
 app.whenReady().then(async () => {
   if (!fs.existsSync(path.join(DIST, "index.html"))) throw new Error("No dist/: run `npm run build` first.");
+  await renderIcon(path.join(ROOT, "src", "electron", "icon.png"), 1024, 1024, 1);
   await renderTiles();
   await renderListing();
   app.quit();
