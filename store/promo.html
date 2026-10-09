@@ -28,7 +28,7 @@
           linear-gradient(135deg, #1648b8 0%, #1d2f9c 45%, var(--ink) 100%);
         position: relative;
       }
-      /* A faint measuring grid, the trade's graph paper. */
+      /* A faint measuring grid, the trade's graph paper, fading out behind the app. */
       body::before {
         content: "";
         position: absolute;
@@ -37,71 +37,64 @@
           linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
           linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
         background-size: 32px 32px;
-        mask-image: linear-gradient(100deg, #000 0%, rgba(0, 0, 0, 0.6) 40%, transparent 70%);
+        mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.5) 35%, transparent 60%);
       }
 
-      .copy { position: absolute; left: 88px; top: 130px; width: 448px; }
-      .brand { display: flex; align-items: center; gap: 16px; }
-      .brand img { width: 72px; height: 72px; filter: drop-shadow(0 10px 18px rgba(8, 10, 60, 0.45)); }
-      .brand span { font-size: 22px; font-weight: 650; letter-spacing: -0.01em; }
+      /* One strip across the top: brand and facts, then the headline. The app gets the rest. */
+      .top { position: absolute; left: 88px; right: 88px; top: 48px; display: flex; align-items: center; justify-content: space-between; }
+      .brand { display: flex; align-items: center; gap: 14px; }
+      .brand img { width: 52px; height: 52px; filter: drop-shadow(0 8px 14px rgba(8, 10, 60, 0.45)); }
+      .brand span { font-size: 20px; font-weight: 650; letter-spacing: -0.01em; }
+
+      .facts { display: flex; gap: 8px; }
+      .facts span {
+        padding: 7px 13px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 560;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+      }
 
       h1 {
-        margin: 52px 0 0;
-        font-size: 54px;
-        line-height: 1.04;
+        position: absolute;
+        left: 88px;
+        top: 128px;
+        margin: 0;
+        font-size: 44px;
+        line-height: 1;
         font-weight: 760;
-        letter-spacing: -0.035em;
+        letter-spacing: -0.03em;
         font-variation-settings: "opsz" 32;
       }
       h1 em { font-style: normal; color: var(--bolt); }
 
-      p {
-        margin: 24px 0 0;
-        font-size: 19px;
-        line-height: 1.5;
-        color: rgba(255, 255, 255, 0.82);
-        max-width: 430px;
-      }
-
-      .facts { display: flex; gap: 10px; margin-top: 40px; flex-wrap: wrap; }
-      .facts span {
-        padding: 8px 14px;
-        border-radius: 999px;
-        font-size: 14px;
-        font-weight: 560;
-        background: rgba(255, 255, 255, 0.12);
-        border: 1px solid rgba(255, 255, 255, 0.22);
-        backdrop-filter: blur(6px);
-      }
-
-      /* The app, running off the right edge. The screenshot is cut just past its results column
-         (90% of its width), so every number stays whole. */
+      /* The app at 87%, running off the bottom edge below its answer. */
       .shot {
         position: absolute;
-        left: 584px;
-        right: 0;
-        top: 150px;
-        border-radius: 14px 0 0 14px;
+        left: 88px;
+        right: 88px;
+        top: 232px;
+        border-radius: 14px 14px 0 0;
         overflow: hidden;
         box-shadow:
           0 0 0 1px rgba(255, 255, 255, 0.18),
           0 30px 70px rgba(5, 8, 50, 0.55),
           0 8px 20px rgba(5, 8, 50, 0.35);
       }
-      .shot img { display: block; width: calc(100% / 0.9); }
+      .shot img { display: block; width: 100%; }
     </style>
   </head>
   <body>
-    <div class="copy">
+    <div class="top">
       <div class="brand"><img src="../src/web/icon.svg" alt="" /><span>UOM Converter</span></div>
-      <h1>Every number on the job, <em>converted.</em></h1>
-      <p>Voltage drop, wire sizes, kVA to amps, price units and UOM codes, with worked examples and the formula behind every answer.</p>
       <div class="facts">
         <span id="count">Every converter</span>
         <span>US · Canada · Europe</span>
         <span>Works offline</span>
       </div>
     </div>
-    <div class="shot"><img src="listing/screenshot-2-voltage-drop.png" alt="" /></div>
+    <h1>Every number on the job, <em>converted.</em></h1>
+    <div class="shot"><img src="listing/screenshot-2-awg.png" alt="" /></div>
   </body>
 </html>

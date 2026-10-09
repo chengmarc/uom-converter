@@ -31,12 +31,13 @@ const TARGET_SIZES = [16, 24, 32, 48, 256];
  * where, which converter, and the theme. Each opens on its first example.
  */
 const SHOTS = [
-  ["2-voltage-drop", "?for=electrician&region=us#vdrop", "light"],
-  ["3-price-units", "?for=distributor&region=us#price", "light"],
-  ["4-kva-amps", "?for=engineer&region=eu#load", "light"],
-  ["5-reels", "?for=counter&region=ca#reels", "light"],
-  ["6-uom-codes", "?for=pim&region=eu#uom-codes", "light"],
-  ["7-awg-dark", "?for=electrician&region=us#awg", "dark"],
+  ["2-awg", "?for=electrician&region=us#awg", "light"], // also the promo's picture
+  ["3-voltage-drop", "?for=electrician&region=us#vdrop", "light"],
+  ["4-price-units", "?for=distributor&region=us#price", "light"],
+  ["5-kva-amps", "?for=engineer&region=eu#load", "light"],
+  ["6-reels", "?for=counter&region=ca#reels", "light"],
+  ["7-uom-codes", "?for=pim&region=eu#uom-codes", "light"],
+  ["8-conduit-dark", "?for=electrician&region=us#conduit", "dark"],
 ];
 /** The layout's design size (main.cjs MIN_SIZE), rendered at 2× for sharp Store images. */
 const SHOT_SIZE = { width: 1366, height: 768, scale: 2 };
@@ -115,7 +116,7 @@ async function renderListing() {
     win.destroy();
   }
 
-  // The promo shows the voltage-drop screenshot, so it comes last. Its converter count is read
+  // The promo shows the AWG screenshot, so it comes last. Its converter count is read
   // from the list in converters/index.ts rather than written into the page.
   nativeTheme.themeSource = "light";
   const list = fs.readFileSync(path.join(ROOT, "src", "web", "converters", "index.ts"), "utf8");

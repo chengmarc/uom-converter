@@ -62,7 +62,7 @@ npm run dist:store     # release/UOM-Converter-<version>.appx
   rendered by `store/render.cjs` (electron-builder reads them through `buildResources`).
 - **Listing images:** `store/listing/` holds what you upload to Partner Center: the 300 × 300 store
   logo, 1080 × 1080 box art, and screenshots at 2732 × 1536 (the 1366 × 768 layout at 2×). The
-  first is a promo designed in `store/promo.html` around the voltage-drop screenshot; the rest
+  first is a promo designed in `store/promo.html` around the AWG screenshot; the rest
   are listed in `SHOTS` in `store/render.cjs`. Upload them in their numbered order.
 - **Restricted capability:** Electron apps declare `runFullTrust`; Partner Center asks why. It's
   a desktop app built with Electron.
