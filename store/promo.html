@@ -1,0 +1,107 @@
+<!doctype html>
+<!-- The Store's first screenshot: rendered by render.cjs at 1366 × 768, 2×, after the real
+     screenshots, since it shows one of them. Colours come from the icon's tile and bolt. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      @font-face {
+        font-family: "Inter Variable";
+        font-weight: 100 900;
+        src: url(../node_modules/@fontsource-variable/inter/files/inter-latin-opsz-normal.woff2) format("woff2-variations");
+      }
+      :root {
+        --azure: #2fc4f7;
+        --blue: #2f7cf6;
+        --indigo: #4b3be0;
+        --bolt: #ffd23f;
+        --ink: #0d0f3a;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; width: 1366px; height: 768px; overflow: hidden; }
+      body {
+        font-family: "Inter Variable", "Segoe UI", sans-serif;
+        color: #fff;
+        background:
+          radial-gradient(900px 600px at 8% -10%, rgba(47, 196, 247, 0.55), transparent 60%),
+          radial-gradient(700px 520px at 105% 110%, rgba(75, 59, 224, 0.9), transparent 65%),
+          linear-gradient(135deg, #1648b8 0%, #1d2f9c 45%, var(--ink) 100%);
+        position: relative;
+      }
+      /* A faint measuring grid, the trade's graph paper. */
+      body::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+        background-size: 32px 32px;
+        mask-image: linear-gradient(100deg, #000 0%, rgba(0, 0, 0, 0.6) 40%, transparent 70%);
+      }
+
+      .copy { position: absolute; left: 88px; top: 130px; width: 448px; }
+      .brand { display: flex; align-items: center; gap: 16px; }
+      .brand img { width: 72px; height: 72px; filter: drop-shadow(0 10px 18px rgba(8, 10, 60, 0.45)); }
+      .brand span { font-size: 22px; font-weight: 650; letter-spacing: -0.01em; }
+
+      h1 {
+        margin: 52px 0 0;
+        font-size: 54px;
+        line-height: 1.04;
+        font-weight: 760;
+        letter-spacing: -0.035em;
+        font-variation-settings: "opsz" 32;
+      }
+      h1 em { font-style: normal; color: var(--bolt); }
+
+      p {
+        margin: 24px 0 0;
+        font-size: 19px;
+        line-height: 1.5;
+        color: rgba(255, 255, 255, 0.82);
+        max-width: 430px;
+      }
+
+      .facts { display: flex; gap: 10px; margin-top: 40px; flex-wrap: wrap; }
+      .facts span {
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-size: 14px;
+        font-weight: 560;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        backdrop-filter: blur(6px);
+      }
+
+      /* The app, running off the right edge. The screenshot is cut just past its results column
+         (90% of its width), so every number stays whole. */
+      .shot {
+        position: absolute;
+        left: 584px;
+        right: 0;
+        top: 150px;
+        border-radius: 14px 0 0 14px;
+        overflow: hidden;
+        box-shadow:
+          0 0 0 1px rgba(255, 255, 255, 0.18),
+          0 30px 70px rgba(5, 8, 50, 0.55),
+          0 8px 20px rgba(5, 8, 50, 0.35);
+      }
+      .shot img { display: block; width: calc(100% / 0.9); }
+    </style>
+  </head>
+  <body>
+    <div class="copy">
+      <div class="brand"><img src="../src/web/icon.svg" alt="" /><span>UOM Converter</span></div>
+      <h1>Every number on the job, <em>converted.</em></h1>
+      <p>Voltage drop, wire sizes, kVA to amps, price units and UOM codes, with worked examples and the formula behind every answer.</p>
+      <div class="facts">
+        <span id="count">Every converter</span>
+        <span>US · Canada · Europe</span>
+        <span>Works offline</span>
+      </div>
+    </div>
+    <div class="shot"><img src="listing/screenshot-2-voltage-drop.png" alt="" /></div>
+  </body>
+</html>

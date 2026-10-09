@@ -45,9 +45,31 @@ Before shipping:
 - **Behind a proxy:** Electron's runtime download ignores `HTTPS_PROXY` unless
   `NODE_USE_ENV_PROXY=1` is set (Node 24).
 
+### Microsoft Store
+
+The Store build is an MSIX package. Partner Center signs it on submission, so it needs no
+certificate of its own.
+
+```
+npm run store:assets   # re-render store/ from icon.svg and the built page
+npm run dist:store     # release/UOM-Converter-<version>.appx
+```
+
+- **Identity:** `build.appx` in `package.json` holds placeholders. Replace `identityName`,
+  `publisher` (`CN=…`) and `publisherDisplayName` with the values under Partner Center →
+  Product identity; the Store rejects a package whose identity doesn't match.
+- **Package images:** `store/appx/` holds the Start, tile and taskbar icons at 100% and 200%,
+  rendered by `store/render.cjs` (electron-builder reads them through `buildResources`).
+- **Listing images:** `store/listing/` holds what you upload to Partner Center: the 300 × 300 store
+  logo, 1080 × 1080 box art, and screenshots at 2732 × 1536 (the 1366 × 768 layout at 2×). The
+  first is a promo designed in `store/promo.html` around the voltage-drop screenshot; the rest
+  are listed in `SHOTS` in `store/render.cjs`. Upload them in their numbered order.
+- **Restricted capability:** Electron apps declare `runFullTrust`; Partner Center asks why. It's
+  a desktop app built with Electron.
+
 ## Layout
 
-All source is under `src/`, one folder per part: `core/` is the maths (plain TypeScript with no DOM, each file tested in a matching `.test.ts`), `web/` is the page (the Vite root), and `electron/` is the desktop shell. `dist/` and `release/` are build output.
+All source is under `src/`, one folder per part: `core/` is the maths (plain TypeScript with no DOM, each file tested in a matching `.test.ts`), `web/` is the page (the Vite root), and `electron/` is the desktop shell. `store/` holds the Microsoft Store images, generated and committed. `dist/` and `release/` are build output.
 
 | Path | What it is |
 |---|---|
@@ -69,6 +91,7 @@ All source is under `src/`, one folder per part: `core/` is the maths (plain Typ
 | `src/web/regions.ts` | US / Canada / Europe defaults |
 | `src/web/visuals.ts`, `src/web/icons.ts` | Inline SVG diagrams and line icons |
 | `src/electron/` | Desktop shell and app icon (`src/web/icon.svg` is the source) |
+| `store/` | Microsoft Store images: `appx/` packed into the MSIX, `listing/` for Partner Center, both rendered by `render.cjs` |
 
 ## Adding things
 

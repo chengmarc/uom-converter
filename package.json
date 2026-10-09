@@ -14,7 +14,9 @@
     "typecheck": "tsc",
     "app": "npm run build && electron .",
     "app:dev": "electron . --dev",
-    "dist:win": "npm run build && electron-builder --win"
+    "dist:win": "npm run build && electron-builder --win",
+    "dist:store": "npm run build && electron-builder --win appx",
+    "store:assets": "npm run build && electron store/render.cjs"
   },
   "devDependencies": {
     "@fontsource-variable/inter": "^5.3.0",
@@ -32,7 +34,8 @@
       "package.json"
     ],
     "directories": {
-      "output": "release"
+      "output": "release",
+      "buildResources": "store"
     },
     "electronDist": "node_modules/electron/dist",
     "win": {
@@ -50,6 +53,20 @@
     },
     "portable": {
       "artifactName": "UOM-Converter-${version}-portable.exe"
+    },
+    "appx": {
+      "identityName": "00000Publisher.UOMConverter",
+      "publisher": "CN=00000000-0000-0000-0000-000000000000",
+      "publisherDisplayName": "Publisher Name",
+      "applicationId": "UOMConverter",
+      "displayName": "UOM Converter",
+      "backgroundColor": "transparent",
+      "minVersion": "10.0.17763.0",
+      "maxVersionTested": "10.0.26100.0",
+      "languages": [
+        "en-US"
+      ],
+      "artifactName": "UOM-Converter-${version}.${ext}"
     }
   }
 }
