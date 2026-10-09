@@ -2,7 +2,7 @@
 
   <img src="src/web/app-icon.svg" width="180"><br>
 
-  <img src="store/badges/badge-download.svg"></a>
+  <a href="https://github.com/chengmarc/uom-converter/releases/latest/download/UOM-Converter-setup.exe"><img src="store/badges/badge-download.svg"></a>
 
   <h1>UOM Converter - Unit Converter for Electrical Industry</h1>
 
@@ -33,7 +33,7 @@ scheme, with no Node access in the page, a sandboxed renderer and a content secu
 
 ```
 npm run app        # build the page and open it in the desktop shell
-npm run dist:win   # release/UOM-Converter-Setup-<version>.exe and a portable .exe
+npm run dist:win   # release/UOM-Converter-setup.exe and UOM-Converter-portable.exe
 ```
 
 ## Microsoft Store (.appx)
@@ -45,3 +45,9 @@ certificate of its own.
 npm run store:assets   # re-render the app icon and store/ from app-icon.svg and the built page
 npm run dist:store     # release/UOM-Converter-<version>.appx
 ```
+
+## Releasing
+
+Releases follow the [release guide](docs/RELEASING.md): the `.exe` files go on GitHub Releases,
+the `.appx` to the Microsoft Store. Changes are listed in the [changelog](docs/CHANGELOG.md), and the
+app's [privacy policy](PRIVACY.md) covers every edition.

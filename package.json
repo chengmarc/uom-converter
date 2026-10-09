@@ -45,10 +45,10 @@
       "oneClick": false,
       "perMachine": false,
       "allowToChangeInstallationDirectory": true,
-      "artifactName": "UOM-Converter-Setup-${version}.exe"
+      "artifactName": "UOM-Converter-setup.exe"
     },
     "portable": {
-      "artifactName": "UOM-Converter-${version}-portable.exe"
+      "artifactName": "UOM-Converter-portable.exe"
     },
     "appx": {
       "identityName": "00000Publisher.UOMConverter",
