@@ -99,9 +99,11 @@ async function renderTiles() {
 async function renderListing() {
   const dir = path.join(__dirname, "listing");
   fs.rmSync(dir, { recursive: true, force: true });
-  // Partner Center's 1:1 app tile icon, and 1:1 box art on the page's frame colour.
+  // Partner Center's store logos: the 1:1 app tile icon, then box art and poster art from
+  // logo.html, at the larger of the two sizes Partner Center accepts for each.
   await renderIcon(path.join(dir, "store-logo-300.png"), 300, 300, 1);
-  await renderIcon(path.join(dir, "box-art-1080.png"), 1080, 1080, 0.6, "#ecebe6");
+  await renderPage("logo.html", path.join(dir, "box-art-2160.png"), 540, 540, 4);
+  await renderPage("logo.html", path.join(dir, "poster-art-1440x2160.png"), 360, 540, 4);
 
   protocol.handle("app", (request) => {
     const { pathname } = new URL(request.url);
@@ -123,10 +125,19 @@ async function renderListing() {
   nativeTheme.themeSource = "light";
   const list = fs.readFileSync(path.join(ROOT, "src", "web", "converters", "index.ts"), "utf8");
   const count = /export const TOOLS: Converter\[\] = \[([^\]]*)\]/.exec(list)[1].split(",").filter((t) => t.trim()).length;
+  await renderPage("promo.html", path.join(dir, "screenshot-1-promo.png"), width, height, scale, `document.querySelector("#count").textContent = "${count} converters"`);
+}
+
+/**
+ * One of the designed pages in this folder (promo.html, logo.html) at width × height CSS pixels,
+ * rendered at `scale`. Pages are laid out small and rendered large, since Windows keeps even an
+ * offscreen window within the screen. `script` fills in anything the page can't know itself.
+ */
+async function renderPage(page, file, width, height, scale, script = "") {
   const win = offscreen(width, height, scale);
-  await win.loadFile(path.join(__dirname, "promo.html"));
-  await win.webContents.executeJavaScript(`document.querySelector("#count").textContent = "${count} converters"; document.fonts.ready.then(() => true)`);
-  await capture(win, path.join(dir, "screenshot-1-promo.png"), { width: width * scale, height: height * scale });
+  await win.loadFile(path.join(__dirname, page));
+  await win.webContents.executeJavaScript(`${script}; document.fonts.ready.then(() => true)`);
+  await capture(win, file, { width: width * scale, height: height * scale });
   win.destroy();
 }
 

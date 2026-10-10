@@ -4,41 +4,11 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <link rel="stylesheet" href="brand.css" />
     <style>
-      @font-face {
-        font-family: "Inter Variable";
-        font-weight: 100 900;
-        src: url(../node_modules/@fontsource-variable/inter/files/inter-latin-opsz-normal.woff2) format("woff2-variations");
-      }
-      :root {
-        --azure: #2fc4f7;
-        --blue: #2f7cf6;
-        --indigo: #4b3be0;
-        --bolt: #ffd23f;
-        --ink: #0d0f3a;
-      }
-      * { box-sizing: border-box; }
-      html, body { margin: 0; width: 1366px; height: 768px; overflow: hidden; }
-      body {
-        font-family: "Inter Variable", "Segoe UI", sans-serif;
-        color: #fff;
-        background:
-          radial-gradient(900px 600px at 8% -10%, rgba(47, 196, 247, 0.55), transparent 60%),
-          radial-gradient(700px 520px at 105% 110%, rgba(75, 59, 224, 0.9), transparent 65%),
-          linear-gradient(135deg, #1648b8 0%, #1d2f9c 45%, var(--ink) 100%);
-        position: relative;
-      }
-      /* A faint measuring grid, the trade's graph paper, fading out behind the app. */
-      body::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background-image:
-          linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-        background-size: 32px 32px;
-        mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.5) 35%, transparent 60%);
-      }
+      html, body { width: 1366px; height: 768px; }
+      /* The grid fades out behind the app. */
+      body::before { mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.5) 35%, transparent 60%); }
 
       /* One strip across the top: brand and facts, then the headline. The app gets the rest. */
       .top { position: absolute; left: 88px; right: 88px; top: 48px; display: flex; align-items: center; justify-content: space-between; }

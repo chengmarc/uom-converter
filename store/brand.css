@@ -1,0 +1,38 @@
+/* The look shared by the Store's designed images (promo.html, logo.html): the icon's azure-to-
+   indigo tile as the background, its gold bolt as the accent, and a faint measuring grid. Sizes
+   are relative, so the same background fits the wide promo and the square and tall logos. */
+
+@font-face {
+  font-family: "Inter Variable";
+  font-weight: 100 900;
+  src: url(../node_modules/@fontsource-variable/inter/files/inter-latin-opsz-normal.woff2) format("woff2-variations");
+}
+
+:root {
+  --bolt: #ffd23f;
+  --ink: #0d0f3a;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; overflow: hidden; }
+
+body {
+  position: relative;
+  font-family: "Inter Variable", "Segoe UI", sans-serif;
+  color: #fff;
+  background:
+    radial-gradient(66% 78% at 8% -10%, rgba(47, 196, 247, 0.55), transparent 60%),
+    radial-gradient(51% 68% at 105% 110%, rgba(75, 59, 224, 0.9), transparent 65%),
+    linear-gradient(135deg, #1648b8 0%, #1d2f9c 45%, var(--ink) 100%);
+}
+
+/* The trade's graph paper. Each page fades it out where its content sits, with mask-image. */
+body::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+}

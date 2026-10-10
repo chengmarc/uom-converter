@@ -1,0 +1,50 @@
+<!doctype html>
+<!-- The Store's box art (1:1) and poster art (9:16): render.cjs loads this page at each size.
+     Everything is sized from the shorter side, so one layout serves both. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="brand.css" />
+    <style>
+      html, body { width: 100vw; height: 100vh; }
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+      /* The grid fades out from the edges toward the icon. */
+      body::before { mask-image: radial-gradient(closest-side, transparent 30%, #000 100%); }
+
+      img {
+        position: relative;
+        width: 50vmin;
+        height: 50vmin;
+        filter: drop-shadow(0 3vmin 5vmin rgba(5, 8, 50, 0.5));
+      }
+      h1 {
+        position: relative;
+        margin: 7vmin 0 0;
+        font-size: 10.5vmin;
+        line-height: 1;
+        font-weight: 760;
+        letter-spacing: -0.03em;
+        font-variation-settings: "opsz" 32;
+      }
+      p {
+        position: relative;
+        margin: 3.2vmin 0 0;
+        font-size: 4.4vmin;
+        font-weight: 520;
+        color: rgba(255, 255, 255, 0.8);
+      }
+      p em { font-style: normal; color: var(--bolt); }
+    </style>
+  </head>
+  <body>
+    <img src="../src/web/app-icon.svg" alt="" />
+    <h1>UOM Converter</h1>
+    <p>For the <em>electrical</em> trade</p>
+  </body>
+</html>

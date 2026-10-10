@@ -100,4 +100,4 @@ Everything else electron-builder leaves in `release/` (`win-unpacked/`, `.blockm
 |---|---|
 | `src/electron/icon.png` | The window, taskbar and installer icon |
 | `store/appx/` | Start, tile and taskbar icons inside the `.appx` |
-| `store/listing/` | Partner Center: store logo, box art, the promo (designed in `store/promo.html`) and screenshots |
+| `store/listing/` | Partner Center: store logo, box and poster art (designed in `store/logo.html`), the promo (`store/promo.html`) and screenshots |
