@@ -51,9 +51,9 @@
       "artifactName": "UOM-Converter-portable.exe"
     },
     "appx": {
-      "identityName": "00000Publisher.UOMConverter",
-      "publisher": "CN=00000000-0000-0000-0000-000000000000",
-      "publisherDisplayName": "Publisher Name",
+      "identityName": "chengmarc.UOMConverter",
+      "publisher": "CN=58F02A86-A694-404A-8E09-F891292262CA",
+      "publisherDisplayName": "chengmarc",
       "applicationId": "UOMConverter",
       "displayName": "UOM Converter",
       "backgroundColor": "transparent",
