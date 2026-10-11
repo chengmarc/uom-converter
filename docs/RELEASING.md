@@ -10,11 +10,8 @@ Releases, and an `.appx` for the Microsoft Store. electron-builder builds all th
 
 1. **Freeze the scope.** Don't mix feature work into the release pass.
 2. **Choose the version** (`1.2.0`, say). The git tag `v<version>` is the version of record;
-   bump the two places that spell it out to match:
-   - `version` in `package.json`: run `npm version <version> --no-git-tag-version`, which also
-     updates `package-lock.json`. It sets the Store package version (`<version>.0`).
-   - the text in [store/badges/badge-download.svg](../store/badges/badge-download.svg), which
-     reads `Download (<version>)` in two places.
+   bump `version` in `package.json` to match: run `npm version <version> --no-git-tag-version`,
+   which also updates `package-lock.json`. It sets the Store package version (`<version>.0`).
 3. **Write it up.** Move the entries under `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md) into a
    dated `[<version>]` section, and add `docs/release/RELEASE_NOTES_<version>.md`.
 4. **Check:**

@@ -2,7 +2,8 @@
 
   <img src="src/web/app-icon.svg" width="180"><br>
 
-  <a href="https://github.com/chengmarc/uom-converter/releases/latest/download/UOM-Converter-setup.exe"><img src="store/badges/badge-download.svg"></a>
+  <a href="https://apps.microsoft.com/detail/9PHZQBV736JC"><img src="store/badges/badge-microsoft.svg" height="50"></a>
+  <a href="https://github.com/chengmarc/uom-converter/releases/latest/download/UOM-Converter-setup.exe"><img src="store/badges/badge-download.svg" height="50"></a>
 
   <h1>UOM Converter - Unit Converter for Electrical Industry</h1>
 
