@@ -7,6 +7,8 @@
 
   <h1>UOM Converter - Unit Converter for Electrical Industry</h1>
 
+  **[Use it in your browser](https://uom-converter.com/)**
+
   <img src="store/listing/screenshot-1-promo.png">
 
 </div>
@@ -26,6 +28,23 @@ npm run typecheck
 ```
 
 Links open a specific view: `?for=engineer&region=eu#vdrop`.
+
+## Website
+
+The same page, built with every converter at its own address
+(`/voltage-drop-calculator/`, `/awg-to-mm2/`…) so searches can land on it. Each page's title and
+description are in `src/web/pages.ts`; `vite.site.config.ts` writes the pages, a sitemap, and an
+offline copy for phones.
+
+```
+npm run dev            # live-reloading at http://localhost:5173/
+npm run build:site     # site/
+npm run preview:site   # serve site/ at http://localhost:4173/
+```
+
+Every push to `main` publishes it to GitHub Pages (`.github/workflows/pages.yml`), at
+<https://uom-converter.com/>. The domain is set in the repo's Settings → Pages, not in a `CNAME`
+file, which Pages ignores for Actions deployments. Set `SITE_URL` to build it for another address.
 
 ## Windows app (.exe)
 

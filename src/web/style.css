@@ -63,6 +63,10 @@ body {
 }
 .brand { display: flex; align-items: center; gap: 0.5rem; margin: 0; font-size: 0.9rem; font-weight: 600; white-space: nowrap; }
 .brand img { display: block; }
+/* Website only (site.ts). */
+.get-app { margin-left: auto; font-size: 0.9rem; font-weight: 600; color: var(--accent); text-decoration: none; }
+.get-app:hover { text-decoration: underline; }
+.get-app:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 .find {
   grid-area: find;

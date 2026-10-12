@@ -5,6 +5,8 @@ import type { Region } from "../core/region";
 import { AUDIENCES, type Audience } from "./audiences";
 import { TOOLS } from "./converters";
 import { icon } from "./icons";
+import { HOME, idFromPath, PAGES } from "./pages";
+import { siteExtras } from "./site";
 import { guessRegion, regionInfo, REGIONS } from "./regions";
 import { setNumberStyle } from "./format";
 import { dyn, el, renderConverter, type Converter, type Values } from "./ui";
@@ -21,6 +23,12 @@ const EVERYTHING: Audience = {
 
 
 // ---------- Page ----------
+
+// The website build (vite.site.config.ts) sets this to the site's base path, and every converter
+// has its own address there (pages.ts). The desktop app leaves it unset and uses #<id> instead.
+declare const __SITE_BASE__: string | undefined;
+const SITE = typeof __SITE_BASE__ === "string" ? __SITE_BASE__ : undefined;
+const pathFor = (id: string) => `${SITE}${PAGES[id].slug}/`;
 
 // In the desktop app Electron draws the window buttons over the page (Window Controls Overlay);
 // style.css then turns the header into the title bar.
@@ -52,6 +60,11 @@ function store(key: string, value: string) {
 const params = new URLSearchParams(location.search);
 const ALL_AUDIENCES = [EVERYTHING, ...AUDIENCES];
 let audience = ALL_AUDIENCES.find((a) => a.id === (params.get("for") ?? stored("uom.audience"))) ?? EVERYTHING;
+// Old links to the website used #<id>: move them to the converter's own address.
+if (SITE && byId.has(location.hash.slice(1))) history.replaceState(null, "", pathFor(location.hash.slice(1)) + location.search);
+// A converter's own page always opens on that converter, whatever the audience last chosen.
+const landing = routeId();
+if (landing && !audience.tools.includes(landing)) audience = EVERYTHING;
 let region: Region = REGIONS.find((r) => r.id === (params.get("region") ?? stored("uom.region")))?.id ?? guessRegion();
 
 function chip(label: string, pressed: boolean, onClick: () => void, opts: { title?: string; icon?: string } = {}) {
@@ -72,7 +85,7 @@ function buildControls() {
 }
 
 function navLink(id: string, text: string) {
-  const a = Object.assign(document.createElement("a"), { href: `#${id}`, textContent: text });
+  const a = Object.assign(document.createElement("a"), { href: SITE ? pathFor(id) : `#${id}`, textContent: text });
   a.dataset.id = id;
   return a;
 }
@@ -147,17 +160,33 @@ function buildPanels() {
   content.replaceChildren(...panels.values());
 }
 
+/** The converter the address asks for, if any. */
+function routeId(): string | undefined {
+  const id = SITE ? idFromPath(location.pathname, SITE) : location.hash.slice(1);
+  return id && byId.has(id) ? id : undefined;
+}
+
 const currentId = () => {
-  const hash = location.hash.slice(1);
+  const id = routeId();
   // Each audience opens on the converter it uses most.
-  return audience.tools.includes(hash) ? hash : audience.tools[0];
+  return id && audience.tools.includes(id) ? id : audience.tools[0];
 };
 
 function syncUrl() {
   const p = new URLSearchParams();
   if (audience !== EVERYTHING) p.set("for", audience.id);
   p.set("region", region);
-  history.replaceState(null, "", `?${p}#${currentId()}`);
+  if (!SITE) return history.replaceState(null, "", `?${p}#${currentId()}`);
+  // The home page stays the home page until a converter is chosen.
+  history.replaceState(null, "", `${routeId() ? pathFor(currentId()) : SITE}?${p}`);
+}
+
+/** Go to a converter's address: a new history entry, like following a link. */
+function navigate(id: string) {
+  if (SITE) {
+    history.pushState(null, "", pathFor(id) + location.search);
+    show(true);
+  } else location.hash = id;
 }
 
 function setAudience(a: Audience) {
@@ -185,6 +214,7 @@ function show(focus: boolean) {
   // The converter pane scrolls on its own, so a new converter starts at its top.
   if (id !== shown) content.scrollTop = 0;
   shown = id;
+  if (SITE) document.title = `${routeId() ? PAGES[id].title : HOME.title} | UOM Converter`;
   markCurrent();
   picker.value = id;
   if (focus) panels.get(id)!.querySelector<HTMLElement>("input[data-field]")?.focus();
@@ -193,8 +223,8 @@ function show(focus: boolean) {
 /** Open a converter, switching to Everything if the current audience doesn't list it. */
 function open(id: string, focus = true) {
   if (!audience.tools.includes(id)) setAudience(EVERYTHING);
-  if (location.hash === `#${id}`) show(focus);
-  else location.hash = id;
+  if (routeId() === id) show(focus);
+  else navigate(id);
 }
 
 // ---------- Sidebar: search and keyboard ----------
@@ -228,7 +258,7 @@ sidebar.addEventListener("keydown", (e) => {
   next.focus();
   // Preview the audience's own converters as focus moves; a match from Everything opens on Enter.
   if (audience.tools.includes(next.dataset.id!)) {
-    history.replaceState(null, "", `#${next.dataset.id}`);
+    history.replaceState(null, "", SITE ? pathFor(next.dataset.id!) + location.search : `#${next.dataset.id}`);
     show(false);
   }
 });
@@ -256,8 +286,16 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
-picker.addEventListener("change", () => (location.hash = picker.value));
+picker.addEventListener("change", () => navigate(picker.value));
 window.addEventListener("hashchange", () => show(true));
+// On the website, Back and Forward move between converters' addresses.
+if (SITE) window.addEventListener("popstate", () => {
+  // Back to a converter the current audience doesn't list: show it under Everything.
+  const id = routeId();
+  if (id && !audience.tools.includes(id)) setAudience(EVERYTHING);
+  else show(true);
+});
+if (SITE) siteExtras(SITE);
 buildControls();
 buildNav();
 buildPanels();

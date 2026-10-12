@@ -7,7 +7,10 @@ match the release tags (`v<version>`).
 
 ## [Unreleased]
 
-No unreleased changes.
+### Added
+
+- the website, at https://uom-converter.com/: every converter at its own address with
+  its own title and description, a sitemap, and an offline copy once visited
 
 ## [1.0.0] - 2026-10-10
 

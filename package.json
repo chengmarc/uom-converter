@@ -12,6 +12,9 @@
     "app": "vite build src/web --outDir ../../dist --emptyOutDir --base ./ && electron .",
     "dist:win": "vite build src/web --outDir ../../dist --emptyOutDir --base ./ && electron-builder --win",
     "dist:store": "vite build src/web --outDir ../../dist --emptyOutDir --base ./ && electron-builder --win appx",
+    "dev": "vite --config vite.site.config.ts",
+    "build:site": "vite build --config vite.site.config.ts",
+    "preview:site": "vite preview --config vite.site.config.ts",
     "store:assets": "vite build src/web --outDir ../../dist --emptyOutDir --base ./ && electron store/render.cjs"
   },
   "devDependencies": {
