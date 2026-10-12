@@ -3,13 +3,14 @@
 import "@fontsource-variable/inter/opsz.css";
 import type { Region } from "../core/region";
 import { AUDIENCES, type Audience } from "./audiences";
-import { TOOLS } from "./converters";
+import { TOOLS } from "../converters";
 import { icon } from "./icons";
 import { HOME, idFromPath, PAGES } from "./pages";
 import { siteExtras } from "./site";
-import { guessRegion, regionInfo, REGIONS } from "./regions";
-import { setNumberStyle } from "./format";
-import { dyn, el, renderConverter, type Converter, type Values } from "./ui";
+import { guessRegion, regionInfo, REGIONS } from "../converters/regions";
+import { setNumberStyle } from "../converters/format";
+import { dyn, type Converter, type Values } from "../converters/model";
+import { el, renderConverter } from "./ui";
 
 // audiences.test.ts checks every id an audience lists exists.
 const byId = new Map(TOOLS.map((t) => [t.id, t]));

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { AUDIENCES } from "./audiences";
-import { TOOLS } from "./converters";
+import { TOOLS } from "../converters";
 
 describe("audiences", () => {
   it("only list converters that exist, once each", () => {

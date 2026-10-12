@@ -1,8 +1,28 @@
-// Small inline-SVG diagrams for results. Colours come from CSS classes (see style.css), so they
-// follow light and dark mode. Each returns a <svg> with a text alternative.
+// Draws a result's diagram (src/converters/visual.ts) as inline SVG. Colours come from CSS
+// classes (see style.css), so they follow light and dark mode. Each is a <svg> with a text
+// alternative.
 
-import { fmt } from "./format";
-import type { Status } from "./ui";
+import { fmt } from "../converters/format";
+import type { Section, Visual } from "../converters/visual";
+
+type Of<K extends Visual["kind"]> = Extract<Visual, { kind: K }>;
+
+export function drawVisual(v: Visual): Element {
+  switch (v.kind) {
+    case "gauge":
+      return gauge(v);
+    case "cross-sections":
+      return crossSections(v.items);
+    case "ruler":
+      return ruler(v.inches, v.marks);
+    case "packs":
+      return packs(v);
+    case "temperature":
+      return temperatureScale(v.celsius);
+    case "price-gap":
+      return priceGap(v.a, v.b, v.factor);
+  }
+}
 
 const NS = "http://www.w3.org/2000/svg";
 
@@ -26,8 +46,7 @@ const text = (x: number, y: number, t: string, cls = "viz-text", anchor = "middl
 
 // ---------- Gauge: a value against limits ----------
 
-/** A bar filled to `value`, with limit marks (e.g. 3% and 5% voltage drop). */
-export function gauge(opts: { value: number; unit: string; marks: { at: number; label: string }[]; status: Status }): Element {
+function gauge(opts: Of<"gauge">): Element {
   const W = 320;
   const x0 = 10;
   const x1 = W - 10;
@@ -46,15 +65,7 @@ export function gauge(opts: { value: number; unit: string; marks: { at: number; 
 
 // ---------- Conductor cross-sections to scale ----------
 
-export interface Section {
-  label: string;
-  sub: string;
-  areaMm2: number;
-  kind: "input" | "match" | "other";
-}
-
-/** Circles with area to scale, so "nearest" and "next larger" can be seen side by side. */
-export function crossSections(items: Section[]): Element {
+function crossSections(items: Section[]): Element {
   const maxD = 64;
   const maxArea = Math.max(...items.map((i) => i.areaMm2));
   const colW = 100;
@@ -74,8 +85,8 @@ export function crossSections(items: Section[]): Element {
 
 // ---------- Ruler ----------
 
-/** One inch of ruler around the value, 1/16" ticks, with the value and nearest fractions marked. */
-export function ruler(inches: number, marks: { at: number; label: string; kind: "exact" | "near" }[]): Element {
+/** 1/16" ticks. */
+function ruler(inches: number, marks: Of<"ruler">["marks"]): Element {
   const W = 320;
   const x0 = 14;
   const x1 = W - 14;
@@ -97,11 +108,8 @@ export function ruler(inches: number, marks: { at: number; label: string; kind: 
 
 // ---------- Packs, coils and reels ----------
 
-/**
- * One shape per pack (up to 12), the last one filled only as far as it's used, so the extra
- * shows. `lastUsed` is 0–1.
- */
-export function packs(opts: { count: number; lastUsed: number; shape: "box" | "reel"; label: string }): Element {
+/** Up to 12 shapes, then "+ n more". */
+function packs(opts: Of<"packs">): Element {
   const shown = Math.min(opts.count, 12);
   const size = 30;
   const gap = 8;
@@ -128,8 +136,7 @@ export function packs(opts: { count: number; lastUsed: number; shape: "box" | "r
 
 // ---------- Temperature ----------
 
-/** A −40 to 120 °C scale with the usual conductor ratings marked. */
-export function temperatureScale(celsius: number): Element {
+function temperatureScale(celsius: number): Element {
   const W = 320;
   const lo = -40;
   const hi = 120;
@@ -147,8 +154,7 @@ export function temperatureScale(celsius: number): Element {
 
 // ---------- Two prices on a log scale ----------
 
-/** Both prices on a log axis; a 10×/100×/1000× gap shows as whole decades. */
-export function priceGap(a: number, b: number, factor: number | undefined): Element {
+function priceGap(a: number, b: number, factor: number | undefined): Element {
   const W = 320;
   const lo = Math.floor(Math.log10(Math.min(a, b))) - 0.3;
   const hi = Math.ceil(Math.log10(Math.max(a, b))) + 0.3;

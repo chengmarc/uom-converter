@@ -1,0 +1,35 @@
+// Conductor metal and weight, for the wire-size converters (awg, mm2, vdrop).
+
+import { conductorKgPerKm, kgPerKmToLbPerKft, type Metal } from "../core/conductors";
+import { amount } from "./format";
+import type { Row, Values } from "./model";
+
+export const metalField = {
+  kind: "choice" as const,
+  id: "metal",
+  label: "Metal (for weight)",
+  advanced: true,
+  options: [
+    { value: "Cu", label: "Copper" },
+    { value: "Al", label: "Aluminum" },
+  ],
+};
+
+/** The metal chosen in a metalField. */
+export const readMetal = (v: Values) => v.str("metal") as Metal;
+
+export function weightRows(areaMm2: number, metal: Metal): Row[] {
+  const kgKm = conductorKgPerKm(areaMm2, metal);
+  const lb = kgPerKmToLbPerKft(kgKm);
+  const group = `Weight, bare ${metal === "Cu" ? "copper" : "aluminum"}`;
+  return [
+    { group, label: "Pounds per 1,000 ft", ...amount(lb, 1, " lb") },
+    { group, label: "Kilograms per km", ...amount(kgKm, 1, " kg") },
+  ];
+}
+
+export const WIRE_FORMULA = [
+  "AWG diameter = 0.127 mm × 92^((36 − gauge) ÷ 39), the ASTM B258 definition. 1/0 is gauge 0, 4/0 is gauge −3.",
+  "1 kcmil = 1,000 circular mils = 0.5067 mm².",
+  "Weight = area × density: copper 8.89 g/cm³, aluminum 2.705 g/cm³. Bare solid metal; stranding adds about 2%, insulation not included.",
+];

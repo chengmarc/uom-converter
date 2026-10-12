@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { TOOLS } from "./converters";
+import { TOOLS } from "../converters";
 import { idFromPath, PAGES } from "./pages";
 
 describe("site pages", () => {

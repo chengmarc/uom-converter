@@ -1,99 +1,13 @@
-// A tiny framework: every converter is declared as inputs ("from") plus a compute function
-// that returns labelled result rows ("to"), and is rendered with the same layout.
+// Renders a converter (src/converters/model.ts) as a panel: examples, the "Convert from" form,
+// and the result, all laid out the same way for every converter.
 
 import type { Region } from "../core/region";
-import { numberStyle, parseNumber } from "./format";
+import { numberStyle, parseNumber } from "../converters/format";
+import { dyn, type Converter, type Field, type Output, type Row, type Table, type Values } from "../converters/model";
+import { drawVisual } from "./visuals";
 
-// ---------- Converter model ----------
-
-export type Dyn<T> = T | ((v: Values) => T);
-
-interface FieldBase {
-  id: string;
-  /** Tucked under "More options": settings most people leave at their default. */
-  advanced?: boolean;
-}
-
-export type Field =
-  | (FieldBase & {
-      kind: "number" | "text";
-      label: Dyn<string>;
-      /** Show the region's currency symbol (before or after, as the region writes it). */
-      currency?: boolean;
-      suffix?: Dyn<string>;
-      placeholder?: Dyn<string>;
-      value?: Dyn<string>;
-      list?: Dyn<string[]>;
-      signed?: boolean;
-      optional?: boolean;
-    })
-  | (FieldBase & { kind: "choice"; label: string; options: { value: string; label: string }[]; value?: Dyn<string> });
-
-export type Status = "good" | "warn" | "bad";
-
-export interface Row {
-  label: string;
-  /** Small print under the label. */
-  detail?: string;
-  /** Rows sharing a group are shown under that subheading. */
-  group?: string;
-  value: string;
-  copy?: string;
-  status?: Status;
-}
-
-export type Output =
-  | {
-      heading: string;
-      /** The first row is the answer and is shown large; the rest are details. */
-      rows: Row[];
-      /** How the numbers were worked out, kept out of the way under "How it's calculated". */
-      formula?: string[];
-      /** A small diagram shown under the answer. */
-      visual?: Element;
-    }
-  | { error: string; fields: string[] }
-  /** Not enough input yet. */
-  | undefined;
-
-/** One click fills the form with a worked example. Keys are field ids; values as typed. */
-export interface Example {
-  label: string;
-  set: Record<string, string>;
-}
-
-/**
- * Examples that differ by region; regions left out use the US ones. Built when a converter
- * renders, so numbers in labels use that region's format.
- */
-export type RegionExamples = Partial<Record<Region, Example[]>> & { us: Example[] };
-export const byRegion =
-  (ex: () => RegionExamples) =>
-  (v: Values): Example[] => {
-    const all = ex();
-    return all[v.region] ?? all.us;
-  };
-
-/** The sidebar sections. Each has an icon in icons.ts. */
-export type Topic = "Pricing" | "Wire & conduit" | "Electrical" | "Units" | "Product data";
-
-export interface Converter {
-  id: string;
-  topic: Topic;
-  title: string;
-  blurb: Dyn<string>;
-  fields: Field[];
-  compute: (v: Values) => Output;
-  examples: Dyn<Example[]>;
-  /** Shown in the results box before anything is entered. */
-  empty: string;
-  note?: Dyn<string>;
-  extra?: () => HTMLElement;
-  /** Called after each compute, e.g. to highlight a table row. */
-  after?: (out: Output, panel: HTMLElement) => void;
-}
-
-export class Values {
+/** Reads a converter's inputs from its panel's form. */
+class PanelValues implements Values {
   constructor(
     private conv: Converter,
     private panel: HTMLElement,
@@ -113,12 +27,10 @@ export class Values {
     return parseNumber(this.str(id), f.kind !== "choice" && f.signed);
   }
 
-  private field(id: string) {
+  private field(id: string): Field {
     return this.conv.fields.find((f) => f.id === id)!;
   }
 }
-
-export const dyn = <T>(d: Dyn<T>, v: Values) => (typeof d === "function" ? (d as (v: Values) => T)(v) : d);
 
 export function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: string) {
   const e = document.createElement(tag);
@@ -131,7 +43,7 @@ export function renderConverter(conv: Converter, region: Region): HTMLElement {
   const panel = el("section", "converter");
   panel.id = `c-${conv.id}`; // not the bare hash, so switching converters does not scroll
   panel.setAttribute("aria-labelledby", `${conv.id}-h`);
-  const values = new Values(conv, panel, region);
+  const values = new PanelValues(conv, panel, region);
   const h = el("h2", undefined, conv.title);
   h.id = `${conv.id}-h`;
   panel.append(h, el("p", "blurb", dyn(conv.blurb, values)));
@@ -249,7 +161,8 @@ export function renderConverter(conv: Converter, region: Region): HTMLElement {
 
   flow.append(arrow, to);
   if (conv.note) panel.append(el("p", "note", dyn(conv.note, values)));
-  if (conv.extra) panel.append(conv.extra());
+  const table = conv.table ? renderTable(conv.table()) : undefined;
+  if (table) panel.append(table);
 
   const update = () => {
     dynamic.forEach((d) => d());
@@ -272,7 +185,8 @@ export function renderConverter(conv: Converter, region: Region): HTMLElement {
       toTitle.textContent = out.heading;
       toBody.replaceChildren(...renderResult(out));
     }
-    conv.after?.(out, panel);
+    const hit = out && "rows" in out ? out.highlight : undefined;
+    table?.querySelectorAll<HTMLElement>("tbody tr").forEach((tr) => tr.classList.toggle("hit", tr.dataset.key !== undefined && tr.dataset.key === hit));
   };
 
   function fill(set: Record<string, string>) {
@@ -336,7 +250,7 @@ function renderResult(out: Extract<Output, { rows: Row[] }>): Node[] {
   }
   if (out.visual) {
     const fig = el("figure", "visual");
-    fig.append(out.visual);
+    fig.append(drawVisual(out.visual));
     nodes.push(fig);
   }
   if (rest.length) nodes.push(renderRows(rest));
@@ -349,6 +263,32 @@ function renderResult(out: Extract<Output, { rows: Row[] }>): Node[] {
     nodes.push(how);
   }
   return nodes;
+}
+
+/** A reference table folded under "summary"; rows with a key can be highlighted by the answer. */
+function renderTable(t: Table): HTMLElement {
+  const details = el("details", "table-wrap");
+  details.append(el("summary", undefined, t.summary));
+  const table = el("table", t.wide ? "wide" : undefined);
+  const headRow = el("tr");
+  for (const c of t.columns) headRow.append(Object.assign(el("th", undefined, c), { scope: "col" }));
+  const body = el("tbody");
+  for (const r of t.rows) {
+    const tr = el("tr");
+    if ("group" in r) {
+      tr.className = "cat";
+      tr.append(Object.assign(el("td", undefined, r.group), { colSpan: t.columns.length }));
+    } else {
+      if (r.key !== undefined) tr.dataset.key = r.key;
+      tr.append(...r.cells.map((c) => el("td", undefined, c)));
+    }
+    body.append(tr);
+  }
+  const head = el("thead");
+  head.append(headRow);
+  table.append(head, body);
+  details.append(table);
+  return details;
 }
 
 function renderRows(rows: Row[]): HTMLElement {
