@@ -1,5 +1,5 @@
 # Runs the tests, the typecheck and the website build on every push and pull request.
-# Deploying the website is Cloudflare's job (platforms/web/wrangler.jsonc), not this workflow's.
+# Deploying the website is Cloudflare's job (apps/web/wrangler.jsonc), not this workflow's.
 name: Checks
 
 on:

@@ -12,7 +12,11 @@
     "skipLibCheck": true
   },
   "include": [
-    "src",
-    "platforms"
+    "packages",
+    "apps"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "**/dist"
   ]
 }

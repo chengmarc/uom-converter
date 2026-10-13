@@ -1,0 +1,9 @@
+{
+  "name": "@uom/core",
+  "description": "The math: wire sizes, conduit, electrical, pricing, units, codes.",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./*": "./src/*.ts"
+  }
+}

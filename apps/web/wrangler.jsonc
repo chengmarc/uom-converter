@@ -1,0 +1,19 @@
+// The website on Cloudflare Workers: static files only (apps/web/dist/, from `npm run build:web`),
+// no Worker code. `npm run deploy:web` builds and deploys it; so does Cloudflare's Git integration
+// (Workers Builds) on every push to main. Response headers are in dist/_headers, written by vite.config.ts.
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "uom-converter",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist",
+    // Unknown addresses get 404.html with a 404 status. HTML handling is left at the default
+    // (auto-trailing-slash): awg-to-mm2.html is served at /awg-to-mm2, and /awg-to-mm2.html and
+    // /awg-to-mm2/ redirect there. dist/_redirects makes the .html redirects permanent (301).
+    "not_found_handling": "404-page"
+  },
+  "routes": [{ "pattern": "uom-converter.com", "custom_domain": true }],
+  // No *.workers.dev copy of the site competing with the domain in search results.
+  "workers_dev": false,
+  "preview_urls": false
+}

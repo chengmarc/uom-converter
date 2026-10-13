@@ -1,42 +1,33 @@
 {
   "name": "uom-converter",
-  "productName": "UOM Converter",
   "description": "Unit-of-measure conversions for the electrical industry.",
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "main": "platforms/windows/electron/main.cjs",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
     "test": "vitest run",
     "typecheck": "tsc",
-    "dev": "vite --config platforms/web/vite.config.ts",
-    "build:web": "vite build --config platforms/web/vite.config.ts",
-    "preview:web": "vite preview --config platforms/web/vite.config.ts",
-    "deploy:web": "npm run build:web && wrangler deploy --config platforms/web/wrangler.jsonc",
-    "app": "vite build --config platforms/windows/vite.config.ts && electron .",
-    "dist:win": "vite build --config platforms/windows/vite.config.ts && electron-builder --config platforms/windows/electron-builder.json --win",
-    "dist:store": "vite build --config platforms/windows/vite.config.ts && electron-builder --config platforms/windows/electron-builder.json --win appx",
-    "store:assets": "vite build --config platforms/windows/vite.config.ts && electron platforms/windows/store/render.cjs",
-    "android:icons": "electron platforms/android/render-icons.cjs",
-    "android:sync": "vite build --config platforms/android/vite.config.ts && cap sync android",
-    "android:run": "npm run android:sync && node platforms/android/gradle.cjs installDebug --launch",
-    "android:apk": "npm run android:sync && node platforms/android/gradle.cjs assembleDebug",
-    "android:aab": "npm run android:sync && node platforms/android/gradle.cjs bundleRelease"
+    "dev": "npm run dev -w @uom/web",
+    "build:web": "npm run build -w @uom/web",
+    "preview:web": "npm run preview -w @uom/web",
+    "deploy:web": "npm run deploy -w @uom/web",
+    "app": "npm run start -w @uom/windows",
+    "dist:win": "npm run dist -w @uom/windows",
+    "dist:store": "npm run dist:store -w @uom/windows",
+    "store:assets": "npm run store:assets -w @uom/windows",
+    "android:icons": "npm run icons -w @uom/android",
+    "android:sync": "npm run sync -w @uom/android",
+    "android:run": "npm run run -w @uom/android",
+    "android:apk": "npm run apk -w @uom/android",
+    "android:aab": "npm run aab -w @uom/android"
   },
   "devDependencies": {
-    "@capacitor/cli": "^8.5.3",
-    "@fontsource-variable/inter": "^5.3.0",
-    "electron": "^44.4.5",
-    "electron-builder": "^26.15.3",
     "typescript": "^5.6.0",
     "vite": "^7.3.0",
-    "vitest": "^3.2.0",
-    "wrangler": "^4.149.0"
-  },
-  "dependencies": {
-    "@capacitor/android": "^8.5.3",
-    "@capacitor/app": "^8.1.2",
-    "@capacitor/clipboard": "^8.0.1",
-    "@capacitor/core": "^8.5.3"
+    "vitest": "^3.2.0"
   }
 }

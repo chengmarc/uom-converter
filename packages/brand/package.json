@@ -1,0 +1,8 @@
+{
+  "name": "@uom/brand",
+  "description": "The app icon every app's icons are made from.",
+  "private": true,
+  "exports": {
+    "./app-icon.svg": "./app-icon.svg"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "@uom/ui",
+  "description": "A converter drawn as HTML, the roles and the icons, for the apps built on a web page.",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "dependencies": {
+    "@uom/converters": "*",
+    "@uom/core": "*"
+  }
+}

@@ -1,9 +1,0 @@
-{
-  "appId": "com.uomconverter.app",
-  "appName": "UOM Converter",
-  "webDir": "platforms/android/dist",
-  "android": {
-    "path": "platforms/android/android",
-    "backgroundColor": "#f7f6f3"
-  }
-}
