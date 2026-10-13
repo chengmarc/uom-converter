@@ -1,4 +1,4 @@
-// Renders the Android app's icons from src/brand/app-icon.svg, so they never drift from it:
+// Renders the Android app's icons from src/app-icon.svg, so they never drift from it:
 //   android/app/src/main/res/mipmap-*/   launcher icons at each screen density:
 //     ic_launcher_background / _foreground   the adaptive icon's layers: the tile's gradient, and
 //                                            the arrows and bolt (each launcher cuts its own shape)
@@ -13,7 +13,7 @@ const path = require("node:path");
 
 const ROOT = path.join(__dirname, "..", "..");
 const RES = path.join(__dirname, "android", "app", "src", "main", "res");
-const ICON = fs.readFileSync(path.join(ROOT, "src", "brand", "app-icon.svg"), "utf8");
+const ICON = fs.readFileSync(path.join(ROOT, "src", "app-icon.svg"), "utf8");
 // The tile's squircle, gradients, glyph and the glyph's drop shadow.
 const DEFS = /<defs>[\s\S]*<\/defs>/.exec(ICON)[0];
 

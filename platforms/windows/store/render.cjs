@@ -2,7 +2,7 @@
 //   electron/icon.png      the desktop window, taskbar and installer icon
 //   appx/                  tile and taskbar icons packed into the MSIX (electron-builder's buildResources)
 //   listing/               images uploaded to Partner Center: store logo, promo and screenshots
-// The icons come from src/brand/app-icon.svg; screenshots from the built page.
+// The icons come from src/app-icon.svg; screenshots from the built page.
 // Run with `npm run store:assets` (builds platforms/windows/dist/ first).
 
 const { app, BrowserWindow, nativeTheme, net, protocol } = require("electron");
@@ -13,7 +13,7 @@ const { pathToFileURL } = require("node:url");
 const ROOT = path.join(__dirname, "..", "..", "..");
 const WINDOWS = path.join(__dirname, "..");
 const DIST = path.join(WINDOWS, "dist");
-const ICON = fs.readFileSync(path.join(ROOT, "src", "brand", "app-icon.svg"), "utf8");
+const ICON = fs.readFileSync(path.join(ROOT, "src", "app-icon.svg"), "utf8");
 const SCALES = [100, 200];
 
 /**

@@ -1,6 +1,6 @@
 <div align="center">
 
-  <img src="src/brand/app-icon.svg" width="180"><br>
+  <img src="src/app-icon.svg" width="180"><br>
 
   <a href="https://apps.microsoft.com/detail/9PHZQBV736JC"><img src="platforms/windows/store/badges/badge-microsoft.svg" height="50"></a>
   <a href="https://github.com/chengmarc/uom-converter/releases/latest/download/UOM-Converter-setup.exe"><img src="platforms/windows/store/badges/badge-download.svg" height="50"></a>
@@ -38,7 +38,7 @@ src/
   core/          the math: wire sizes, conduit, electrical, pricing, units, codes
   converters/    each converter's fields, examples and compute, plus number formats and regions;
                  diagrams and tables as data, so nothing here depends on a page
-  brand/         the app icon every platform's icons are made from
+  app-icon.svg   the app icon every platform's icons are made from
   ui/            a converter drawn as HTML (form, result, diagrams), the roles and the icons,
                  for the platforms built on a web page; each styles it its own way
 platforms/
@@ -106,4 +106,4 @@ version comes from `package.json` (1.2.3 is Play's versionCode 10203).
 
 Windows releases follow the [release guide](platforms/windows/RELEASING.md): the `.exe` files go
 on GitHub Releases, the `.appx` to the Microsoft Store. Changes are listed in the
-[changelog](docs/CHANGELOG.md), and the app's [privacy policy](PRIVACY.md) covers every edition.
+[changelog](docs/CHANGELOG.md), and the app's [privacy policy](docs/PRIVACY.md) covers every edition.

@@ -133,7 +133,7 @@ function sitePages(): Plugin {
       writeFileSync(join(OUT, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${SITE_URL}sitemap.xml\n`);
 
       // Rendered for the Windows app by platforms/windows/store/render.cjs.
-      copyFileSync(resolve(ROOT, "src/brand/app-icon.svg"), join(OUT, "icon.svg"));
+      copyFileSync(resolve(ROOT, "src/app-icon.svg"), join(OUT, "icon.svg"));
       copyFileSync(resolve(ROOT, "platforms/windows/store/appx/Square44x44Logo.targetsize-256_altform-unplated.png"), join(OUT, "icon-256.png"));
       copyFileSync(resolve(ROOT, "platforms/windows/store/listing/screenshot-1-promo.png"), join(OUT, "og.png"));
       writeFileSync(

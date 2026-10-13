@@ -73,7 +73,7 @@ published there.
 2. **Build** with `npm run dist:store`.
 3. **Upload** `platforms/windows/release/UOM-Converter-<version>.appx` in a new Partner Center
    submission. For a first submission or new screenshots, upload the images in
-   `platforms/windows/store/listing/` in their numbered order, and give `PRIVACY.md`'s GitHub
+   `platforms/windows/store/listing/` in their numbered order, and give `docs/PRIVACY.md`'s GitHub
    address as the privacy policy URL.
 4. When asked about the `runFullTrust` capability: it's a desktop app built with Electron.
 
@@ -95,7 +95,7 @@ Everything else electron-builder leaves there (`win-unpacked/`, `.blockmap` file
 ### Where the images come from
 
 `npm run store:assets` runs [store/render.cjs](store/render.cjs), which renders from
-`src/brand/app-icon.svg` and the built page (paths below are in `platforms/windows/`):
+`src/app-icon.svg` and the built page (paths below are in `platforms/windows/`):
 
 | Output | Used for |
 |---|---|
