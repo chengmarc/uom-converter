@@ -394,6 +394,13 @@ a { color: var(--accent); }
 .crumbs a { color: var(--muted); text-decoration: none; }
 .crumbs a:hover { color: var(--accent); text-decoration: underline; }
 
+/* Every example worked out, as text (workedExamples in main.ts). */
+.worked { display: grid; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); gap: 0.75rem; max-width: 60rem; margin-top: 3rem; }
+.worked h2 { grid-column: 1 / -1; margin: 0 0 0.5rem; font-size: 1.35rem; font-weight: 700; letter-spacing: -0.015em; }
+.worked-item { padding: 1rem 1.1rem; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+.worked-item h3 { margin: 0 0 0.5rem; font-size: 1rem; font-weight: 650; line-height: 1.35; }
+.worked-item ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.2rem; color: var(--muted); font-size: 0.95rem; font-variant-numeric: tabular-nums; }
+
 .related { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--line); }
 .related h2 { margin: 0 0 1.25rem; font-size: 1.35rem; font-weight: 700; letter-spacing: -0.015em; }
 

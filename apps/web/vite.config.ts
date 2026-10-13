@@ -274,12 +274,13 @@ function sitePages(): Plugin {
         writeFileSync(join(OUT, `${page.slug || "index"}.html`), html);
       });
 
-      const today = new Date().toISOString().slice(0, 10);
+      // No <lastmod>: the build doesn't know when a page last changed, and the build date would
+      // say every page changes on every deploy, which teaches search engines to ignore the field.
       const urls = [SITE_URL, ...pages.map((p) => SITE_URL + p.slug)];
       writeFileSync(
         join(OUT, "sitemap.xml"),
         `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
-          urls.map((u) => `  <url><loc>${u}</loc><lastmod>${today}</lastmod></url>`).join("\n") +
+          urls.map((u) => `  <url><loc>${u}</loc></url>`).join("\n") +
           `\n</urlset>\n`,
       );
       writeFileSync(join(OUT, "llms.txt"), llmsTxt(pages.map((page, i) => ({ page, topic: drawn[i + 2].topic })), drawn[0].regions));

@@ -8,7 +8,7 @@
 import "@fontsource-variable/inter/opsz.css";
 import type { Region } from "@uom/core/region";
 import { TOOLS } from "@uom/converters";
-import { setNumberStyle } from "@uom/converters/format";
+import { parseNumber, setNumberStyle } from "@uom/converters/format";
 import { dyn, type Converter, type Topic, type Values } from "@uom/converters/model";
 import { guessRegion, regionInfo, REGIONS } from "@uom/converters/regions";
 import { AUDIENCES, type Audience } from "@uom/ui/audiences";
@@ -279,6 +279,8 @@ function converterView(id: string): Node[] {
   }
   crumbs.append(ol);
   article.append(crumbs, panel(id, "h1"));
+  const worked = workedExamples(conv);
+  if (worked) article.append(worked);
 
   const others = TOOLS.filter((t) => t.topic === conv.topic && t.id !== id);
   if (others.length) {
@@ -291,6 +293,52 @@ function converterView(id: string): Node[] {
   }
   layout.append(side, article);
   return [layout];
+}
+
+/** A converter's inputs as an example sets them, the rest at their defaults: no form needed. */
+class ExampleValues implements Values {
+  constructor(
+    private conv: Converter,
+    private set: Record<string, string>,
+    readonly region: Region,
+  ) {}
+
+  str(id: string): string {
+    if (id in this.set) return this.set[id];
+    const f = this.conv.fields.find((x) => x.id === id)!;
+    if (f.value !== undefined) return dyn(f.value, this).trim();
+    return f.kind === "choice" ? f.options[0].value : "";
+  }
+
+  num(id: string): number | undefined {
+    const f = this.conv.fields.find((x) => x.id === id)!;
+    return parseNumber(this.str(id), f.kind !== "choice" && f.signed);
+  }
+}
+
+/**
+ * Every example worked out, as text: what the converter gives for each, without clicking through
+ * them. The page reads as an answer to "12 AWG in mm²" on its own, for people and search engines.
+ */
+function workedExamples(conv: Converter): HTMLElement | undefined {
+  const examples = dyn(conv.examples, { region } as Values);
+  const items = examples.flatMap((ex) => {
+    const out = conv.compute(new ExampleValues(conv, ex.set, region));
+    if (!out || "error" in out || !out.rows.length) return [];
+    const item = el("div", "worked-item");
+    const list = el("ul");
+    // The answer and the details that come with it, up to the first few.
+    for (const r of out.rows.slice(0, 5)) list.append(el("li", undefined, `${r.label}: ${r.value}`));
+    item.append(el("h3", undefined, out.heading), list);
+    return [item];
+  });
+  if (!items.length) return undefined;
+  const s = el("section", "worked");
+  s.setAttribute("aria-labelledby", "worked-h");
+  const h = el("h2", undefined, "Worked examples");
+  h.id = "worked-h";
+  s.append(h, ...items);
+  return s;
 }
 
 // ---------- Drawing the page for the address ----------
