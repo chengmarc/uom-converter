@@ -8,6 +8,7 @@
 //                       HTML itself has the converter and links, not just an empty <main>.
 //   404.html           served for unknown addresses
 //   sitemap.xml, robots.txt
+//   llms.txt            the site and every converter, for AI assistants (llmstxt.org)
 //   app-icon.svg        from @uom/brand's public folder, as in every app
 //   manifest.webmanifest, sw.js, icons   install from the browser and use it offline
 //   og.png              the preview image when a link is shared
@@ -144,12 +145,22 @@ const BODY = /(<body>)([\s\S]*)(<\/body>)/;
  * script runs in happy-dom, a browser for Node; in the browser it runs again and redraws the
  * page with the visitor's region. Drawn for the US, the region most visitors get.
  */
-async function prerender(shell: string, paths: string[]): Promise<string[]> {
+interface Drawn {
+  body: string;
+  /** The page's <h1>. */
+  name: string;
+  /** A converter page's topic, from its breadcrumb. */
+  topic?: string;
+  /** The region buttons: "US (NEC, 60 Hz)". */
+  regions: string[];
+}
+
+async function prerender(shell: string, paths: string[]): Promise<Drawn[]> {
   const src = shell.match(/<script type="module" crossorigin src="([^"]+)"><\/script>/)?.[1];
   const body = shell.match(BODY)?.[2];
   if (!src || !body) throw new Error("index.html: expected the module script and a <body>");
   const script = pathToFileURL(join(OUT, src.slice(BASE.length))).href;
-  const out: string[] = [];
+  const out: Drawn[] = [];
   for (const [i, path] of paths.entries()) {
     GlobalRegistrator.register({ url: new URL(path, SITE_URL).href });
     try {
@@ -159,12 +170,52 @@ async function prerender(shell: string, paths: string[]): Promise<string[]> {
       // What was typed or picked is a property, which HTML doesn't keep: write it as the attribute.
       document.querySelectorAll("input").forEach((e) => e.setAttribute("value", e.value));
       document.querySelectorAll("option").forEach((e) => e.toggleAttribute("selected", e.selected));
-      out.push(document.body.innerHTML);
+      const name = document.querySelector("main h1")?.textContent?.trim();
+      if (!name) throw new Error(`${path}: expected an <h1>`);
+      out.push({
+        body: document.body.innerHTML,
+        name,
+        topic: document.querySelector(".crumbs li:last-child a")?.textContent?.trim(),
+        regions: Array.from(document.querySelectorAll("#region button"), (b) => `${b.textContent} (${b.getAttribute("title")})`),
+      });
     } finally {
       await GlobalRegistrator.unregister();
     }
   }
   return out;
+}
+
+const REPO_URL = "https://github.com/chengmarc/uom-converter";
+
+/**
+ * The site for AI assistants and the crawlers that feed them (https://llmstxt.org): what it is,
+ * then every converter by topic, each linked to its page with the page's own description. Built
+ * from the same pages as the sitemap, with the topics as the pages' breadcrumbs show them.
+ */
+function llmsTxt(converters: { page: Page; topic?: string }[], regions: string[]): string {
+  const topics = new Map<string, Page[]>();
+  for (const { page, topic } of converters) {
+    if (!topic) throw new Error(`${page.slug}: no topic in its breadcrumb`);
+    topics.set(topic, [...(topics.get(topic) ?? []), page]);
+  }
+  const item = (name: string, url: string, notes: string) => `- [${name}](${url}): ${notes}`;
+  return [
+    `# ${NAME}`,
+    `> ${HOME.description}`,
+    [
+      `${NAME} is a free website with ${converters.length} converters and calculators for people who buy, sell, specify and install electrical products: suppliers, distributors, counter staff, electricians, engineers and product data (PIM) teams.`,
+      `Every converter has its own page. The region picked in the page header sets the units, codes and frequency the converters use: ${regions.join(", ")}. The HTML of each page shows the converter with a worked example in US units and how it's calculated; every answer is worked out in the visitor's browser, with no account and nothing sent anywhere.`,
+      `The home page, ${SITE_URL}, lists every converter.`,
+    ].join("\n\n"),
+    ...[...topics].map(([topic, pages]) => `## ${topic}\n\n${pages.map((p) => item(p.title, SITE_URL + p.slug, p.description)).join("\n")}`),
+    `## Optional\n\n` +
+      [
+        item("Windows app", STORE_URL, "the same converters as a free Windows app from the Microsoft Store, working offline"),
+        item("Source code", REPO_URL, "the website and apps, open source under the Apache 2.0 license"),
+        item("Privacy", `${REPO_URL}/blob/main/docs/PRIVACY.md`, "what the website and apps do and don't collect"),
+        item("Sitemap", `${SITE_URL}sitemap.xml`, "every page's address"),
+      ].join("\n"),
+  ].join("\n\n") + "\n";
 }
 
 /** Offline copy: every page and asset cached on install, then served from cache and refreshed in the background. */
@@ -216,12 +267,10 @@ function sitePages(): Plugin {
       const pages = Object.values(PAGES);
       const missing = { ...HOME, slug: "404", title: "Page not found" };
       const all = [HOME, missing, ...pages];
-      const bodies = await prerender(shell, all.map((p) => BASE + p.slug));
+      const drawn = await prerender(shell, all.map((p) => BASE + p.slug));
       all.forEach((page, i) => {
-        const h1 = bodies[i].match(/<h1[^>]*>([^<]*)<\/h1>/)?.[1];
-        if (!h1) throw new Error(`${page.slug || "index"}.html: expected an <h1>`);
-        const name = h1.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&amp;/g, "&");
-        const html = withHead(shell, page, name, page === missing).replace(BODY, (_, open, __, close) => open + bodies[i] + close);
+        const { body, name } = drawn[i];
+        const html = withHead(shell, page, name, page === missing).replace(BODY, (_, open, __, close) => open + body + close);
         writeFileSync(join(OUT, `${page.slug || "index"}.html`), html);
       });
 
@@ -233,6 +282,7 @@ function sitePages(): Plugin {
           urls.map((u) => `  <url><loc>${u}</loc><lastmod>${today}</lastmod></url>`).join("\n") +
           `\n</urlset>\n`,
       );
+      writeFileSync(join(OUT, "llms.txt"), llmsTxt(pages.map((page, i) => ({ page, topic: drawn[i + 2].topic })), drawn[0].regions));
       // Search engines read robots.txt only at a domain's root, which is where the site lives.
       writeFileSync(join(OUT, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${SITE_URL}sitemap.xml\n`);
 

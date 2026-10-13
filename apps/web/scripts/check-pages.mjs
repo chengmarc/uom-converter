@@ -1,6 +1,6 @@
 // Checks the built website (apps/web/dist/) the way a search engine or link preview reads it:
 // every page's title, description, canonical address, share tags, structured data and heading,
-// the sitemap, and the links between pages. `npm run check:web`, after `npm run build:web`.
+// the sitemap and llms.txt, and the links between pages. `npm run check:web`, after `npm run build:web`.
 // Exits non-zero, listing every problem, if anything is off.
 
 import { existsSync, readdirSync, readFileSync } from "node:fs";
@@ -131,8 +131,14 @@ const sitemap = all(readFileSync(join(DIST, "sitemap.xml"), "utf8"), /<loc>([^<]
 for (const loc of sitemap) if (!indexed.has(loc)) fail("sitemap.xml", `${loc} isn't an indexed page`);
 for (const url of indexed.keys()) if (!sitemap.includes(url)) fail("sitemap.xml", `${url} is missing`);
 
+// llms.txt links every indexed page, and only those, by its canonical address.
+const llms = readFileSync(join(DIST, "llms.txt"), "utf8");
+const linked = all(llms, /\]\(([^)]*)\)/g).filter((u) => u.startsWith(SITE_URL) && !u.endsWith(".xml"));
+for (const url of linked) if (!indexed.has(url)) fail("llms.txt", `${url} isn't an indexed page`);
+for (const url of indexed.keys()) if (!llms.includes(url)) fail("llms.txt", `${url} is missing`);
+
 if (errors.length) {
   console.error(`${errors.length} problem${errors.length === 1 ? "" : "s"} in the built pages:\n  ${errors.join("\n  ")}`);
   process.exit(1);
 }
-console.log(`${files.length} pages checked: titles, descriptions, share tags, structured data, headings, links and sitemap.`);
+console.log(`${files.length} pages checked: titles, descriptions, share tags, structured data, headings, links, sitemap and llms.txt.`);
