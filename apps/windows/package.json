@@ -3,6 +3,7 @@
   "productName": "UOM Converter",
   "description": "Unit-of-measure conversions for the electrical industry.",
   "private": true,
+  "license": "Apache-2.0",
   "type": "module",
   "main": "electron/main.cjs",
   "scripts": {

@@ -113,3 +113,7 @@ root `package.json` (1.2.3 is Play's versionCode 10203).
 Windows releases follow the [release guide](apps/windows/RELEASING.md): the `.exe` files go
 on GitHub Releases, the `.appx` to the Microsoft Store. Changes are listed in the
 [changelog](docs/CHANGELOG.md), and the app's [privacy policy](docs/PRIVACY.md) covers every edition.
+
+## License
+
+[Apache 2.0](LICENSE).
