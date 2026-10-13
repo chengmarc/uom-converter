@@ -1,5 +1,5 @@
-// The diagrams a result can carry, as data. Each app draws them its own way (src/web/visuals.ts
-// draws inline SVG). The constructors keep converter code reading like a call to a diagram.
+// The diagrams a result can carry, as data. Each platform draws them its own way
+// (platforms/web/visuals.ts draws inline SVG). The constructors keep converter code reading like a call to a diagram.
 
 import type { Status } from "./model";
 

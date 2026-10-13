@@ -1,9 +1,9 @@
 // Renders a converter (src/converters/model.ts) as a panel: examples, the "Convert from" form,
 // and the result, all laid out the same way for every converter.
 
-import type { Region } from "../core/region";
-import { numberStyle, parseNumber } from "../converters/format";
-import { dyn, type Converter, type Field, type Output, type Row, type Table, type Values } from "../converters/model";
+import type { Region } from "../../src/core/region";
+import { numberStyle, parseNumber } from "../../src/converters/format";
+import { dyn, type Converter, type Field, type Output, type Row, type Table, type Values } from "../../src/converters/model";
 import { drawVisual } from "./visuals";
 
 /** Reads a converter's inputs from its panel's form. */

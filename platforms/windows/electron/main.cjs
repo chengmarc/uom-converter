@@ -1,5 +1,5 @@
-// Electron shell for the UOM converter. The page is the same static build as the website
-// (dist/), served from a private app:// scheme so it gets a real origin: browser storage and
+// Electron shell for the UOM converter. The page is the static build in platforms/windows/dist/
+// (see ../vite.config.ts), served from a private app:// scheme so it gets a real origin: browser storage and
 // clipboard behave exactly as on the web, and nothing can load from outside the app.
 
 const { app, BrowserWindow, Menu, nativeTheme, net, protocol, screen, shell } = require("electron");
@@ -8,7 +8,7 @@ const os = require("node:os");
 const path = require("node:path");
 const { pathToFileURL } = require("node:url");
 
-const DIST = path.join(__dirname, "..", "..", "dist");
+const DIST = path.join(__dirname, "..", "dist");
 
 /**
  * The page's frame colours (--chrome and --text in style.css, light and dark), for the title bar

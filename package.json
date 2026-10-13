@@ -5,17 +5,17 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "main": "src/electron/main.cjs",
+  "main": "platforms/windows/electron/main.cjs",
   "scripts": {
     "test": "vitest run",
     "typecheck": "tsc",
-    "app": "vite build src/web --outDir ../../dist --emptyOutDir --base ./ && electron .",
-    "dist:win": "vite build src/web --outDir ../../dist --emptyOutDir --base ./ && electron-builder --win",
-    "dist:store": "vite build src/web --outDir ../../dist --emptyOutDir --base ./ && electron-builder --win appx",
-    "dev": "vite --config vite.site.config.ts",
-    "build:site": "vite build --config vite.site.config.ts",
-    "preview:site": "vite preview --config vite.site.config.ts",
-    "store:assets": "vite build src/web --outDir ../../dist --emptyOutDir --base ./ && electron store/render.cjs"
+    "dev": "vite --config platforms/web/vite.config.ts",
+    "build:web": "vite build --config platforms/web/vite.config.ts",
+    "preview:web": "vite preview --config platforms/web/vite.config.ts",
+    "app": "vite build --config platforms/windows/vite.config.ts && electron .",
+    "dist:win": "vite build --config platforms/windows/vite.config.ts && electron-builder --config platforms/windows/electron-builder.json --win",
+    "dist:store": "vite build --config platforms/windows/vite.config.ts && electron-builder --config platforms/windows/electron-builder.json --win appx",
+    "store:assets": "vite build --config platforms/windows/vite.config.ts && electron platforms/windows/store/render.cjs"
   },
   "devDependencies": {
     "@fontsource-variable/inter": "^5.3.0",
@@ -24,48 +24,5 @@
     "typescript": "^5.6.0",
     "vite": "^7.3.0",
     "vitest": "^3.2.0"
-  },
-  "build": {
-    "appId": "com.uomconverter.app",
-    "files": [
-      "dist/**",
-      "src/electron/**",
-      "package.json"
-    ],
-    "directories": {
-      "output": "release",
-      "buildResources": "store"
-    },
-    "electronDist": "node_modules/electron/dist",
-    "win": {
-      "target": [
-        "nsis",
-        "portable"
-      ],
-      "icon": "src/electron/icon.png"
-    },
-    "nsis": {
-      "oneClick": false,
-      "perMachine": false,
-      "allowToChangeInstallationDirectory": true,
-      "artifactName": "UOM-Converter-setup.exe"
-    },
-    "portable": {
-      "artifactName": "UOM-Converter-portable.exe"
-    },
-    "appx": {
-      "identityName": "chengmarc.UOMConverter",
-      "publisher": "CN=58F02A86-A694-404A-8E09-F891292262CA",
-      "publisherDisplayName": "chengmarc",
-      "applicationId": "UOMConverter",
-      "displayName": "UOM Converter",
-      "backgroundColor": "transparent",
-      "minVersion": "10.0.17763.0",
-      "maxVersionTested": "10.0.26100.0",
-      "languages": [
-        "en-US"
-      ],
-      "artifactName": "UOM-Converter-${version}.${ext}"
-    }
   }
 }

@@ -1,6 +1,6 @@
-// The website build: `npm run build:site` writes site/, published to GitHub Pages by
-// .github/workflows/pages.yml. It is the same page as the desktop app, plus:
-//   <slug>/index.html   one page per converter (src/web/pages.ts), each with its own title,
+// The website build: `npm run build:web` writes platforms/web/dist/, published to GitHub Pages by
+// .github/workflows/pages.yml. It is the page in this folder, plus:
+//   <slug>/index.html   one page per converter (pages.ts), each with its own title,
 //                       description and canonical address, so searches land on the converter
 //   404.html            GitHub Pages' fallback for unknown addresses
 //   sitemap.xml, robots.txt
@@ -12,11 +12,12 @@ import { createHash } from "node:crypto";
 import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { defineConfig, type Plugin } from "vite";
-import { HOME, PAGES, type Page } from "./src/web/pages";
+import { HOME, PAGES, type Page } from "./pages";
 
 const SITE_URL = (process.env.SITE_URL ?? "https://uom-converter.com/").replace(/\/?$/, "/");
 const BASE = new URL(SITE_URL).pathname;
-const OUT = resolve(__dirname, "site");
+const OUT = resolve(__dirname, "dist");
+const ROOT = resolve(__dirname, "../..");
 const NAME = "UOM Converter";
 const STORE_URL = "https://apps.microsoft.com/detail/9PHZQBV736JC";
 
@@ -65,7 +66,7 @@ function withHead(html: string, page: Page, noindex = false): string {
 
 /** Offline copy: every page and asset cached on install, then served from cache and refreshed in the background. */
 function serviceWorker(files: string[], version: string): string {
-  return `// Written by vite.site.config.ts.
+  return `// Written by platforms/web/vite.config.ts.
 const CACHE = "uom-${version}";
 const FILES = ${JSON.stringify(files)};
 self.addEventListener("install", (e) => {
@@ -128,9 +129,10 @@ function sitePages(): Plugin {
       // Search engines read robots.txt only at a domain's root, which is where the site lives.
       writeFileSync(join(OUT, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${SITE_URL}sitemap.xml\n`);
 
-      copyFileSync(resolve(__dirname, "src/web/app-icon.svg"), join(OUT, "icon.svg"));
-      copyFileSync(resolve(__dirname, "store/appx/Square44x44Logo.targetsize-256_altform-unplated.png"), join(OUT, "icon-256.png"));
-      copyFileSync(resolve(__dirname, "store/listing/screenshot-1-promo.png"), join(OUT, "og.png"));
+      // Rendered for the Windows app by platforms/windows/store/render.cjs.
+      copyFileSync(resolve(ROOT, "src/brand/app-icon.svg"), join(OUT, "icon.svg"));
+      copyFileSync(resolve(ROOT, "platforms/windows/store/appx/Square44x44Logo.targetsize-256_altform-unplated.png"), join(OUT, "icon-256.png"));
+      copyFileSync(resolve(ROOT, "platforms/windows/store/listing/screenshot-1-promo.png"), join(OUT, "og.png"));
       writeFileSync(
         join(OUT, "manifest.webmanifest"),
         JSON.stringify(
@@ -162,7 +164,7 @@ function sitePages(): Plugin {
 }
 
 export default defineConfig({
-  root: resolve(__dirname, "src/web"),
+  root: __dirname,
   base: BASE,
   define: { __SITE_BASE__: JSON.stringify(BASE) },
   build: { outDir: OUT, emptyOutDir: true },

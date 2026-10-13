@@ -1,0 +1,43 @@
+{
+  "appId": "com.uomconverter.app",
+  "files": [
+    "platforms/windows/dist/**",
+    "platforms/windows/electron/**",
+    "package.json"
+  ],
+  "directories": {
+    "output": "platforms/windows/release",
+    "buildResources": "platforms/windows/store"
+  },
+  "electronDist": "node_modules/electron/dist",
+  "win": {
+    "target": [
+      "nsis",
+      "portable"
+    ],
+    "icon": "platforms/windows/electron/icon.png"
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": false,
+    "allowToChangeInstallationDirectory": true,
+    "artifactName": "UOM-Converter-setup.exe"
+  },
+  "portable": {
+    "artifactName": "UOM-Converter-portable.exe"
+  },
+  "appx": {
+    "identityName": "chengmarc.UOMConverter",
+    "publisher": "CN=58F02A86-A694-404A-8E09-F891292262CA",
+    "publisherDisplayName": "chengmarc",
+    "applicationId": "UOMConverter",
+    "displayName": "UOM Converter",
+    "backgroundColor": "transparent",
+    "minVersion": "10.0.17763.0",
+    "maxVersionTested": "10.0.26100.0",
+    "languages": [
+      "en-US"
+    ],
+    "artifactName": "UOM-Converter-${version}.${ext}"
+  }
+}

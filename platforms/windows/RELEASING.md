@@ -1,10 +1,11 @@
 # Releasing
 
 How the source tree becomes the three release files: an installer and a portable exe for GitHub
-Releases, and an `.appx` for the Microsoft Store. electron-builder builds all three from the
-`build` settings in [package.json](../package.json).
+Releases, and an `.appx` for the Microsoft Store. electron-builder builds all three from
+[electron-builder.json](electron-builder.json), into `platforms/windows/release/`. Commands run from
+the repo root.
 
-← Back to the [README](../README.md).
+← Back to the [README](../../README.md).
 
 ## Cut a release
 
@@ -12,7 +13,7 @@ Releases, and an `.appx` for the Microsoft Store. electron-builder builds all th
 2. **Choose the version** (`1.2.0`, say). The git tag `v<version>` is the version of record;
    bump `version` in `package.json` to match: run `npm version <version> --no-git-tag-version`,
    which also updates `package-lock.json`. It sets the Store package version (`<version>.0`).
-3. **Write it up.** Move the entries under `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md) into a
+3. **Write it up.** Move the entries under `[Unreleased]` in [CHANGELOG.md](../../docs/CHANGELOG.md) into a
    dated `[<version>]` section, and add `docs/release/RELEASE_NOTES_<version>.md`.
 4. **Check:**
 
@@ -30,8 +31,8 @@ Releases, and an `.appx` for the Microsoft Store. electron-builder builds all th
 6. **Build:**
 
    ```
-   npm run dist:win     # release/UOM-Converter-setup.exe and release/UOM-Converter-portable.exe
-   npm run dist:store   # release/UOM-Converter-<version>.appx
+   npm run dist:win     # UOM-Converter-setup.exe and UOM-Converter-portable.exe
+   npm run dist:store   # UOM-Converter-<version>.appx
    ```
 
 7. **Try it out.** Install with the setup exe, ideally on a machine that hasn't run the app before:
@@ -52,7 +53,7 @@ Releases, and an `.appx` for the Microsoft Store. electron-builder builds all th
 9. **Publish** the two exe files to GitHub, with the release notes as the description:
 
    ```
-   gh release create v<version> release/UOM-Converter-setup.exe release/UOM-Converter-portable.exe --title "UOM Converter <version>" --notes-file docs/release/RELEASE_NOTES_<version>.md
+   gh release create v<version> platforms/windows/release/UOM-Converter-setup.exe platforms/windows/release/UOM-Converter-portable.exe --title "UOM Converter <version>" --notes-file docs/release/RELEASE_NOTES_<version>.md
    ```
 
    The README's download badge points at `releases/latest/download/UOM-Converter-setup.exe`, so it
@@ -67,34 +68,37 @@ rejects unsigned exe installers, so the exe files are for GitHub only and the `.
 published there.
 
 1. **One time:** copy the three values under Partner Center → the app → Product identity into
-   `build.appx` in `package.json`: `identityName`, `publisher` (`CN=…`) and `publisherDisplayName`.
+   `appx` in [electron-builder.json](electron-builder.json): `identityName`, `publisher` (`CN=…`) and `publisherDisplayName`.
    Until then they hold placeholders, and the Store rejects a package whose identity doesn't match.
 2. **Build** with `npm run dist:store`.
-3. **Upload** `release/UOM-Converter-<version>.appx` in a new Partner Center submission. For a
-   first submission or new screenshots, upload the images in `store/listing/` in their numbered
-   order, and give `PRIVACY.md`'s GitHub address as the privacy policy URL.
+3. **Upload** `platforms/windows/release/UOM-Converter-<version>.appx` in a new Partner Center
+   submission. For a first submission or new screenshots, upload the images in
+   `platforms/windows/store/listing/` in their numbered order, and give `PRIVACY.md`'s GitHub
+   address as the privacy policy URL.
 4. When asked about the `runFullTrust` capability: it's a desktop app built with Electron.
 
 ## Reference
 
 ### Release files
 
+In `platforms/windows/release/`:
+
 | File | Published to |
 |---|---|
-| `release/UOM-Converter-setup.exe` | GitHub Releases |
-| `release/UOM-Converter-portable.exe` | GitHub Releases |
-| `release/UOM-Converter-<version>.appx` | Microsoft Store (Partner Center) only |
+| `UOM-Converter-setup.exe` | GitHub Releases |
+| `UOM-Converter-portable.exe` | GitHub Releases |
+| `UOM-Converter-<version>.appx` | Microsoft Store (Partner Center) only |
 
-Everything else electron-builder leaves in `release/` (`win-unpacked/`, `.blockmap` files,
+Everything else electron-builder leaves there (`win-unpacked/`, `.blockmap` files,
 `builder-debug.yml`) is intermediate and isn't published.
 
 ### Where the images come from
 
-`npm run store:assets` runs [store/render.cjs](../store/render.cjs), which renders from
-`src/web/app-icon.svg` and the built page:
+`npm run store:assets` runs [store/render.cjs](store/render.cjs), which renders from
+`src/brand/app-icon.svg` and the built page (paths below are in `platforms/windows/`):
 
 | Output | Used for |
 |---|---|
-| `src/electron/icon.png` | The window, taskbar and installer icon |
+| `electron/icon.png` | The window, taskbar and installer icon |
 | `store/appx/` | Start, tile and taskbar icons inside the `.appx` |
 | `store/listing/` | Partner Center: store logo, box and poster art (designed in `store/logo.html`), the promo (`store/promo.html`) and screenshots |

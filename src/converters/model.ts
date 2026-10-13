@@ -1,7 +1,7 @@
 // What a converter is, apart from how any one app shows it: inputs ("from"), a compute function
 // that returns labelled result rows ("to"), worked examples, and optional diagrams and reference
-// tables described as data. Each app (src/web for the website and the Windows app) renders these
-// its own way; nothing here touches the page.
+// tables described as data. Each platform renders these its own way (platforms/web, which the
+// Windows app also uses for now); nothing here touches the page.
 
 import type { Region } from "../core/region";
 import type { Visual } from "./visual";

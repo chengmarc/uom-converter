@@ -1,5 +1,5 @@
 // What only the website has: a link to the Windows app, and offline use once installed from the
-// browser (sw.js, written by vite.site.config.ts).
+// browser (sw.js, written by vite.config.ts).
 
 import { el } from "./ui";
 

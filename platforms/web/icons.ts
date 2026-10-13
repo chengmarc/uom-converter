@@ -2,7 +2,7 @@
 // colour of wherever they sit.
 
 import type { AudienceId } from "./audiences";
-import type { Topic } from "../converters/model";
+import type { Topic } from "../../src/converters/model";
 
 // Typed like topics, so a new audience can't ship without an icon.
 const AUDIENCES: Record<AudienceId, string> = {

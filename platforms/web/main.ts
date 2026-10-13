@@ -1,15 +1,15 @@
 // Bundled with the app: the page may only load its own files (see the CSP in index.html).
 // Weight and optical-size axes: headings and big result values get display-cut letterforms.
 import "@fontsource-variable/inter/opsz.css";
-import type { Region } from "../core/region";
+import type { Region } from "../../src/core/region";
 import { AUDIENCES, type Audience } from "./audiences";
-import { TOOLS } from "../converters";
+import { TOOLS } from "../../src/converters";
 import { icon } from "./icons";
 import { HOME, idFromPath, PAGES } from "./pages";
 import { siteExtras } from "./site";
-import { guessRegion, regionInfo, REGIONS } from "../converters/regions";
-import { setNumberStyle } from "../converters/format";
-import { dyn, type Converter, type Values } from "../converters/model";
+import { guessRegion, regionInfo, REGIONS } from "../../src/converters/regions";
+import { setNumberStyle } from "../../src/converters/format";
+import { dyn, type Converter, type Values } from "../../src/converters/model";
 import { el, renderConverter } from "./ui";
 
 // audiences.test.ts checks every id an audience lists exists.
@@ -25,7 +25,7 @@ const EVERYTHING: Audience = {
 
 // ---------- Page ----------
 
-// The website build (vite.site.config.ts) sets this to the site's base path, and every converter
+// The website build (vite.config.ts here) sets this to the site's base path, and every converter
 // has its own address there (pages.ts). The desktop app leaves it unset and uses #<id> instead.
 declare const __SITE_BASE__: string | undefined;
 const SITE = typeof __SITE_BASE__ === "string" ? __SITE_BASE__ : undefined;

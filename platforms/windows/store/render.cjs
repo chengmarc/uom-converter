@@ -1,18 +1,19 @@
 // Renders every image derived from the app's own sources, so they never drift from it:
-//   src/electron/icon.png  the desktop window, taskbar and installer icon
+//   electron/icon.png      the desktop window, taskbar and installer icon
 //   appx/                  tile and taskbar icons packed into the MSIX (electron-builder's buildResources)
 //   listing/               images uploaded to Partner Center: store logo, promo and screenshots
-// The icons come from src/web/app-icon.svg; screenshots from the built page.
-// Run with `npm run store:assets` (builds dist/ first).
+// The icons come from src/brand/app-icon.svg; screenshots from the built page.
+// Run with `npm run store:assets` (builds platforms/windows/dist/ first).
 
 const { app, BrowserWindow, nativeTheme, net, protocol } = require("electron");
 const fs = require("node:fs");
 const path = require("node:path");
 const { pathToFileURL } = require("node:url");
 
-const ROOT = path.join(__dirname, "..");
-const DIST = path.join(ROOT, "dist");
-const ICON = fs.readFileSync(path.join(ROOT, "src", "web", "app-icon.svg"), "utf8");
+const ROOT = path.join(__dirname, "..", "..", "..");
+const WINDOWS = path.join(__dirname, "..");
+const DIST = path.join(WINDOWS, "dist");
+const ICON = fs.readFileSync(path.join(ROOT, "src", "brand", "app-icon.svg"), "utf8");
 const SCALES = [100, 200];
 
 /**
@@ -121,9 +122,9 @@ async function renderListing() {
   }
 
   // The promo shows the AWG screenshot, so it comes last. Its converter count is read
-  // from the list in converters/index.ts rather than written into the page.
+  // from the list in src/converters/index.ts rather than written into the page.
   nativeTheme.themeSource = "light";
-  const list = fs.readFileSync(path.join(ROOT, "src", "web", "converters", "index.ts"), "utf8");
+  const list = fs.readFileSync(path.join(ROOT, "src", "converters", "index.ts"), "utf8");
   const count = /export const TOOLS: Converter\[\] = \[([^\]]*)\]/.exec(list)[1].split(",").filter((t) => t.trim()).length;
   await renderPage("promo.html", path.join(dir, "screenshot-1-promo.png"), width, height, scale, `document.querySelector("#count").textContent = "${count} converters"`);
 }
@@ -145,8 +146,8 @@ async function renderPage(page, file, width, height, scale, script = "") {
 app.on("window-all-closed", () => {});
 
 app.whenReady().then(async () => {
-  if (!fs.existsSync(path.join(DIST, "index.html"))) throw new Error("No dist/: run it with `npm run store:assets`, which builds the page first.");
-  await renderIcon(path.join(ROOT, "src", "electron", "icon.png"), 1024, 1024, 1);
+  if (!fs.existsSync(path.join(DIST, "index.html"))) throw new Error("No platforms/windows/dist/: run it with `npm run store:assets`, which builds the page first.");
+  await renderIcon(path.join(WINDOWS, "electron", "icon.png"), 1024, 1024, 1);
   await renderTiles();
   await renderListing();
   app.quit();

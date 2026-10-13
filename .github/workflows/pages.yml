@@ -1,4 +1,4 @@
-# Builds the website (npm run build:site) and publishes it to GitHub Pages on every push to main.
+# Builds the website (npm run build:web) and publishes it to GitHub Pages on every push to main.
 # One-time setup: Settings → Pages → Build and deployment → Source: GitHub Actions.
 name: Website
 
@@ -31,10 +31,10 @@ jobs:
           ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
       - run: npm test
       - run: npm run typecheck
-      - run: npm run build:site
+      - run: npm run build:web
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: site
+          path: platforms/web/dist
 
   deploy:
     needs: build
