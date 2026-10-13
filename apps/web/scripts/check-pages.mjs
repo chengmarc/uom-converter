@@ -33,6 +33,8 @@ const files = readdirSync(DIST).filter((f) => f.endsWith(".html"));
 const indexed = new Map(); // canonical address → file
 const titles = new Map();
 const descriptions = new Map();
+/** [file, address, what] for addresses in structured data that must be indexed pages. */
+const pointsAt = [];
 
 for (const file of files) {
   const html = readFileSync(join(DIST, file), "utf8");
@@ -102,18 +104,26 @@ for (const file of files) {
         fail(file, `structured data isn't JSON: ${e.message}`);
       }
       const of = (type) => graph.filter((n) => n["@type"] === type);
-      if (of("WebPage")[0]?.url !== url) fail(file, "no WebPage at the page's address");
-      if (of("WebApplication")[0]?.url !== url) fail(file, "no WebApplication at the page's address");
+      // A topic's page is a collection listing its converters; any other page is about one application.
+      const collection = of("CollectionPage")[0];
+      if ((collection ?? of("WebPage")[0])?.url !== url) fail(file, "no WebPage or CollectionPage at the page's address");
+      if (collection) {
+        const items = of("ItemList")[0]?.itemListElement ?? [];
+        if (!items.length) fail(file, "a CollectionPage with no ItemList");
+        for (const it of items) pointsAt.push([file, it.url, "list item"]);
+      } else if (of("WebApplication")[0]?.url !== url) fail(file, "no WebApplication at the page's address");
       if (slug) {
         const trail = of("BreadcrumbList")[0]?.itemListElement ?? [];
         if (trail.at(-1)?.item !== url || trail[0]?.item !== SITE_URL) fail(file, "breadcrumb doesn't run from the home page to this one");
+        for (const c of trail.slice(1, -1)) pointsAt.push([file, c.item, "breadcrumb"]);
       } else if (!of("WebSite").length) fail(file, "no WebSite");
     }
   }
 
   // The page as drawn at build time, not an empty shell.
   const main = html.match(/<main[^>]*>([\s\S]*)<\/main>/)?.[1] ?? "";
-  const h1 = all(main, /<h1[^>]*>([^<]*)<\/h1>/g);
+  // Its text, without the icon some headings start with.
+  const h1 = all(main, /<h1[^>]*>([\s\S]*?)<\/h1>/g).map((h) => h.replace(/<[^>]*>/g, ""));
   if (h1.length !== 1 || !h1[0].trim()) fail(file, `${h1.length} <h1> in <main>`);
   if (main.replace(/<[^>]*>/g, "").trim().length < 200) fail(file, "<main> has almost no text");
 
@@ -125,6 +135,9 @@ for (const file of files) {
     if (!(rest === "" || existsSync(join(DIST, `${rest}.html`)) || existsSync(join(DIST, rest)))) fail(file, `link to ${href} goes nowhere`);
   }
 }
+
+// Structured data names only pages open to search (checked once every page has been read).
+for (const [file, url, what] of pointsAt) if (!indexed.has(url)) fail(file, `${what} ${url} isn't an indexed page`);
 
 // The sitemap lists exactly the pages that are open to search.
 const sitemap = all(readFileSync(join(DIST, "sitemap.xml"), "utf8"), /<loc>([^<]*)<\/loc>/g);

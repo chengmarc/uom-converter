@@ -14,7 +14,7 @@ import { guessRegion, regionInfo, REGIONS } from "@uom/converters/regions";
 import { AUDIENCES, type Audience } from "@uom/ui/audiences";
 import { el, renderConverter } from "@uom/ui/converter";
 import { icon } from "@uom/ui/icons";
-import { HOME, idFromPath, PAGES } from "./pages";
+import { HOME, idFromPath, PAGES, topicFromPath, TOPIC_PAGES } from "./pages";
 import { registerOffline, STORE_URL } from "./site";
 
 // The Windows app's own Store screenshots, light and dark (apps/windows/scripts/render.cjs).
@@ -42,6 +42,7 @@ const ALL_AUDIENCES = [EVERYTHING, ...AUDIENCES];
 const TOPICS = [...new Set(TOOLS.map((t) => t.topic))];
 const topicAnchor = (t: Topic) => t.toLowerCase().replace(/[^a-z]+/g, "-");
 const pathFor = (id: string) => BASE + PAGES[id].slug;
+const topicPath = (t: Topic) => BASE + TOPIC_PAGES[t].slug;
 
 const main = document.querySelector<HTMLElement>("#main")!;
 
@@ -69,14 +70,19 @@ const blurb = (t: Converter) => dyn(t.blurb, { region } as Values);
 
 // ---------- Addresses ----------
 
-type Route = { kind: "home" } | { kind: "converter"; id: string } | { kind: "missing" };
+type Route = { kind: "home" } | { kind: "converter"; id: string } | { kind: "topic"; topic: Topic } | { kind: "missing" };
 
 function route(): Route {
   const path = location.pathname;
   if (path === BASE || path === `${BASE}index.html`) return { kind: "home" };
   const id = idFromPath(path, BASE);
-  return id && byId.has(id) ? { kind: "converter", id } : { kind: "missing" };
+  if (id && byId.has(id)) return { kind: "converter", id };
+  const topic = topicFromPath(path, BASE);
+  return topic ? { kind: "topic", topic } : { kind: "missing" };
 }
+
+/** An address one of the site's pages is drawn for, so following a link to it needs no reload. */
+const isPage = (path: string) => path === BASE || !!idFromPath(path, BASE) || !!topicFromPath(path, BASE);
 
 /** The settings ride along in the address, so a shared link opens the same way. */
 function syncUrl() {
@@ -125,11 +131,13 @@ function tiles(tools: Converter[]) {
   return list;
 }
 
-function topicHeading(tag: "h2" | "h3", topic: Topic) {
+/** A topic's name with its icon, linked to the topic's page unless `current` (it's this page). */
+function topicHeading(tag: "h2" | "h3", topic: Topic, current = false) {
   const h = el(tag, "topic-title");
   const i = icon(topic);
   if (i) h.append(i);
-  h.append(topic);
+  if (current) h.append(topic);
+  else h.append(link(topicPath(topic), topic));
   return h;
 }
 
@@ -238,10 +246,8 @@ function windowsApp() {
 
 // ---------- A converter's page ----------
 
-function converterView(id: string): Node[] {
-  const conv = byId.get(id)!;
-  const layout = el("div", "doc-layout wrap");
-
+/** The converters by topic, for the audience picked in it; `current` is the page being shown. */
+function sidebar(current: { id?: string; topic?: Topic }) {
   const side = el("aside", "side");
   side.setAttribute("aria-label", "Converters");
   const pick = el("label", "side-role");
@@ -256,10 +262,10 @@ function converterView(id: string): Node[] {
     nav.replaceChildren(
       ...shownTopics().map((topic) => {
         const g = el("div", "side-group");
-        g.append(topicHeading("h2", topic));
+        g.append(topicHeading("h2", topic, topic === current.topic));
         for (const t of toolsFor(topic)) {
           const a = link(pathFor(t.id), t.title);
-          if (t.id === id) a.setAttribute("aria-current", "page");
+          if (t.id === current.id) a.setAttribute("aria-current", "page");
           g.append(a);
         }
         return g;
@@ -267,18 +273,30 @@ function converterView(id: string): Node[] {
     );
   };
   refreshLists();
+  return side;
+}
 
-  const article = el("article", "doc");
-  const crumbs = el("nav", "crumbs");
-  crumbs.setAttribute("aria-label", "Breadcrumb");
+/** The trail from the home page to the page shown, which isn't in it: its <h1> follows. */
+function crumbs(trail: HTMLAnchorElement[]) {
+  const nav = el("nav", "crumbs");
+  nav.setAttribute("aria-label", "Breadcrumb");
   const ol = el("ol");
-  for (const a of [link(BASE, "Converters"), link(`${BASE}#${topicAnchor(conv.topic)}`, conv.topic)]) {
+  for (const a of trail) {
     const li = el("li");
     li.append(a);
     ol.append(li);
   }
-  crumbs.append(ol);
-  article.append(crumbs, panel(id, "h1"));
+  nav.append(ol);
+  return nav;
+}
+
+function converterView(id: string): Node[] {
+  const conv = byId.get(id)!;
+  const layout = el("div", "doc-layout wrap");
+  const side = sidebar({ id });
+
+  const article = el("article", "doc");
+  article.append(crumbs([link(BASE, "Converters"), link(topicPath(conv.topic), conv.topic)]), panel(id, "h1"));
   const worked = workedExamples(conv);
   if (worked) article.append(worked);
 
@@ -316,21 +334,26 @@ class ExampleValues implements Values {
   }
 }
 
+/** A converter's answers to its examples, in the current region; examples it can't answer are left out. */
+function examplesWorkedOut(conv: Converter) {
+  return dyn(conv.examples, { region } as Values).flatMap((ex) => {
+    const out = conv.compute(new ExampleValues(conv, ex.set, region));
+    return out && "rows" in out && out.rows.length ? [out] : [];
+  });
+}
+
 /**
  * Every example worked out, as text: what the converter gives for each, without clicking through
  * them. The page reads as an answer to "12 AWG in mm²" on its own, for people and search engines.
  */
 function workedExamples(conv: Converter): HTMLElement | undefined {
-  const examples = dyn(conv.examples, { region } as Values);
-  const items = examples.flatMap((ex) => {
-    const out = conv.compute(new ExampleValues(conv, ex.set, region));
-    if (!out || "error" in out || !out.rows.length) return [];
+  const items = examplesWorkedOut(conv).map((out) => {
     const item = el("div", "worked-item");
     const list = el("ul");
     // The answer and the details that come with it, up to the first few.
     for (const r of out.rows.slice(0, 5)) list.append(el("li", undefined, `${r.label}: ${r.value}`));
     item.append(el("h3", undefined, out.heading), list);
-    return [item];
+    return item;
   });
   if (!items.length) return undefined;
   const s = el("section", "worked");
@@ -339,6 +362,64 @@ function workedExamples(conv: Converter): HTMLElement | undefined {
   h.id = "worked-h";
   s.append(h, ...items);
   return s;
+}
+
+// ---------- A topic's page ----------
+
+/**
+ * Every converter on a topic, whatever the audience: an introduction, the converters, a worked
+ * answer from each, and the other topics. The hub a search for "electrical calculators" lands on.
+ */
+function topicView(topic: Topic): Node[] {
+  const page = TOPIC_PAGES[topic];
+  const convs = TOOLS.filter((t) => t.topic === topic);
+  const layout = el("div", "doc-layout wrap");
+  const side = sidebar({ topic });
+
+  const article = el("article", "doc topic-page");
+  const h1 = el("h1", "topic-h1");
+  const i = icon(topic);
+  if (i) h1.append(i);
+  h1.append(page.heading);
+  article.append(crumbs([link(BASE, "Converters")]), h1, el("p", "lede", page.intro), tiles(convs));
+
+  // One answer from each converter: the first example, as the converter works it out.
+  const answers = el("section", "answers");
+  answers.setAttribute("aria-labelledby", "answers-h");
+  const ah = el("h2", undefined, "Quick answers");
+  ah.id = "answers-h";
+  const list = el("ul");
+  for (const t of convs) {
+    const out = examplesWorkedOut(t)[0];
+    if (!out) continue;
+    const [answer] = out.rows;
+    const li = el("li");
+    // "Weight: 50 lb → Kilograms: 22.68 kg", from the heading "50 lb equals".
+    const question = out.heading.replace(/\s+(equals|is|gives)$/, "");
+    li.append(link(pathFor(t.id), t.title), ": ", el("span", undefined, `${question} → ${answer.label}: ${answer.value}`));
+    list.append(li);
+  }
+  answers.append(ah, list);
+  if (list.childElementCount) article.append(answers);
+
+  const others = el("section", "related");
+  others.setAttribute("aria-labelledby", "others-h");
+  const oh = el("h2", undefined, "Other topics");
+  oh.id = "others-h";
+  const ul = el("ul", "tiles");
+  for (const t of TOPICS.filter((x) => x !== topic)) {
+    const a = el("a", "tile");
+    a.href = topicPath(t);
+    a.append(el("span", "tile-title", TOPIC_PAGES[t].heading), el("span", "tile-text", TOPIC_PAGES[t].description));
+    const li = el("li");
+    li.append(a);
+    ul.append(li);
+  }
+  others.append(oh, ul);
+  article.append(others);
+
+  layout.append(side, article);
+  return [layout];
 }
 
 // ---------- Drawing the page for the address ----------
@@ -354,6 +435,9 @@ function render() {
   if (r.kind === "converter") {
     main.replaceChildren(...converterView(r.id));
     setHead(PAGES[r.id].title, pathFor(r.id));
+  } else if (r.kind === "topic") {
+    main.replaceChildren(...topicView(r.topic));
+    setHead(TOPIC_PAGES[r.topic].title, topicPath(r.topic));
   } else if (r.kind === "home") {
     main.replaceChildren(...homeView(false));
     setHead(HOME.title, BASE);
@@ -502,7 +586,7 @@ document.addEventListener("click", (e) => {
   if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
   const a = (e.target as Element).closest<HTMLAnchorElement>("a[href]");
   if (!a || a.target || a.origin !== location.origin) return;
-  if (a.pathname !== BASE && !idFromPath(a.pathname, BASE)) return;
+  if (!isPage(a.pathname)) return;
   e.preventDefault();
   if (a.pathname === location.pathname) {
     history.pushState(null, "", location.pathname + location.search + a.hash);
@@ -522,14 +606,17 @@ document.querySelectorAll<HTMLAnchorElement>("#get-app, #footer-app").forEach((a
 document.querySelector("#footer-topic-list")!.replaceChildren(
   ...TOPICS.map((t) => {
     const li = el("li");
-    li.append(link(`${BASE}#${topicAnchor(t)}`, t));
+    li.append(link(topicPath(t), t));
     return li;
   }),
 );
 
-// Old links to the site used #<id>: move them to the converter's own address.
+// Old links to the site used #<id> for a converter and #<topic> for a topic: move them to the
+// converter's or topic's own address.
 const legacy = location.hash.slice(1);
+const legacyTopic = TOPICS.find((t) => topicAnchor(t) === legacy);
 if (route().kind === "home" && byId.has(legacy)) history.replaceState(null, "", pathFor(legacy) + location.search);
+else if (route().kind === "home" && legacyTopic) history.replaceState(null, "", topicPath(legacyTopic) + location.search);
 
 setNumberStyle(regionInfo(region).number);
 drawRegion();

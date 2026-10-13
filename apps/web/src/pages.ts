@@ -1,6 +1,9 @@
 // The website gives every converter its own address, so a search for "voltage drop calculator"
-// can land on that converter. Each page's title and description are written for search: the
-// words people type, not the app's short sidebar names. The desktop app doesn't use any of this.
+// can land on that converter, and every topic has a page listing its converters. Each page's
+// title and description are written for search: the words people type, not the app's short
+// sidebar names. The desktop app doesn't use any of this.
+
+import type { Topic } from "@uom/converters/model";
 
 export interface Page {
   /** The page's address on the site: /<slug> (served from <slug>.html). */
@@ -170,6 +173,63 @@ export const PAGES: Record<string, Page> = {
   },
 };
 
+/** A topic's page: its converters, with an introduction. */
+export interface TopicPage extends Page {
+  /** The page's heading: what the topic's converters are, in the words people search for. */
+  heading: string;
+  /** What the topic covers and who it's for, in two or three sentences. */
+  intro: string;
+}
+
+/** By topic, in the order the converters list them. pages.test.ts checks every topic has one. */
+export const TOPIC_PAGES: Record<Topic, TopicPage> = {
+  Pricing: {
+    slug: "pricing",
+    title: "Electrical Pricing: E/C/M, Multiplier and Margin Tools",
+    description:
+      "Calculators for electrical distribution pricing: E/C/M price units, wire price per foot or metre, list × multiplier, margin and markup, packs and reels.",
+    heading: "Pricing calculators",
+    intro:
+      "Electrical distributors quote prices per each (E), per 100 (C) or per 1,000 (M), and wire is usually priced per M feet. These calculators convert between those units, work out net prices from list price and multiplier, and turn margin into markup. They also count the boxes, packs, coils and reels an order needs.",
+  },
+  "Wire & conduit": {
+    slug: "wire-and-conduit",
+    title: "Wire Size and Conduit Converters: AWG, mm², Trade Size",
+    description:
+      "Convert AWG and kcmil wire sizes to mm² and back, and conduit trade sizes to metric designators with their knockout punch sizes.",
+    heading: "Wire size and conduit converters",
+    intro:
+      "North America sizes wire in AWG and kcmil; most of the world uses mm² (IEC 60228). These converters match one to the other, with the conductor's area, diameter and weight. Conduit inch trade sizes pair with metric designators, each with its typical knockout punch size.",
+  },
+  Electrical: {
+    slug: "electrical",
+    title: "Electrical Calculators: Voltage Drop, kVA, Ohm's Law",
+    description:
+      "Electrical calculators: kVA and amps, voltage drop, power factor, transformer fault current, motor slip, line-to-neutral voltage, Ohm's law, energy cost.",
+    heading: "Electrical calculators",
+    intro:
+      "Calculators for sizing and checking circuits and equipment: kVA, kW and amps on single- and three-phase systems, voltage drop and the wire size that keeps it within limits, power factor correction, transformer fault current, motor speed and slip, line-to-neutral voltage, Ohm's law and running cost. Each shows how it's calculated.",
+  },
+  Units: {
+    slug: "units",
+    title: "Unit Converters: Length, Torque, Power, Temperature",
+    description:
+      "Unit converters for the electrical trade: feet to metres, inch fractions to mm, °C to °F, hp to kW, foot-candles to lux, torque, weight and box fill.",
+    heading: "Unit converters",
+    intro:
+      "Conversions between US customary and metric units, with the values the trade uses: 60, 75 and 90 °C insulation ratings, lug and breaker torque, box fill in cubic inches (NEC) or millilitres (CEC), and copper and aluminum prices per pound or kilogram. Most have a table of common values.",
+  },
+  "Product data": {
+    slug: "product-data",
+    title: "Product Data Tools: UOM Codes, ETIM, GTIN-14",
+    description:
+      "Tools for electrical product data: UN/ECE Rec 20 UOM codes, spec values to metric for ETIM, unit prices from price quantities, UOM mix-ups and GTIN-14s.",
+    heading: "Product data tools",
+    intro:
+      "For the teams who load supplier files into an ERP, PIM or webshop: look up UN/ECE Recommendation 20 unit codes, convert spec values to the metric units ETIM features take, get unit prices from BMEcat-style price quantities, catch prices loaded in the wrong unit of measure, and build GTIN-14s for each packaging level.",
+  },
+};
+
 export const HOME: Page = {
   slug: "",
   title: "Electrical Converter: Wire Size, Voltage Drop, Pricing",
@@ -179,7 +239,18 @@ export const HOME: Page = {
 
 /** The converter a site path opens, if any: "/voltage-drop-calculator" → "vdrop". */
 export function idFromPath(path: string, base: string): string | undefined {
-  // The host redirects /<slug>.html and /<slug>/ to /<slug>, but a copy saved offline may not.
-  const slug = path.startsWith(base) ? path.slice(base.length).replace(/(\.html|\/)$/, "") : "";
+  const slug = slugOf(path, base);
   return Object.keys(PAGES).find((id) => PAGES[id].slug === slug);
+}
+
+/** The topic a site path opens, if any: "/electrical" → "Electrical". */
+export function topicFromPath(path: string, base: string): Topic | undefined {
+  const slug = slugOf(path, base);
+  return (Object.keys(TOPIC_PAGES) as Topic[]).find((t) => TOPIC_PAGES[t].slug === slug);
+}
+
+/** A site path's slug: "/voltage-drop-calculator" → "voltage-drop-calculator". */
+function slugOf(path: string, base: string): string {
+  // The host redirects /<slug>.html and /<slug>/ to /<slug>, but a copy saved offline may not.
+  return path.startsWith(base) ? path.slice(base.length).replace(/(\.html|\/)$/, "") : "";
 }

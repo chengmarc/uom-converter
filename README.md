@@ -66,8 +66,10 @@ each app's Vite build compiles what it imports. One version covers every app: th
 ## Website
 
 Every converter at its own address (`/voltage-drop-calculator`, `/awg-to-mm2`…) so searches
-can land on it. Each page's title and description are in `apps/web/src/pages.ts`;
-`apps/web/vite.config.ts` writes the pages, a sitemap, and an offline copy for phones.
+can land on it, and a page per topic listing its converters (`/electrical`, `/units`…). Each
+page's title and description are in `apps/web/src/pages.ts`; `apps/web/vite.config.ts` writes
+the pages with their content drawn in, a sitemap, `llms.txt`, and an offline copy for phones.
+`npm run check:web` checks the built pages as search engines read them.
 
 ```
 npm run dev           # live-reloading at http://localhost:5173/

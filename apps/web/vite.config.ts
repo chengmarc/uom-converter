@@ -7,6 +7,7 @@
 //                       Every page's <body> is drawn at build time (prerender below), so the
 //                       HTML itself has the converter and links, not just an empty <main>.
 //   404.html           served for unknown addresses
+//   <topic>.html        one page per topic (src/pages.ts TOPIC_PAGES), listing its converters
 //   sitemap.xml, robots.txt
 //   llms.txt            the site and every converter, for AI assistants (llmstxt.org)
 //   app-icon.svg        from @uom/brand's public folder, as in every app
@@ -23,7 +24,8 @@ import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { defineConfig, type Plugin } from "vite";
-import { HOME, PAGES, type Page } from "./src/pages";
+import type { Topic } from "@uom/converters/model";
+import { HOME, PAGES, TOPIC_PAGES, type Page, type TopicPage } from "./src/pages";
 
 const SITE_URL = (process.env.SITE_URL ?? "https://uom-converter.com/").replace(/\/?$/, "/");
 const BASE = new URL(SITE_URL).pathname;
@@ -44,15 +46,61 @@ function pngSize(file: string): [number, number] {
   return [b.readUInt32BE(16), b.readUInt32BE(20)];
 }
 
+/** What a page is, for search engines: the home page, a converter, or a topic listing converters. */
+type Kind = "home" | "converter" | "topic";
+
+/** A link as the page draws it: its text, and the absolute address. */
+interface Link {
+  name: string;
+  url: string;
+}
+
 /**
- * What search engines read as data, as one graph: the site; the page; the converter on it, a free
- * web application; and on a converter's page, the trail back to the home page, ending at `name`,
- * the converter's name as its page shows it.
+ * What search engines read as data, as one graph: the site (home page); the page; on a converter's
+ * page, the converter as a free web application; on a topic's page, the list of its converters;
+ * and the page's breadcrumb trail, ending at `leaf`, the page's own name in that trail.
  */
-function structuredData(page: Page, name: string): object {
+function structuredData(page: Page, kind: Kind, drawn: Drawn, leaf: string): object {
   const url = SITE_URL + page.slug;
   const website = { "@id": `${SITE_URL}#website` };
-  const app = {
+  const webpage = {
+    "@type": kind === "topic" ? "CollectionPage" : "WebPage",
+    "@id": `${url}#webpage`,
+    url,
+    name: `${page.title} | ${NAME}`,
+    description: page.description,
+    inLanguage: "en",
+    isPartOf: website,
+    mainEntity: { "@id": kind === "topic" ? `${url}#list` : `${url}#app` },
+    primaryImageOfPage: { "@type": "ImageObject", url: `${SITE_URL}og.png` },
+    ...(drawn.trail.length ? { breadcrumb: { "@id": `${url}#breadcrumb` } } : {}),
+  };
+  const graph: object[] = [webpage];
+  if (kind === "home") {
+    graph.unshift({ "@type": "WebSite", ...website, url: SITE_URL, name: NAME, description: HOME.description, inLanguage: "en" });
+  }
+  if (kind === "topic") {
+    graph.push({
+      "@type": "ItemList",
+      "@id": `${url}#list`,
+      itemListElement: drawn.items.map((item, i) => ({ "@type": "ListItem", position: i + 1, name: item.name, url: item.url })),
+    });
+  } else {
+    graph.push(app(page, url));
+  }
+  if (drawn.trail.length) {
+    graph.push({
+      "@type": "BreadcrumbList",
+      "@id": `${url}#breadcrumb`,
+      itemListElement: [...drawn.trail, { name: leaf, url }].map((c, i) => ({ "@type": "ListItem", position: i + 1, name: c.name, item: c.url })),
+    });
+  }
+  return { "@context": "https://schema.org", "@graph": graph };
+}
+
+/** A converter, or the home page's whole set of them, as a free web application. */
+function app(page: Page, url: string): object {
+  return {
     "@type": "WebApplication",
     "@id": `${url}#app`,
     name: page.slug ? page.title : NAME,
@@ -65,36 +113,10 @@ function structuredData(page: Page, name: string): object {
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
     ...(page.slug ? {} : { sameAs: [STORE_URL] }),
   };
-  const webpage = {
-    "@type": "WebPage",
-    "@id": `${url}#webpage`,
-    url,
-    name: `${page.title} | ${NAME}`,
-    description: page.description,
-    inLanguage: "en",
-    isPartOf: website,
-    mainEntity: { "@id": app["@id"] },
-    primaryImageOfPage: { "@type": "ImageObject", url: `${SITE_URL}og.png` },
-    ...(page.slug ? { breadcrumb: { "@id": `${url}#breadcrumb` } } : {}),
-  };
-  const graph: object[] = [webpage, app];
-  if (page.slug) {
-    graph.push({
-      "@type": "BreadcrumbList",
-      "@id": `${url}#breadcrumb`,
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Converters", item: SITE_URL },
-        { "@type": "ListItem", position: 2, name, item: url },
-      ],
-    });
-  } else {
-    graph.unshift({ "@type": "WebSite", ...website, url: SITE_URL, name: NAME, description: HOME.description, inLanguage: "en" });
-  }
-  return { "@context": "https://schema.org", "@graph": graph };
 }
 
 /** The page's own head: title, description, canonical address, share preview, structured data and app manifest. */
-function head(page: Page, name: string, noindex = false): string {
+function head(page: Page, kind: Kind, drawn: Drawn, leaf: string, noindex = false): string {
   const url = SITE_URL + page.slug;
   const title = esc(`${page.title} | ${NAME}`);
   const description = esc(page.description);
@@ -126,17 +148,30 @@ function head(page: Page, name: string, noindex = false): string {
     `<link rel="manifest" href="${BASE}manifest.webmanifest" />`,
     `<link rel="apple-touch-icon" href="${BASE}icon-256.png" />`,
     // A data block, not a script: the page's CSP doesn't apply to it. A page kept out of search has none.
-    ...(noindex ? [] : [`<script type="application/ld+json">${JSON.stringify(structuredData(page, name)).replace(/</g, "\\u003c")}</script>`]),
+    ...(noindex ? [] : [`<script type="application/ld+json">${JSON.stringify(structuredData(page, kind, drawn, leaf)).replace(/</g, "\\u003c")}</script>`]),
   ].join("\n    ");
 }
 
-function withHead(html: string, page: Page, name: string, noindex = false): string {
-  const out = html.replace(/<title>[^<]*<\/title>\s*<meta name="description"[^>]*>/, head(page, name, noindex));
+function withHead(html: string, page: Page, kind: Kind, drawn: Drawn, leaf: string, noindex = false): string {
+  const out = html.replace(/<title>[^<]*<\/title>\s*<meta name="description"[^>]*>/, head(page, kind, drawn, leaf, noindex));
   if (out === html) throw new Error("index.html: expected <title> followed by <meta name=\"description\">");
   return out;
 }
 
 const BODY = /(<body>)([\s\S]*)(<\/body>)/;
+
+/** A page as the site's script draws it, and what the build reads from it. */
+interface Drawn {
+  body: string;
+  /** The page's <h1>. */
+  name: string;
+  /** The breadcrumb trail above the <h1>: the home page, then a converter's topic. */
+  trail: Link[];
+  /** A topic page's converters, in its list. */
+  items: Link[];
+  /** The region buttons: "US (NEC, 60 Hz)". */
+  regions: string[];
+}
 
 /**
  * Each page's <body> as the site's script draws it at that address, so the HTML that's served
@@ -145,16 +180,6 @@ const BODY = /(<body>)([\s\S]*)(<\/body>)/;
  * script runs in happy-dom, a browser for Node; in the browser it runs again and redraws the
  * page with the visitor's region. Drawn for the US, the region most visitors get.
  */
-interface Drawn {
-  body: string;
-  /** The page's <h1>. */
-  name: string;
-  /** A converter page's topic, from its breadcrumb. */
-  topic?: string;
-  /** The region buttons: "US (NEC, 60 Hz)". */
-  regions: string[];
-}
-
 async function prerender(shell: string, paths: string[]): Promise<Drawn[]> {
   const src = shell.match(/<script type="module" crossorigin src="([^"]+)"><\/script>/)?.[1];
   const body = shell.match(BODY)?.[2];
@@ -172,10 +197,13 @@ async function prerender(shell: string, paths: string[]): Promise<Drawn[]> {
       document.querySelectorAll("option").forEach((e) => e.toggleAttribute("selected", e.selected));
       const name = document.querySelector("main h1")?.textContent?.trim();
       if (!name) throw new Error(`${path}: expected an <h1>`);
+      const links = (selector: string) =>
+        Array.from(document.querySelectorAll<HTMLAnchorElement>(selector), (a) => ({ name: (a.querySelector(".tile-title") ?? a).textContent!.trim(), url: new URL(a.href, SITE_URL).href }));
       out.push({
         body: document.body.innerHTML,
         name,
-        topic: document.querySelector(".crumbs li:last-child a")?.textContent?.trim(),
+        trail: links("main .crumbs a"),
+        items: links("main .topic-page > .tiles a"),
         regions: Array.from(document.querySelectorAll("#region button"), (b) => `${b.textContent} (${b.getAttribute("title")})`),
       });
     } finally {
@@ -192,10 +220,10 @@ const REPO_URL = "https://github.com/chengmarc/uom-converter";
  * then every converter by topic, each linked to its page with the page's own description. Built
  * from the same pages as the sitemap, with the topics as the pages' breadcrumbs show them.
  */
-function llmsTxt(converters: { page: Page; topic?: string }[], regions: string[]): string {
-  const topics = new Map<string, Page[]>();
+function llmsTxt(converters: { page: Page; topic?: Topic }[], regions: string[]): string {
+  const topics = new Map<Topic, Page[]>();
   for (const { page, topic } of converters) {
-    if (!topic) throw new Error(`${page.slug}: no topic in its breadcrumb`);
+    if (!topic || !TOPIC_PAGES[topic]) throw new Error(`${page.slug}: no topic in its breadcrumb`);
     topics.set(topic, [...(topics.get(topic) ?? []), page]);
   }
   const item = (name: string, url: string, notes: string) => `- [${name}](${url}): ${notes}`;
@@ -207,7 +235,11 @@ function llmsTxt(converters: { page: Page; topic?: string }[], regions: string[]
       `Every converter has its own page. The region picked in the page header sets the units, codes and frequency the converters use: ${regions.join(", ")}. The HTML of each page shows the converter with a worked example in US units and how it's calculated; every answer is worked out in the visitor's browser, with no account and nothing sent anywhere.`,
       `The home page, ${SITE_URL}, lists every converter.`,
     ].join("\n\n"),
-    ...[...topics].map(([topic, pages]) => `## ${topic}\n\n${pages.map((p) => item(p.title, SITE_URL + p.slug, p.description)).join("\n")}`),
+    // Each topic's page first: it lists the converters under it.
+    ...[...topics].map(([topic, pages]) => {
+      const hub = TOPIC_PAGES[topic];
+      return `## ${topic}\n\n${[hub, ...pages].map((p) => item(p.title, SITE_URL + p.slug, p.description)).join("\n")}`;
+    }),
     `## Optional\n\n` +
       [
         item("Windows app", STORE_URL, "the same converters as a free Windows app from the Microsoft Store, working offline"),
@@ -264,13 +296,21 @@ function sitePages(): Plugin {
     },
     async closeBundle() {
       const shell = readFileSync(join(OUT, "index.html"), "utf8");
-      const pages = Object.values(PAGES);
-      const missing = { ...HOME, slug: "404", title: "Page not found" };
-      const all = [HOME, missing, ...pages];
-      const drawn = await prerender(shell, all.map((p) => BASE + p.slug));
-      all.forEach((page, i) => {
-        const { body, name } = drawn[i];
-        const html = withHead(shell, page, name, page === missing).replace(BODY, (_, open, __, close) => open + body + close);
+      const topics = Object.entries(TOPIC_PAGES) as [Topic, TopicPage][];
+      const converters = Object.values(PAGES);
+      // Every page but the home page and 404, which are open to search: the topics, then the converters.
+      const pages = [...topics.map(([, page]) => page), ...converters];
+      const all: { page: Page; kind: Kind; leaf?: string; noindex?: boolean }[] = [
+        { page: HOME, kind: "home" },
+        { page: { ...HOME, slug: "404", title: "Page not found" }, kind: "home", noindex: true },
+        // A topic page's own name in its breadcrumb trail is the topic, as converter pages show it.
+        ...topics.map(([topic, page]) => ({ page, kind: "topic" as const, leaf: topic })),
+        ...converters.map((page) => ({ page, kind: "converter" as const })),
+      ];
+      const drawn = await prerender(shell, all.map(({ page }) => BASE + page.slug));
+      all.forEach(({ page, kind, leaf, noindex }, i) => {
+        const d = drawn[i];
+        const html = withHead(shell, page, kind, d, leaf ?? d.name, noindex).replace(BODY, (_, open, __, close) => open + d.body + close);
         writeFileSync(join(OUT, `${page.slug || "index"}.html`), html);
       });
 
@@ -283,7 +323,9 @@ function sitePages(): Plugin {
           urls.map((u) => `  <url><loc>${u}</loc></url>`).join("\n") +
           `\n</urlset>\n`,
       );
-      writeFileSync(join(OUT, "llms.txt"), llmsTxt(pages.map((page, i) => ({ page, topic: drawn[i + 2].topic })), drawn[0].regions));
+      const firstConverter = all.length - converters.length;
+      const topicOf = (i: number) => drawn[firstConverter + i].trail.at(-1)?.name as Topic | undefined;
+      writeFileSync(join(OUT, "llms.txt"), llmsTxt(converters.map((page, i) => ({ page, topic: topicOf(i) })), drawn[0].regions));
       // Search engines read robots.txt only at a domain's root, which is where the site lives.
       writeFileSync(join(OUT, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${SITE_URL}sitemap.xml\n`);
 
@@ -316,7 +358,7 @@ function sitePages(): Plugin {
       const offline = assets.filter((a) => !a.endsWith(".png"));
       const files = [BASE, ...pages.map((p) => BASE + p.slug), ...offline.map((a) => BASE + a), `${BASE}app-icon.svg`, `${BASE}icon-256.png`];
       // Asset names carry a content hash, so a new build with any change gets a new cache.
-      const version = createHash("sha256").update(JSON.stringify(files) + JSON.stringify(PAGES)).digest("hex").slice(0, 12);
+      const version = createHash("sha256").update(JSON.stringify(files) + JSON.stringify(pages)).digest("hex").slice(0, 12);
       writeFileSync(join(OUT, "sw.js"), serviceWorker(files, version));
 
       // Files under assets/ are named by their content, so they can be cached for good. Everything
