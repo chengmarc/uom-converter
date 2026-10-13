@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 // The website: a home page listing every converter, and a page per converter at its own address
 // (pages.ts). Following a link between them doesn't reload the page: it's pushed onto history, so
 // Back and Forward work as usual. Each converter is drawn by packages/ui/src/converter.ts.
@@ -17,8 +18,10 @@ import { HOME, idFromPath, PAGES } from "./pages";
 import { registerOffline, STORE_URL } from "./site";
 
 // The Windows app's own Store screenshots, light and dark (apps/windows/scripts/render.cjs).
-const APP_LIGHT = new URL("../../windows/store/listing/screenshot-3-voltage-drop.png", import.meta.url).href;
-const APP_DARK = new URL("../../windows/store/listing/screenshot-8-conduit-dark.png", import.meta.url).href;
+// Imported, not new URL(…, import.meta.url): that would make addresses on the build machine when
+// vite.config.ts runs this script to write each page's HTML.
+import APP_LIGHT from "../../windows/store/listing/screenshot-3-voltage-drop.png";
+import APP_DARK from "../../windows/store/listing/screenshot-8-conduit-dark.png";
 
 // The site's base path, from SITE_URL in vite.config.ts.
 declare const __SITE_BASE__: string;

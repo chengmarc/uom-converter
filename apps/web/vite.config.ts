@@ -4,7 +4,9 @@
 //                       description and canonical address, so searches land on the converter.
 //                       Cloudflare serves it at /<slug> (no .html, no slash), which is the
 //                       address the canonical tag, sitemap and links use.
-//   404.html            served for unknown addresses
+//                       Every page's <body> is drawn at build time (prerender below), so the
+//                       HTML itself has the converter and links, not just an empty <main>.
+//   404.html           served for unknown addresses
 //   sitemap.xml, robots.txt
 //   app-icon.svg        from @uom/brand's public folder, as in every app
 //   manifest.webmanifest, sw.js, icons   install from the browser and use it offline
@@ -16,6 +18,8 @@
 import { createHash } from "node:crypto";
 import { copyFileSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
+import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { defineConfig, type Plugin } from "vite";
 import { HOME, PAGES, type Page } from "./src/pages";
 
@@ -69,6 +73,38 @@ function withHead(html: string, page: Page, noindex = false): string {
   return out;
 }
 
+const BODY = /(<body>)([\s\S]*)(<\/body>)/;
+
+/**
+ * Each page's <body> as the site's script draws it at that address, so the HTML that's served
+ * already has the converter, its explanation and the links to every other page: search engines,
+ * link previews and readers without JavaScript get the page, not an empty <main>. The built
+ * script runs in happy-dom, a browser for Node; in the browser it runs again and redraws the
+ * page with the visitor's region. Drawn for the US, the region most visitors get.
+ */
+async function prerender(shell: string, paths: string[]): Promise<string[]> {
+  const src = shell.match(/<script type="module" crossorigin src="([^"]+)"><\/script>/)?.[1];
+  const body = shell.match(BODY)?.[2];
+  if (!src || !body) throw new Error("index.html: expected the module script and a <body>");
+  const script = pathToFileURL(join(OUT, src.slice(BASE.length))).href;
+  const out: string[] = [];
+  for (const [i, path] of paths.entries()) {
+    GlobalRegistrator.register({ url: new URL(path, SITE_URL).href });
+    try {
+      document.body.innerHTML = body;
+      // A fresh copy of the script for each page: the query makes it a different module to Node.
+      await import(`${script}?page=${i}`);
+      // What was typed or picked is a property, which HTML doesn't keep: write it as the attribute.
+      document.querySelectorAll("input").forEach((e) => e.setAttribute("value", e.value));
+      document.querySelectorAll("option").forEach((e) => e.toggleAttribute("selected", e.selected));
+      out.push(document.body.innerHTML);
+    } finally {
+      await GlobalRegistrator.unregister();
+    }
+  }
+  return out;
+}
+
 /** Offline copy: every page and asset cached on install, then served from cache and refreshed in the background. */
 function serviceWorker(files: string[], version: string): string {
   return `// Written by apps/web/vite.config.ts.
@@ -113,14 +149,16 @@ function sitePages(): Plugin {
     generateBundle(_, bundle) {
       assets = Object.keys(bundle).filter((f) => f !== "index.html");
     },
-    closeBundle() {
+    async closeBundle() {
       const shell = readFileSync(join(OUT, "index.html"), "utf8");
       const pages = Object.values(PAGES);
-      writeFileSync(join(OUT, "index.html"), withHead(shell, HOME));
-      writeFileSync(join(OUT, "404.html"), withHead(shell, { ...HOME, title: "Page not found" }, true));
-      for (const page of pages) {
-        writeFileSync(join(OUT, `${page.slug}.html`), withHead(shell, page));
-      }
+      const missing = { ...HOME, slug: "404", title: "Page not found" };
+      const all = [HOME, missing, ...pages];
+      const bodies = await prerender(shell, all.map((p) => BASE + p.slug));
+      all.forEach((page, i) => {
+        const html = withHead(shell, page, page === missing).replace(BODY, (_, open, __, close) => open + bodies[i] + close);
+        writeFileSync(join(OUT, `${page.slug || "index"}.html`), html);
+      });
 
       const today = new Date().toISOString().slice(0, 10);
       const urls = [SITE_URL, ...pages.map((p) => SITE_URL + p.slug)];
