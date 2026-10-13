@@ -208,7 +208,7 @@ function categoryStrip(): HTMLElement {
   const list = el("ul");
   for (const t of TOPICS) {
     const a = link(topicPath(t), "");
-    const img = photo(`${TOPIC_PAGES[t].slug}-thumb`, "(max-width: 640px) 50vw, 20vw", "");
+    const img = photo(`${TOPIC_PAGES[t].slug}-thumb`, "(max-width: 640px) 9rem, 20vw", "");
     if (img) {
       img.setAttribute("fetchpriority", "high");
       a.append(img);
@@ -265,6 +265,7 @@ function homeView(missing: boolean): Node[] {
   };
   refreshLists();
 
+  dir.append(toTop());
   return [categoryStrip(), intro, dir, windowsApp()];
 }
 
@@ -332,8 +333,15 @@ function crumbs(trail: HTMLAnchorElement[]) {
     li.append(a);
     ol.append(li);
   }
-  nav.append(ol);
+  nav.append(el("span", "crumbs-label", "You are here:"), ol);
   return nav;
+}
+
+/** "Back to top", at the end of a long page. */
+function toTop() {
+  const p = el("p", "to-top");
+  p.append(link("#main", "Back to top ▲"));
+  return p;
 }
 
 /**
@@ -376,6 +384,7 @@ function converterView(id: string): Node[] {
     related.append(rh, tiles(others));
     article.append(related);
   }
+  article.append(toTop());
   layout.append(side, article);
   return [band, layout];
 }
@@ -490,6 +499,7 @@ function topicView(topic: Topic): Node[] {
   others.append(oh, ul);
   article.append(others);
 
+  article.append(toTop());
   layout.append(side, article);
   return [band, layout];
 }

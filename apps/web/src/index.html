@@ -15,13 +15,20 @@
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
-    <!-- One header on every page: the name, the region and the Windows app, then the categories. -->
+    <!-- One header on every page: a strip of small links, the name and the region, then the categories. -->
     <header class="site-header">
+      <nav class="utility-bar" aria-label="Site">
+        <ul class="wrap">
+          <li><a id="get-app" rel="noopener">Windows app</a></li>
+          <li><a href="https://github.com/chengmarc/uom-converter" rel="noopener">Source code</a></li>
+          <li><a href="https://github.com/chengmarc/uom-converter/issues" rel="noopener">Report a problem</a></li>
+          <li><a href="https://github.com/chengmarc/uom-converter/blob/main/docs/PRIVACY.md" rel="noopener">Privacy</a></li>
+        </ul>
+      </nav>
       <div class="wrap header-row">
         <a class="brand" href="/" data-home><img src="/app-icon.svg" alt="" width="24" height="24" />UOM Converter</a>
         <div class="header-tools">
           <label class="region"><span>Region</span><select id="region"></select></label>
-          <a class="get-app" id="get-app" rel="noopener">Windows app</a>
         </div>
       </div>
       <nav class="category-nav" aria-label="Categories">
@@ -51,8 +58,13 @@
       </div>
       <div class="footer-legal">
         <div class="wrap">
-          <span>© <span id="footer-year"></span> UOM Converter</span>
-          <a href="https://github.com/chengmarc/uom-converter/blob/main/docs/PRIVACY.md" rel="noopener">Privacy</a>
+          <ul class="footer-links">
+            <li><a href="/" data-home>Home</a></li>
+            <li><a href="https://github.com/chengmarc/uom-converter/blob/main/docs/PRIVACY.md" rel="noopener">Privacy</a></li>
+            <li><a href="https://github.com/chengmarc/uom-converter" rel="noopener">Source code</a></li>
+            <li><a href="https://github.com/chengmarc/uom-converter/issues" rel="noopener">Report a problem</a></li>
+          </ul>
+          <p>© <span id="footer-year"></span> UOM Converter</p>
         </div>
       </div>
     </footer>

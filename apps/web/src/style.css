@@ -132,7 +132,6 @@ a:hover { color: var(--accent-hover); }
 .header-tools { display: flex; align-items: center; gap: 1.25rem; font-size: 0.85rem; }
 .region { display: flex; align-items: center; gap: 0.45rem; color: var(--brand-muted); }
 .region select { height: 28px; padding: 0 0.3rem; border: 1px solid transparent; border-radius: 2px; background: #ffffff; color: #222831; font: inherit; }
-.get-app, .get-app:hover { color: var(--brand-ink); }
 
 /* The categories, on a lighter bar; the one being shown filled in blue. */
 .category-nav { background: #1d3a66; border-bottom: 3px solid var(--accent); }
@@ -145,7 +144,6 @@ a:hover { color: var(--accent-hover); }
 @media (max-width: 640px) {
   .header-row { padding-block: 0.5rem; }
   .brand { font-size: 1rem; }
-  .get-app { display: none; }
   .region span { display: none; }
 }
 
@@ -251,7 +249,8 @@ a:hover { color: var(--accent-hover); }
 .category-photo { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; }
 .category-band::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgb(19 41 75 / 0.93) 0%, rgb(19 41 75 / 0.85) 50%, rgb(19 41 75 / 0.6) 100%); }
 .category-inner { padding-block: 1.5rem 1.75rem; }
-.category-band .crumbs ol { margin-bottom: 0.6rem; }
+.category-band .crumbs { margin-bottom: 0.6rem; }
+.category-band .crumbs-label { color: var(--brand-muted); }
 .category-band .crumbs a { color: var(--brand-muted); }
 .category-band .crumbs a:hover { color: var(--brand-ink); }
 .category-band .crumbs li + li::before { color: var(--brand-muted); }
@@ -259,7 +258,9 @@ a:hover { color: var(--accent-hover); }
 .category-title a, .category-title a:hover { color: var(--brand-ink); text-decoration: none; }
 .category-title a:hover { text-decoration: underline; }
 
-.crumbs ol { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 1rem; padding: 0; list-style: none; font-size: 0.85rem; }
+.crumbs { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.4rem; margin: 0 0 1rem; font-size: 0.85rem; }
+.crumbs-label { color: var(--muted); }
+.crumbs ol { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0; padding: 0; list-style: none; }
 .crumbs li + li::before { content: "›"; margin-right: 0.4rem; color: var(--muted); }
 .crumbs a { color: var(--accent); text-decoration: none; }
 .crumbs a:hover { text-decoration: underline; }
@@ -529,6 +530,91 @@ tr.hit td { background: var(--accent-soft); color: var(--accent); font-weight: 6
   .footer-grid { grid-template-columns: 1fr 1fr; }
   .footer-brand { grid-column: 1 / -1; }
 }
+
+/* ---------- Period details ----------
+   What a long-lived supplier's site keeps from each redesign: a fixed-width page on grey, a strip of
+   small links over the header, gradient bars and panel headings, glossy buttons and inset fields,
+   form boxes titled on their border, Verdana for the small print, underlined links that turn purple
+   once visited, "»" before menu links, "You are here:" and "Back to top". Kept together here, laid
+   over the rules above, so the period can be dialled up or down in one place. */
+
+:root {
+  --page: #dde2e8;
+  --page-edge: #c3cad3;
+  --small: Verdana, Tahoma, Geneva, sans-serif;
+  --visited: #6a2d8f;
+  --bar-top: #fbfcfd;
+  --bar-bottom: #e4e9ee;
+  --gloss-top: #ffffff;
+  --gloss-bottom: #e6eaef;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page: #0c0e11;
+    --page-edge: #2a3038;
+    --visited: #c39be0;
+    --bar-top: #2b3138;
+    --bar-bottom: #21262c;
+    --gloss-top: #2c3239;
+    --gloss-bottom: #1f2429;
+  }
+}
+
+/* 1. The page: a fixed-width column on grey. Everything full-width before stops at its edges. */
+body { background: var(--page); }
+.site-header, main, .site-footer { width: 100%; max-width: 1100px; margin-inline: auto; }
+main { background: var(--bg); border-inline: 1px solid var(--page-edge); }
+
+/* 2. Small links over the header, between pipes. */
+.utility-bar { background: #0b1a31; font: 11px/1.5 var(--small); }
+.utility-bar ul { display: flex; justify-content: flex-end; flex-wrap: wrap; margin: 0 auto; padding-block: 4px; list-style: none; }
+.utility-bar li + li::before { content: "|"; margin: 0 0.6em; color: var(--brand-muted); }
+.utility-bar a { color: var(--brand-muted); }
+.utility-bar a:hover { color: var(--brand-ink); }
+
+/* 3. The footer's line of links between pipes, the copyright under it; "Back to top" after long pages. */
+.footer-legal { font: 11px/1.6 var(--small); }
+.footer-legal .wrap { display: block; text-align: center; }
+.site-footer .footer-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 0; margin: 0; padding: 0; list-style: none; }
+.footer-links li + li::before { content: "|"; margin: 0 0.6em; }
+.footer-legal p { margin: 0.35rem 0 0; }
+.to-top { margin: 2rem 0 0; text-align: right; font: 11px var(--small); }
+
+/* 4. Gradients on the bars, and a divider between the menu's entries. */
+.site-header { background: linear-gradient(180deg, #24467a 0%, var(--brand) 100%); }
+.category-nav { background: linear-gradient(180deg, #2d5088 0%, #1a3561 100%); }
+.category-nav li + li { border-left: 1px solid rgb(0 0 0 / 0.3); box-shadow: inset 1px 0 0 rgb(255 255 255 / 0.12); }
+.category-nav a[aria-current] { background: linear-gradient(180deg, #2b7bd6 0%, var(--accent) 100%); }
+.site-footer { background: linear-gradient(180deg, var(--brand) 0%, #0f2240 100%); }
+
+/* 5. Panel headings in a grey gradient. */
+.topic > .topic-title, .worked-item h3, .side-group .topic-title { background: linear-gradient(180deg, var(--bar-top) 0%, var(--bar-bottom) 100%); }
+
+/* 6. Glossy buttons; fields with a shadow inside. */
+.example, .button { background: linear-gradient(180deg, var(--gloss-top) 0%, var(--gloss-bottom) 100%); box-shadow: 0 1px 0 rgb(0 0 0 / 0.06); }
+.example:hover { background: linear-gradient(180deg, var(--gloss-top) 0%, var(--bar-bottom) 100%); }
+.example[aria-pressed="true"] { background: linear-gradient(180deg, #d9e6f6 0%, #c3d6ef 100%); box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.15); }
+@media (prefers-color-scheme: dark) { .example[aria-pressed="true"] { background: var(--accent-soft); } }
+.segmented input:checked + span { background: linear-gradient(180deg, var(--gloss-top) 0%, var(--gloss-bottom) 100%); }
+.text-input, .side-role select, .region select { box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.14); }
+
+/* 7. "Convert from" as a form box, its title sitting on the border. */
+.flow { margin-top: 0.7rem; }
+.from { position: relative; padding-top: 1.75rem; border-color: var(--line-strong); }
+.from .box-title { position: absolute; top: -0.7em; left: 0.9rem; padding: 0 0.4rem; background: var(--bg); color: var(--text); font-size: 0.85rem; line-height: 1.4; }
+
+/* 8. Verdana for the small print. */
+.crumbs, .site-footer nav a, .side-role, .region { font-family: var(--small); }
+.crumbs { font-size: 11px; }
+
+/* 9. Links underlined, and purple once visited. */
+.tile .tile-title, .side-group > a, .answers a, .crumbs a, .site-footer nav a, .app-box a { text-decoration: underline; }
+.tile:visited .tile-title, .side-group > a:visited, .answers a:visited, .crumbs a:visited, .app-box a:visited { color: var(--visited); }
+.category-band .crumbs a:visited { color: var(--brand-muted); }
+.side-group > a[aria-current] { color: var(--text); text-decoration: none; }
+
+/* 10. "»" before menu and footer links. */
+.side-group > a::before, .site-footer nav li a::before { content: "» "; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; }

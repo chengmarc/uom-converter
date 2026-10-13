@@ -17,21 +17,29 @@ const OUT = resolve(import.meta.dirname, "../src/images");
 
 /** Each use of a photo: its crop, and the widths it's written at (never wider than the crop). */
 const SLOTS = {
-  // Each topic: a 3:1 banner for the band across its pages, and a square for the home page's strip
-  // and the topic's thumbnail.
-  // Narrower than the photo: a worker at a desk on the right edge is left out.
-  "pricing-banner": { from: "1800x1200-3.jpg", crop: { left: 0, top: 230, width: 1560, height: 520 }, widths: [800, 1200, 1560] },
-  "pricing-thumb": { from: "1800x1200-3.jpg", crop: { left: 120, top: 180, width: 860, height: 860 }, widths: [240, 480] },
-  "wire-and-conduit-banner": { from: "topic-pricing.jpg", crop: { left: 0, top: 300, width: 2048, height: 683 }, widths: [800, 1200, 1800] },
-  "wire-and-conduit-thumb": { from: "topic-pricing.jpg", crop: { left: 380, top: 280, width: 820, height: 820 }, widths: [240, 480] },
-  // Placeholders until better photos are found: small, and the panel photo has a worker in it
-  // (cropped out here).
-  "electrical-banner": { from: "banner.jpg", crop: { left: 60, top: 40, width: 1025, height: 342 }, widths: [800, 1025] },
-  "electrical-thumb": { from: "banner.jpg", crop: { left: 310, top: 90, width: 550, height: 550 }, widths: [240, 480] },
-  "units-banner": { from: "W082137AE-5-US1b_1500_1500.jpg", crop: { left: 290, top: 200, width: 1000, height: 333 }, widths: [800, 1000] },
-  "units-thumb": { from: "W082137AE-5-US1b_1500_1500.jpg", crop: { left: 640, top: 100, width: 620, height: 620 }, widths: [240, 480] },
-  "product-data-banner": { from: "2D-Barcodes-scaled.jpg", crop: { left: 0, top: 150, width: 1620, height: 540 }, widths: [800, 1200, 1620] },
-  "product-data-thumb": { from: "2D-Barcodes-scaled.jpg", crop: { left: 150, top: 150, width: 720, height: 720 }, widths: [240, 480] },
+  // Each topic: a banner for the band across its pages, and a square for the home page's strip and
+  // the thumbnails beside its converters.
+  //
+  // The band is the window's full width but only about 110px tall, so it shows a thin slice of the
+  // banner's middle. Banners are cut 6:1 around the slice worth seeing (rows of stock, of wiring,
+  // of tools, of labels) and written up to the photo's own width; under the band's navy, a photo
+  // stretched past that doesn't show it. Squares go up to their crop's size: the home page's strip
+  // shows them at a fifth of the window.
+  //
+  // Above the worker at a desk on the right edge, so the full width can be used.
+  "pricing-banner": { from: "1800x1200-3.jpg", crop: { left: 0, top: 320, width: 1800, height: 300 }, widths: [800, 1200, 1800] },
+  "pricing-thumb": { from: "1800x1200-3.jpg", crop: { left: 120, top: 180, width: 860, height: 860 }, widths: [240, 480, 860] },
+  "wire-and-conduit-banner": { from: "topic-pricing.jpg", crop: { left: 0, top: 560, width: 2048, height: 341 }, widths: [800, 1200, 2048] },
+  "wire-and-conduit-thumb": { from: "topic-pricing.jpg", crop: { left: 380, top: 280, width: 820, height: 820 }, widths: [240, 480, 820] },
+  // Right of the hard hat at the left edge, and above the worker's arm at the bottom.
+  "electrical-banner": { from: "banner.jpg", crop: { left: 50, top: 180, width: 1035, height: 172 }, widths: [800, 1035] },
+  "electrical-thumb": { from: "banner.jpg", crop: { left: 310, top: 90, width: 550, height: 550 }, widths: [240, 550] },
+  // The row of screwdrivers, above the bench and the maker's label on its edge.
+  "units-banner": { from: "W082137AE-5-US1b_1500_1500.jpg", crop: { left: 300, top: 440, width: 970, height: 162 }, widths: [800, 970] },
+  "units-thumb": { from: "W082137AE-5-US1b_1500_1500.jpg", crop: { left: 640, top: 100, width: 620, height: 620 }, widths: [240, 620] },
+  // The labels on the cartons.
+  "product-data-banner": { from: "2D-Barcodes-scaled.jpg", crop: { left: 0, top: 230, width: 1620, height: 270 }, widths: [800, 1200, 1620] },
+  "product-data-thumb": { from: "2D-Barcodes-scaled.jpg", crop: { left: 150, top: 150, width: 720, height: 720 }, widths: [240, 480, 720] },
 };
 
 mkdirSync(OUT, { recursive: true });
