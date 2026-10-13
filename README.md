@@ -2,12 +2,11 @@
 
   <img src="packages/brand/public/app-icon.svg" width="180"><br>
 
-  <a href="https://apps.microsoft.com/detail/9PHZQBV736JC"><img src="apps/windows/store/badges/badge-microsoft.svg" height="50"></a>
-  <a href="https://github.com/chengmarc/uom-converter/releases/latest/download/UOM-Converter-setup.exe"><img src="apps/windows/store/badges/badge-download.svg" height="50"></a>
-
+  <a href="https://uom-converter.com/"><img src="docs/badges/badge-browser.svg" height="50"></a>
+  <a href="https://play.google.com/store/apps/details?id=com.uomconverter.app"><img src="docs/badges/badge-google-play.svg" height="50"></a>
+  <a href="https://apps.microsoft.com/detail/9PHZQBV736JC"><img src="docs/badges/badge-microsoft-store.svg" height="50"></a>
+  <a href="https://github.com/chengmarc/uom-converter/releases/latest/download/UOM-Converter-setup.exe"><img src="docs/badges/badge-download.svg" height="50"></a>
   <h1>UOM Converter - Unit Converter for Electrical Industry</h1>
-
-  **[Use it in your browser](https://uom-converter.com/)**
 
   <img src="apps/windows/store/listing/screenshot-1-promo.png">
 
@@ -128,3 +127,5 @@ on GitHub Releases, the `.appx` to the Microsoft Store. Changes are listed in th
 ## License
 
 [Apache 2.0](LICENSE).
+
+Google Play and the Google Play logo are trademarks of Google LLC.

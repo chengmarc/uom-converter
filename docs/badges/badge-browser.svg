@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 139 50" width="139" height="50" role="img" aria-label="Use it in your browser">
+<title>Use it in your browser</title>
+<!-- Drawn to sit beside the official store badges: black, rounded, a two-line label. -->
+<rect width="139" height="50" rx="6" fill="#000"/>
+<g transform="translate(9.2 8.8) scale(1.35)"><path fill="#EA4335" d="M12 7L21.8 7A11 11 0 0 0 2.77 6.01L7.67 14.5A5 5 0 0 1 12 7Z"/><path fill="#FBBC04" d="M16.33 14.5L11.43 22.99A11 11 0 0 0 21.8 7L12 7A5 5 0 0 1 16.33 14.5Z"/><path fill="#34A853" d="M7.67 14.5L2.77 6.01A11 11 0 0 0 11.43 22.99L16.33 14.5A5 5 0 0 1 7.67 14.5Z"/><circle cx="12" cy="12" r="5" fill="#fff"/><circle cx="12" cy="12" r="4" fill="#1A73E8"/></g>
+<g font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, 'Noto Sans', Helvetica, Arial, sans-serif" fill="#fff">
+<text x="50" y="20" font-size="12" textLength="70" lengthAdjust="spacingAndGlyphs">Use it in your</text>
+<text x="50" y="39" font-size="21" textLength="74" lengthAdjust="spacingAndGlyphs">Browser</text>
+</g>
+</svg>

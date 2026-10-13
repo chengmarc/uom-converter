@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 142 50" width="142" height="50" role="img" aria-label="Get it from Microsoft">
-<title>Get it from Microsoft</title>
-<rect width="142" height="50" fill="#000"/>
-<g transform="translate(14 9.5) scale(1.291667)"><path fill="#f25022" d="M1 1h10.4v10.4H1z"/><path fill="#7fba00" d="M12.6 1H23v10.4H12.6z"/><path fill="#00a4ef" d="M1 12.6h10.4V23H1z"/><path fill="#ffb900" d="M12.6 12.6H23V23H12.6z"/></g>
-<g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif">
-<text x="54" y="20.5" font-size="12" fill="#fff" textLength="57" lengthAdjust="spacing">Get it from</text>
-<text x="54" y="38.5" font-size="17" font-weight="600" fill="#fff" textLength="74" lengthAdjust="spacing">Microsoft</text>
-</g>
-</svg>
