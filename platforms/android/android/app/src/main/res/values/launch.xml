@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The page's background (the bg colour in platforms/android/app/style.css), so launch blends into it. -->
+    <color name="launch_background">#F7F6F3</color>
+</resources>

@@ -314,9 +314,15 @@ function renderRows(rows: Row[]): HTMLElement {
   return list;
 }
 
+let writeClipboard = (text: string) => navigator.clipboard.writeText(text);
+/** For an app whose web view has no clipboard of its own (Android uses a native plugin). */
+export function setClipboard(write: (text: string) => Promise<void>) {
+  writeClipboard = write;
+}
+
 async function copy(row: HTMLElement, hint: HTMLElement, text: string) {
   try {
-    await navigator.clipboard.writeText(text);
+    await writeClipboard(text);
     hint.textContent = "Copied";
     row.classList.add("copied");
     setTimeout(() => {

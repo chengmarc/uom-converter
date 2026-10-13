@@ -16,9 +16,15 @@
     "app": "vite build --config platforms/windows/vite.config.ts && electron .",
     "dist:win": "vite build --config platforms/windows/vite.config.ts && electron-builder --config platforms/windows/electron-builder.json --win",
     "dist:store": "vite build --config platforms/windows/vite.config.ts && electron-builder --config platforms/windows/electron-builder.json --win appx",
-    "store:assets": "vite build --config platforms/windows/vite.config.ts && electron platforms/windows/store/render.cjs"
+    "store:assets": "vite build --config platforms/windows/vite.config.ts && electron platforms/windows/store/render.cjs",
+    "android:icons": "electron platforms/android/render-icons.cjs",
+    "android:sync": "vite build --config platforms/android/vite.config.ts && cap sync android",
+    "android:run": "npm run android:sync && node platforms/android/gradle.cjs installDebug --launch",
+    "android:apk": "npm run android:sync && node platforms/android/gradle.cjs assembleDebug",
+    "android:aab": "npm run android:sync && node platforms/android/gradle.cjs bundleRelease"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.5.3",
     "@fontsource-variable/inter": "^5.3.0",
     "electron": "^44.4.5",
     "electron-builder": "^26.15.3",
@@ -26,5 +32,11 @@
     "vite": "^7.3.0",
     "vitest": "^3.2.0",
     "wrangler": "^4.149.0"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/clipboard": "^8.0.1",
+    "@capacitor/core": "^8.5.3"
   }
 }

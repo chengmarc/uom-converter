@@ -44,6 +44,7 @@ src/
 platforms/
   web/           the website: header, home page, a page per converter, footer, and its build
   windows/       the app window (app/), Electron shell, electron-builder config, Store assets
+  android/       the app screens (app/), the Capacitor native project (android/), icons
 ```
 
 ## Website
@@ -85,6 +86,21 @@ certificate of its own.
 npm run store:assets   # re-render the app icon and platforms/windows/store/ from the icon and the built page
 npm run dist:store     # UOM-Converter-<version>.appx
 ```
+
+## Android app
+
+Its own phone screens (`platforms/android/app/`) in a Capacitor app, package `com.uomconverter.app`.
+Needs Android Studio, for the SDK and emulator; `platforms/android/gradle.cjs` finds its Java and
+SDK and passes `HTTPS_PROXY` on to Gradle.
+
+```
+npm run android:run     # build, install and open on the running emulator or device
+npm run android:apk     # debug .apk in platforms/android/android/app/build/outputs/apk/debug/
+npm run android:icons   # re-render the launcher icons and the Play icon from the app icon
+```
+
+`capacitor.config.json` sits at the repo root because the Capacitor CLI runs from there. The
+version comes from `package.json` (1.2.3 is Play's versionCode 10203).
 
 ## Releasing
 
