@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 // main.cjs can't be imported outside Electron, so read both files as text.
 const main = readFileSync(new URL("./main.cjs", import.meta.url), "utf8");
-const css = readFileSync(new URL("../../web/style.css", import.meta.url), "utf8");
+const css = readFileSync(new URL("../app/style.css", import.meta.url), "utf8");
 
 const frame = (mode: "light" | "dark") => {
   const m = new RegExp(`${mode}: \\{ chrome: "(#[0-9a-f]{6})", text: "(#[0-9a-f]{6})" \\}`).exec(main);

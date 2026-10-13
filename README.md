@@ -39,17 +39,16 @@ src/
   converters/    each converter's fields, examples and compute, plus number formats and regions;
                  diagrams and tables as data, so nothing here depends on a page
   brand/         the app icon every platform's icons are made from
+  ui/            a converter drawn as HTML (form, result, diagrams), the roles and the icons,
+                 for the platforms built on a web page; each styles it its own way
 platforms/
-  web/           the page (layout, navigation, rendering) and the website build
-  windows/       Electron shell, electron-builder config, Store assets and listing
+  web/           the website: header, home page, a page per converter, footer, and its build
+  windows/       the app window (app/), Electron shell, electron-builder config, Store assets
 ```
-
-For now the Windows app shows the web platform's page; `platforms/windows/vite.config.ts` builds
-it without the website's extras.
 
 ## Website
 
-Every converter at its own address (`/voltage-drop-calculator/`, `/awg-to-mm2/`…) so searches
+Every converter at its own address (`/voltage-drop-calculator`, `/awg-to-mm2`…) so searches
 can land on it. Each page's title and description are in `platforms/web/pages.ts`;
 `platforms/web/vite.config.ts` writes the pages, a sitemap, and an offline copy for phones.
 
@@ -57,11 +56,13 @@ can land on it. Each page's title and description are in `platforms/web/pages.ts
 npm run dev           # live-reloading at http://localhost:5173/
 npm run build:web     # platforms/web/dist/
 npm run preview:web   # serve platforms/web/dist/ at http://localhost:4173/
+npm run deploy:web    # build and deploy to Cloudflare (needs `npx wrangler login` once)
 ```
 
-Every push to `main` publishes it to GitHub Pages (`.github/workflows/pages.yml`), at
-<https://uom-converter.com/>. The domain is set in the repo's Settings → Pages, not in a `CNAME`
-file, which Pages ignores for Actions deployments. Set `SITE_URL` to build it for another address.
+It is served at <https://uom-converter.com/> by Cloudflare Workers as static files
+(`platforms/web/wrangler.jsonc`, no Worker code). Cloudflare's Git integration deploys every push
+to `main`; `.github/workflows/checks.yml` runs the tests and the build on GitHub. Set `SITE_URL`
+to build it for another address.
 
 ## Windows app (.exe)
 

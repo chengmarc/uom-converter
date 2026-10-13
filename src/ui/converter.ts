@@ -1,9 +1,10 @@
 // Renders a converter (src/converters/model.ts) as a panel: examples, the "Convert from" form,
-// and the result, all laid out the same way for every converter.
+// and the result, all laid out the same way for every converter. Shared by the apps built on a
+// web page (platforms/web and platforms/windows); each styles it in its own stylesheet.
 
-import type { Region } from "../../src/core/region";
-import { numberStyle, parseNumber } from "../../src/converters/format";
-import { dyn, type Converter, type Field, type Output, type Row, type Table, type Values } from "../../src/converters/model";
+import type { Region } from "../core/region";
+import { numberStyle, parseNumber } from "../converters/format";
+import { dyn, type Converter, type Field, type Output, type Row, type Table, type Values } from "../converters/model";
 import { drawVisual } from "./visuals";
 
 /** Reads a converter's inputs from its panel's form. */
@@ -39,12 +40,13 @@ export function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, 
   return e;
 }
 
-export function renderConverter(conv: Converter, region: Region): HTMLElement {
+/** `heading`: h1 when the converter is the page's subject (a website page), h2 when it sits in an app or another page. */
+export function renderConverter(conv: Converter, region: Region, heading: "h1" | "h2" = "h2"): HTMLElement {
   const panel = el("section", "converter");
   panel.id = `c-${conv.id}`; // not the bare hash, so switching converters does not scroll
   panel.setAttribute("aria-labelledby", `${conv.id}-h`);
   const values = new PanelValues(conv, panel, region);
-  const h = el("h2", undefined, conv.title);
+  const h = el(heading, undefined, conv.title);
   h.id = `${conv.id}-h`;
   panel.append(h, el("p", "blurb", dyn(conv.blurb, values)));
 

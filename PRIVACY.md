@@ -1,7 +1,7 @@
 # Privacy Policy
 
 **UOM Converter**
-Last updated: October 12, 2026
+Last updated: October 13, 2026
 
 This policy covers UOM Converter in every form it ships in: the Microsoft Store edition, the
 Windows installer, the portable exe, and the website at <https://uom-converter.com/>.
@@ -32,10 +32,10 @@ once loaded: it works out every answer in your browser and sends nothing back.
   local storage for the site. Clearing the site's data removes them.
 - **Offline copy.** Your browser may keep a copy of the site's pages and files so it works without
   a connection. Nothing you type is part of that copy.
-- **Hosting.** The site is hosted on GitHub Pages. Like any web server, GitHub receives your IP
+- **Hosting.** The site is hosted on Cloudflare. Like any web server, Cloudflare receives your IP
   address and the pages you request, under the
-  [GitHub Privacy Statement](https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement).
-  The developer does not receive these logs.
+  [Cloudflare Privacy Policy](https://www.cloudflare.com/privacypolicy/). The site does not use
+  Cloudflare's analytics or add any of its scripts to the page.
 
 ## Third parties
 

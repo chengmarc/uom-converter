@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- Only the app's own files. -->
+    <!-- Only the site's own files. -->
     <meta
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"
@@ -14,34 +14,54 @@
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
-    <!-- The app frame: title bar and audience bar stay put; the sidebar and the converter scroll on their own. -->
-    <header class="titlebar">
-      <h1 class="brand"><img src="../../src/brand/app-icon.svg" alt="" width="18" height="18" />UOM Converter</h1>
-    </header>
-    <!-- Who you are and where you work: the two choices that set up every converter. -->
-    <div class="audience">
-      <span class="label" id="audience-label">Show converters for</span>
-      <div id="audience" class="tabs" role="group" aria-labelledby="audience-label"></div>
-      <div class="region">
-        <span class="label" id="region-label">Region</span>
-        <div id="region" class="seg" role="group" aria-labelledby="region-label"></div>
+    <a class="skip" href="#main">Skip to content</a>
+    <!-- One header on every page: home, search, region, and the Windows app. -->
+    <header class="site-header">
+      <div class="wrap header-row">
+        <a class="brand" href="/" data-home><img src="../../src/brand/app-icon.svg" alt="" width="24" height="24" />UOM Converter</a>
+        <div class="search" role="search">
+          <label class="sr" for="q">Search converters</label>
+          <input
+            id="q"
+            type="search"
+            placeholder="Search converters"
+            autocomplete="off"
+            spellcheck="false"
+            role="combobox"
+            aria-expanded="false"
+            aria-controls="q-results"
+            aria-autocomplete="list"
+            aria-keyshortcuts="/ Control+K"
+          />
+          <kbd aria-hidden="true">/</kbd>
+          <ul id="q-results" class="search-results" role="listbox" aria-label="Converters" hidden></ul>
+        </div>
+        <div class="region" role="group" aria-label="Region" id="region"></div>
+        <a class="button get-app" id="get-app" rel="noopener">Get the Windows app</a>
       </div>
-      <p id="audience-desc" class="audience-desc"></p>
-    </div>
-    <label class="picker">
-      <span class="label">Converter</span>
-      <select id="picker"></select>
-    </label>
-    <div class="layout">
-      <!-- Heads the converter list it searches, and stays put while the list scrolls. -->
-      <label class="find">
-        <span class="label">Find a converter</span>
-        <input id="find" type="search" placeholder="Find a converter" autocomplete="off" spellcheck="false" aria-controls="sidebar" aria-keyshortcuts="Control+F" />
-        <kbd>Ctrl F</kbd>
-      </label>
-      <nav id="sidebar" aria-label="Converters"></nav>
-      <main id="content"></main>
-    </div>
+    </header>
+    <main id="main" tabindex="-1"></main>
+    <footer class="site-footer">
+      <div class="wrap footer-grid">
+        <div class="footer-brand">
+          <a class="brand" href="/" data-home><img src="../../src/brand/app-icon.svg" alt="" width="24" height="24" />UOM Converter</a>
+          <p>Free unit conversions for the electrical trade. Everything is worked out in your browser.</p>
+        </div>
+        <nav aria-labelledby="footer-topics">
+          <h2 id="footer-topics">Converters</h2>
+          <ul id="footer-topic-list"></ul>
+        </nav>
+        <nav aria-labelledby="footer-project">
+          <h2 id="footer-project">Project</h2>
+          <ul>
+            <li><a id="footer-app">Windows app</a></li>
+            <li><a href="https://github.com/chengmarc/uom-converter/blob/main/PRIVACY.md" rel="noopener">Privacy</a></li>
+            <li><a href="https://github.com/chengmarc/uom-converter" rel="noopener">Source code</a></li>
+            <li><a href="https://github.com/chengmarc/uom-converter/issues" rel="noopener">Report a problem</a></li>
+          </ul>
+        </nav>
+      </div>
+    </footer>
     <script type="module" src="./main.ts"></script>
   </body>
 </html>

@@ -1,8 +1,8 @@
-// Simple 24×24 line icons, drawn for this page. Stroke uses currentColor so they take the text
+// Simple 24×24 line icons, drawn for these apps. Stroke uses currentColor so they take the text
 // colour of wherever they sit.
 
 import type { AudienceId } from "./audiences";
-import type { Topic } from "../../src/converters/model";
+import type { Topic } from "../converters/model";
 
 // Typed like topics, so a new audience can't ship without an icon.
 const AUDIENCES: Record<AudienceId, string> = {

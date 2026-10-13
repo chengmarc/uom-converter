@@ -3,7 +3,7 @@
 // words people type, not the app's short sidebar names. The desktop app doesn't use any of this.
 
 export interface Page {
-  /** The page's folder on the site: /<slug>/. */
+  /** The page's address on the site: /<slug> (served from <slug>.html). */
   slug: string;
   /** The browser tab and search result title, before " | UOM Converter". */
   title: string;
@@ -177,8 +177,9 @@ export const HOME: Page = {
     "Free converters for the electrical trade: AWG to mm², voltage drop, conduit, kVA and amps, price per E/C/M, multipliers, margins and UOM codes. US, Canada and Europe.",
 };
 
-/** The converter a site path opens, if any: "/uom-converter/voltage-drop-calculator/" → "vdrop". */
+/** The converter a site path opens, if any: "/voltage-drop-calculator" → "vdrop". */
 export function idFromPath(path: string, base: string): string | undefined {
-  const slug = path.startsWith(base) ? path.slice(base.length).replace(/\/(index\.html)?$/, "") : "";
+  // The host redirects /<slug>.html and /<slug>/ to /<slug>, but a copy saved offline may not.
+  const slug = path.startsWith(base) ? path.slice(base.length).replace(/(\.html|\/)$/, "") : "";
   return Object.keys(PAGES).find((id) => PAGES[id].slug === slug);
 }

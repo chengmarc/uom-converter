@@ -1,15 +1,19 @@
-// The website build: `npm run build:web` writes platforms/web/dist/, published to GitHub Pages by
-// .github/workflows/pages.yml. It is the page in this folder, plus:
-//   <slug>/index.html   one page per converter (pages.ts), each with its own title,
-//                       description and canonical address, so searches land on the converter
-//   404.html            GitHub Pages' fallback for unknown addresses
+// The website build: `npm run build:web` writes platforms/web/dist/, served by Cloudflare Workers
+// (wrangler.jsonc). It is the page in this folder, plus:
+//   <slug>.html         one page per converter (pages.ts), each with its own title,
+//                       description and canonical address, so searches land on the converter.
+//                       Cloudflare serves it at /<slug> (no .html, no slash), which is the
+//                       address the canonical tag, sitemap and links use.
+//   404.html            served for unknown addresses
 //   sitemap.xml, robots.txt
 //   manifest.webmanifest, sw.js, icons   install from the browser and use it offline
 //   og.png              the preview image when a link is shared
+//   _headers            caching rules for Cloudflare
+//   _redirects          /<slug>.html and /index.html → the canonical address, permanently
 // The address it is served from is SITE_URL (default below); its path becomes Vite's base.
 
 import { createHash } from "node:crypto";
-import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { copyFileSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { defineConfig, type Plugin } from "vite";
 import { HOME, PAGES, type Page } from "./pages";
@@ -25,7 +29,7 @@ const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").repl
 
 /** The page's own head: title, description, canonical address, share preview and app manifest. */
 function head(page: Page, noindex = false): string {
-  const url = SITE_URL + (page.slug ? `${page.slug}/` : "");
+  const url = SITE_URL + page.slug;
   const title = `${page.title} | ${NAME}`;
   const ld = {
     "@context": "https://schema.org",
@@ -49,8 +53,8 @@ function head(page: Page, noindex = false): string {
     `<meta property="og:url" content="${url}" />`,
     `<meta property="og:image" content="${SITE_URL}og.png" />`,
     `<meta name="twitter:card" content="summary_large_image" />`,
-    `<meta name="theme-color" content="#f6f5f2" media="(prefers-color-scheme: light)" />`,
-    `<meta name="theme-color" content="#141412" media="(prefers-color-scheme: dark)" />`,
+    `<meta name="theme-color" content="#f7f6f3" media="(prefers-color-scheme: light)" />`,
+    `<meta name="theme-color" content="#131312" media="(prefers-color-scheme: dark)" />`,
     `<link rel="manifest" href="${BASE}manifest.webmanifest" />`,
     `<link rel="apple-touch-icon" href="${BASE}icon-256.png" />`,
     // A data block, not a script: the page's CSP doesn't apply to it.
@@ -114,12 +118,11 @@ function sitePages(): Plugin {
       writeFileSync(join(OUT, "index.html"), withHead(shell, HOME));
       writeFileSync(join(OUT, "404.html"), withHead(shell, { ...HOME, title: "Page not found" }, true));
       for (const page of pages) {
-        mkdirSync(join(OUT, page.slug), { recursive: true });
-        writeFileSync(join(OUT, page.slug, "index.html"), withHead(shell, page));
+        writeFileSync(join(OUT, `${page.slug}.html`), withHead(shell, page));
       }
 
       const today = new Date().toISOString().slice(0, 10);
-      const urls = [SITE_URL, ...pages.map((p) => `${SITE_URL}${p.slug}/`)];
+      const urls = [SITE_URL, ...pages.map((p) => SITE_URL + p.slug)];
       writeFileSync(
         join(OUT, "sitemap.xml"),
         `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
@@ -143,8 +146,8 @@ function sitePages(): Plugin {
             start_url: BASE,
             scope: BASE,
             display: "standalone",
-            background_color: "#f6f5f2",
-            theme_color: "#f6f5f2",
+            background_color: "#f7f6f3",
+            theme_color: "#f7f6f3",
             icons: [
               { src: `${BASE}icon.svg`, sizes: "any", type: "image/svg+xml" },
               { src: `${BASE}icon-256.png`, sizes: "256x256", type: "image/png" },
@@ -155,10 +158,27 @@ function sitePages(): Plugin {
         ),
       );
 
-      const files = [BASE, ...pages.map((p) => `${BASE}${p.slug}/`), ...assets.map((a) => BASE + a), `${BASE}icon.svg`, `${BASE}icon-256.png`];
+      // The home page's screenshots of the Windows app are left to be cached when first shown.
+      const offline = assets.filter((a) => !a.endsWith(".png"));
+      const files = [BASE, ...pages.map((p) => BASE + p.slug), ...offline.map((a) => BASE + a), `${BASE}icon.svg`, `${BASE}icon-256.png`];
       // Asset names carry a content hash, so a new build with any change gets a new cache.
       const version = createHash("sha256").update(JSON.stringify(files) + JSON.stringify(PAGES)).digest("hex").slice(0, 12);
       writeFileSync(join(OUT, "sw.js"), serviceWorker(files, version));
+
+      // Files under assets/ are named by their content, so they can be cached for good. Everything
+      // else (pages, sw.js, the manifest) keeps one address across builds and is checked each time,
+      // so a deploy reaches visitors (and the offline copy) on their next visit.
+      writeFileSync(
+        join(OUT, "_headers"),
+        `/*\n  Cache-Control: no-cache\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n\n` +
+          `${BASE}assets/*\n  ! Cache-Control\n  Cache-Control: public, max-age=31536000, immutable\n`,
+      );
+      // Cloudflare already redirects these spellings, but with a 307 (temporary). A 301 tells
+      // search engines the extensionless address is the one to keep. 404.html is left out on purpose.
+      writeFileSync(
+        join(OUT, "_redirects"),
+        [`${BASE}index.html ${BASE} 301`, ...pages.map((p) => `${BASE}${p.slug}.html ${BASE}${p.slug} 301`)].join("\n") + "\n",
+      );
     },
   };
 }

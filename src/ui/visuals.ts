@@ -1,9 +1,9 @@
 // Draws a result's diagram (src/converters/visual.ts) as inline SVG. Colours come from CSS
-// classes (see style.css), so they follow light and dark mode. Each is a <svg> with a text
+// classes (in each app's stylesheet), so they follow light and dark mode. Each is a <svg> with a text
 // alternative.
 
-import { fmt } from "../../src/converters/format";
-import type { Section, Visual } from "../../src/converters/visual";
+import { fmt } from "../converters/format";
+import type { Section, Visual } from "../converters/visual";
 
 type Of<K extends Visual["kind"]> = Extract<Visual, { kind: K }>;
 

@@ -22,10 +22,12 @@ describe("site pages", () => {
   });
 
   it("are found from their address", () => {
-    expect(idFromPath("/uom-converter/voltage-drop-calculator/", "/uom-converter/")).toBe("vdrop");
-    expect(idFromPath("/uom-converter/voltage-drop-calculator/index.html", "/uom-converter/")).toBe("vdrop");
     expect(idFromPath("/voltage-drop-calculator", "/")).toBe("vdrop");
-    expect(idFromPath("/uom-converter/", "/uom-converter/")).toBeUndefined();
-    expect(idFromPath("/elsewhere/voltage-drop-calculator/", "/uom-converter/")).toBeUndefined();
+    expect(idFromPath("/voltage-drop-calculator.html", "/")).toBe("vdrop");
+    expect(idFromPath("/voltage-drop-calculator/", "/")).toBe("vdrop");
+    expect(idFromPath("/uom-converter/voltage-drop-calculator", "/uom-converter/")).toBe("vdrop");
+    expect(idFromPath("/", "/")).toBeUndefined();
+    expect(idFromPath("/voltage-drop-calculator/extra", "/")).toBeUndefined();
+    expect(idFromPath("/elsewhere/voltage-drop-calculator", "/uom-converter/")).toBeUndefined();
   });
 });
