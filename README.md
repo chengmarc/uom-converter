@@ -1,6 +1,6 @@
 <div align="center">
 
-  <img src="packages/brand/app-icon.svg" width="180"><br>
+  <img src="packages/brand/public/app-icon.svg" width="180"><br>
 
   <a href="https://apps.microsoft.com/detail/9PHZQBV736JC"><img src="apps/windows/store/badges/badge-microsoft.svg" height="50"></a>
   <a href="https://github.com/chengmarc/uom-converter/releases/latest/download/UOM-Converter-setup.exe"><img src="apps/windows/store/badges/badge-download.svg" height="50"></a>
@@ -44,8 +44,19 @@ packages/
   brand/         @uom/brand: the app icon every app's icons are made from
 apps/
   web/           the website: header, home page, a page per converter, footer, and its build
-  windows/       the app window (app/), Electron shell, electron-builder config, Store assets
-  android/       the app screens (app/), the Capacitor native project (native/), icons
+  windows/       the Electron app: its page (src/renderer/) and shell (src/main/), Store assets
+  android/       the app screens (src/), the Capacitor native project (native/), icons
+```
+
+Inside an app, `src/` is its source, `scripts/` its helpers (icon renderers, the Gradle runner),
+`store/` its listing, and its tools' configs sit at its root. Builds land in `dist/`.
+
+Live preview, reloading on every save:
+
+```
+npm run dev           # the website, at http://localhost:5173/
+npm run dev:windows   # the Windows app, in its own window
+npm run dev:android   # the Android app, on an emulator (started if need be) or USB phone
 ```
 
 Each package and app has its own `package.json` listing what it uses; the apps import the
@@ -56,7 +67,7 @@ each app's Vite build compiles what it imports. One version covers every app: th
 ## Website
 
 Every converter at its own address (`/voltage-drop-calculator`, `/awg-to-mm2`…) so searches
-can land on it. Each page's title and description are in `apps/web/pages.ts`;
+can land on it. Each page's title and description are in `apps/web/src/pages.ts`;
 `apps/web/vite.config.ts` writes the pages, a sitemap, and an offline copy for phones.
 
 ```
@@ -73,7 +84,7 @@ to build it for another address.
 
 ## Windows app (.exe)
 
-The page wrapped in Electron (`apps/windows/electron/main.cjs`). It is served from a private
+The page wrapped in Electron (`apps/windows/src/main/main.cjs`). It is served from a private
 `app://` scheme, with no Node access in the page, a sandboxed renderer and a content security
 policy. electron-builder's settings are in `apps/windows/electron-builder.config.cjs`, and builds
 land in `apps/windows/release/`.
@@ -95,8 +106,8 @@ npm run dist:store     # UOM-Converter-<version>.appx
 
 ## Android app
 
-Its own phone screens (`apps/android/app/`) in a Capacitor app, package `com.uomconverter.app`.
-Needs Android Studio, for the SDK and emulator; `apps/android/gradle.cjs` finds its Java and
+Its own phone screens (`apps/android/src/`) in a Capacitor app, package `com.uomconverter.app`.
+Needs Android Studio, for the SDK and emulator; `apps/android/scripts/gradle.cjs` finds its Java and
 SDK and passes `HTTPS_PROXY` on to Gradle.
 
 ```
@@ -105,7 +116,7 @@ npm run android:apk     # debug .apk in apps/android/native/app/build/outputs/ap
 npm run android:icons   # re-render the launcher icons and the Play icon from the app icon
 ```
 
-Its Capacitor settings are in `apps/android/capacitor.config.json`. The version comes from the
+Its Capacitor settings are in `apps/android/capacitor.config.ts`. The version comes from the
 root `package.json` (1.2.3 is Play's versionCode 10203).
 
 ## Releasing

@@ -1,5 +1,5 @@
 // Electron shell for the UOM converter. The page is the static build in apps/windows/dist/
-// (see ../vite.config.ts), served from a private app:// scheme so it gets a real origin: browser storage and
+// (see ../../vite.config.ts), served from a private app:// scheme so it gets a real origin: browser storage and
 // clipboard behave exactly as on the web, and nothing can load from outside the app.
 
 const { app, BrowserWindow, Menu, nativeTheme, net, protocol, screen, shell } = require("electron");
@@ -8,7 +8,10 @@ const os = require("node:os");
 const path = require("node:path");
 const { pathToFileURL } = require("node:url");
 
-const DIST = path.join(__dirname, "..", "dist");
+const DIST = path.join(__dirname, "..", "..", "dist");
+// `npm run dev:windows` (scripts/dev.mjs) points the app at Vite's dev server instead, for live
+// reload. A packaged app ignores it, so it always shows its own build.
+const DEV_URL = app.isPackaged ? undefined : process.env.UOM_DEV_URL;
 
 /**
  * The page's frame colours (--chrome and --text in style.css, light and dark), for the title bar
@@ -137,12 +140,12 @@ function createWindow() {
     return { action: "deny" };
   });
   win.webContents.on("will-navigate", (event, url) => {
-    if (url.startsWith("app://")) return;
+    if (url.startsWith("app://") || (DEV_URL && url.startsWith(DEV_URL))) return;
     event.preventDefault();
     if (url.startsWith("https://")) shell.openExternal(url);
   });
 
-  win.loadURL("app://uom/index.html");
+  win.loadURL(DEV_URL ?? "app://uom/index.html");
 }
 
 // One window is enough: a second launch focuses the running app instead.

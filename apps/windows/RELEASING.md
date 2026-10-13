@@ -52,10 +52,10 @@ the repo root.
    ```
 
 9. **Publish** the two exe files to GitHub, with the version's CHANGELOG section as the
-   description. [release-notes.cjs](release-notes.cjs) copies it to `apps/windows/release/RELEASE_NOTES.md`:
+   description. [scripts/release-notes.cjs](scripts/release-notes.cjs) copies it to `apps/windows/release/RELEASE_NOTES.md`:
 
    ```
-   node apps/windows/release-notes.cjs <version>
+   node apps/windows/scripts/release-notes.cjs <version>
    gh release create v<version> apps/windows/release/UOM-Converter-setup.exe apps/windows/release/UOM-Converter-portable.exe --title "UOM Converter <version>" --notes-file apps/windows/release/RELEASE_NOTES.md
    ```
 
@@ -91,18 +91,18 @@ In `apps/windows/release/`:
 | `UOM-Converter-setup.exe` | GitHub Releases |
 | `UOM-Converter-portable.exe` | GitHub Releases |
 | `UOM-Converter-<version>.appx` | Microsoft Store (Partner Center) only |
-| `RELEASE_NOTES.md` | The GitHub release's description (from `release-notes.cjs`) |
+| `RELEASE_NOTES.md` | The GitHub release's description (from `scripts/release-notes.cjs`) |
 
 Everything else electron-builder leaves there (`win-unpacked/`, `.blockmap` files,
 `builder-debug.yml`) is intermediate and isn't published.
 
 ### Where the images come from
 
-`npm run store:assets` runs [store/render.cjs](store/render.cjs), which renders from
-`packages/brand/app-icon.svg` and the built page (paths below are in `apps/windows/`):
+`npm run store:assets` runs [scripts/render.cjs](scripts/render.cjs), which renders from
+`packages/brand/public/app-icon.svg` and the built page (paths below are in `apps/windows/`):
 
 | Output | Used for |
 |---|---|
-| `electron/icon.png` | The window, taskbar and installer icon |
+| `src/main/icon.png` | The window, taskbar and installer icon |
 | `store/appx/` | Start, tile and taskbar icons inside the `.appx` |
 | `store/listing/` | Partner Center: store logo, box and poster art (designed in `store/logo.html`), the promo (`store/promo.html`) and screenshots |

@@ -1,8 +1,8 @@
 {
   "name": "@uom/brand",
-  "description": "The app icon every app's icons are made from.",
+  "description": "The app icon every app's icons are made from. public/ is each app's Vite public folder: served as-is in dev, copied into every build.",
   "private": true,
   "exports": {
-    "./app-icon.svg": "./app-icon.svg"
+    "./app-icon.svg": "./public/app-icon.svg"
   }
 }

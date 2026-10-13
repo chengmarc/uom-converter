@@ -16,9 +16,9 @@ import { icon } from "@uom/ui/icons";
 import { HOME, idFromPath, PAGES } from "./pages";
 import { registerOffline, STORE_URL } from "./site";
 
-// The Windows app's own Store screenshots, light and dark (apps/windows/store/render.cjs).
-const APP_LIGHT = new URL("../windows/store/listing/screenshot-3-voltage-drop.png", import.meta.url).href;
-const APP_DARK = new URL("../windows/store/listing/screenshot-8-conduit-dark.png", import.meta.url).href;
+// The Windows app's own Store screenshots, light and dark (apps/windows/scripts/render.cjs).
+const APP_LIGHT = new URL("../../windows/store/listing/screenshot-3-voltage-drop.png", import.meta.url).href;
+const APP_DARK = new URL("../../windows/store/listing/screenshot-8-conduit-dark.png", import.meta.url).href;
 
 // The site's base path, from SITE_URL in vite.config.ts.
 declare const __SITE_BASE__: string;

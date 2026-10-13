@@ -11,7 +11,8 @@ const { app, BrowserWindow } = require("electron");
 const fs = require("node:fs");
 const path = require("node:path");
 
-const RES = path.join(__dirname, "native", "app", "src", "main", "res");
+const ANDROID = path.join(__dirname, "..");
+const RES = path.join(ANDROID, "native", "app", "src", "main", "res");
 const ICON = fs.readFileSync(require.resolve("@uom/brand/app-icon.svg"), "utf8");
 // The tile's squircle, gradients, glyph and the glyph's drop shadow.
 const DEFS = /<defs>[\s\S]*<\/defs>/.exec(ICON)[0];
@@ -60,7 +61,7 @@ async function render(name, file, size) {
   if (w !== size) throw new Error(`${file} is ${w}px wide, expected ${size}`);
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(file, png);
-  console.log(`${path.relative(__dirname, file)}  ${size}×${size}`);
+  console.log(`${path.relative(ANDROID, file)}  ${size}×${size}`);
 }
 
 // Each icon closes its window before the next opens; that mustn't end the app.
@@ -74,7 +75,7 @@ app.whenReady().then(async () => {
       await render("legacy", path.join(dir, "ic_launcher.png"), 48 * x);
       await render("round", path.join(dir, "ic_launcher_round.png"), 48 * x);
     }
-    await render("store", path.join(__dirname, "store", "icon-512.png"), 512);
+    await render("store", path.join(ANDROID, "store", "icon-512.png"), 512);
   } catch (e) {
     console.error(e);
     process.exitCode = 1;

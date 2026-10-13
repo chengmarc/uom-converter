@@ -11,7 +11,7 @@ const electron = path.dirname(require.resolve("electron/package.json"));
 module.exports = {
   appId: "com.uomconverter.app",
   extraMetadata: { name: "uom-converter", version },
-  files: ["dist/**", "electron/**", "package.json"],
+  files: ["dist/**", "src/main/**", "!**/*.test.ts", "package.json"],
   directories: {
     output: "release",
     buildResources: "store",
@@ -20,7 +20,7 @@ module.exports = {
   electronDist: path.join(electron, "dist"),
   win: {
     target: ["nsis", "portable"],
-    icon: "electron/icon.png",
+    icon: "src/main/icon.png",
   },
   nsis: {
     oneClick: false,

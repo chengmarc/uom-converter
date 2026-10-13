@@ -1,11 +1,12 @@
 // The website build: `npm run build:web` writes apps/web/dist/, served by Cloudflare Workers
-// (wrangler.jsonc). It is the page in this folder, plus:
-//   <slug>.html         one page per converter (pages.ts), each with its own title,
+// (wrangler.jsonc). It is the page in src/, plus:
+//   <slug>.html         one page per converter (src/pages.ts), each with its own title,
 //                       description and canonical address, so searches land on the converter.
 //                       Cloudflare serves it at /<slug> (no .html, no slash), which is the
 //                       address the canonical tag, sitemap and links use.
 //   404.html            served for unknown addresses
 //   sitemap.xml, robots.txt
+//   app-icon.svg        from @uom/brand's public folder, as in every app
 //   manifest.webmanifest, sw.js, icons   install from the browser and use it offline
 //   og.png              the preview image when a link is shared
 //   _headers            caching rules for Cloudflare
@@ -14,10 +15,9 @@
 
 import { createHash } from "node:crypto";
 import { copyFileSync, readFileSync, writeFileSync } from "node:fs";
-import { createRequire } from "node:module";
 import { join, resolve } from "node:path";
 import { defineConfig, type Plugin } from "vite";
-import { HOME, PAGES, type Page } from "./pages";
+import { HOME, PAGES, type Page } from "./src/pages";
 
 const SITE_URL = (process.env.SITE_URL ?? "https://uom-converter.com/").replace(/\/?$/, "/");
 const BASE = new URL(SITE_URL).pathname;
@@ -133,8 +133,7 @@ function sitePages(): Plugin {
       // Search engines read robots.txt only at a domain's root, which is where the site lives.
       writeFileSync(join(OUT, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${SITE_URL}sitemap.xml\n`);
 
-      copyFileSync(createRequire(import.meta.url).resolve("@uom/brand/app-icon.svg"), join(OUT, "icon.svg"));
-      // Rendered for the Windows app by apps/windows/store/render.cjs.
+      // Rendered for the Windows app by apps/windows/scripts/render.cjs.
       copyFileSync(resolve(WINDOWS, "store/appx/Square44x44Logo.targetsize-256_altform-unplated.png"), join(OUT, "icon-256.png"));
       copyFileSync(resolve(WINDOWS, "store/listing/screenshot-1-promo.png"), join(OUT, "og.png"));
       writeFileSync(
@@ -150,7 +149,7 @@ function sitePages(): Plugin {
             background_color: "#f7f6f3",
             theme_color: "#f7f6f3",
             icons: [
-              { src: `${BASE}icon.svg`, sizes: "any", type: "image/svg+xml" },
+              { src: `${BASE}app-icon.svg`, sizes: "any", type: "image/svg+xml" },
               { src: `${BASE}icon-256.png`, sizes: "256x256", type: "image/png" },
             ],
           },
@@ -161,7 +160,7 @@ function sitePages(): Plugin {
 
       // The home page's screenshots of the Windows app are left to be cached when first shown.
       const offline = assets.filter((a) => !a.endsWith(".png"));
-      const files = [BASE, ...pages.map((p) => BASE + p.slug), ...offline.map((a) => BASE + a), `${BASE}icon.svg`, `${BASE}icon-256.png`];
+      const files = [BASE, ...pages.map((p) => BASE + p.slug), ...offline.map((a) => BASE + a), `${BASE}app-icon.svg`, `${BASE}icon-256.png`];
       // Asset names carry a content hash, so a new build with any change gets a new cache.
       const version = createHash("sha256").update(JSON.stringify(files) + JSON.stringify(PAGES)).digest("hex").slice(0, 12);
       writeFileSync(join(OUT, "sw.js"), serviceWorker(files, version));
@@ -185,7 +184,8 @@ function sitePages(): Plugin {
 }
 
 export default defineConfig({
-  root: __dirname,
+  root: resolve(__dirname, "src"),
+  publicDir: resolve(__dirname, "../../packages/brand/public"),
   base: BASE,
   define: { __SITE_BASE__: JSON.stringify(BASE) },
   build: { outDir: OUT, emptyOutDir: true },

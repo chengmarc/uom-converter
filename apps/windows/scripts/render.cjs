@@ -1,7 +1,7 @@
 // Renders every image derived from the app's own sources, so they never drift from it:
-//   electron/icon.png      the desktop window, taskbar and installer icon
-//   appx/                  tile and taskbar icons packed into the MSIX (electron-builder's buildResources)
-//   listing/               images uploaded to Partner Center: store logo, promo and screenshots
+//   src/main/icon.png      the desktop window, taskbar and installer icon
+//   store/appx/            tile and taskbar icons packed into the MSIX (electron-builder's buildResources)
+//   store/listing/         images uploaded to Partner Center: store logo, promo and screenshots
 // The icons come from @uom/brand's app-icon.svg; screenshots from the built page.
 // Run with `npm run store:assets` (builds apps/windows/dist/ first).
 
@@ -12,6 +12,7 @@ const { pathToFileURL } = require("node:url");
 
 const WINDOWS = path.join(__dirname, "..");
 const DIST = path.join(WINDOWS, "dist");
+const STORE = path.join(WINDOWS, "store");
 const ICON = fs.readFileSync(require.resolve("@uom/brand/app-icon.svg"), "utf8");
 const SCALES = [100, 200];
 
@@ -86,7 +87,7 @@ async function renderIcon(file, width, height, share, background = "transparent"
 }
 
 async function renderTiles() {
-  const dir = path.join(__dirname, "appx");
+  const dir = path.join(STORE, "appx");
   fs.rmSync(dir, { recursive: true, force: true });
   for (const [name, w, h, share] of TILES) {
     for (const s of SCALES) await renderIcon(path.join(dir, `${name}.scale-${s}.png`), Math.round((w * s) / 100), Math.round((h * s) / 100), share);
@@ -97,7 +98,7 @@ async function renderTiles() {
 }
 
 async function renderListing() {
-  const dir = path.join(__dirname, "listing");
+  const dir = path.join(STORE, "listing");
   fs.rmSync(dir, { recursive: true, force: true });
   // Partner Center's store logos: the 1:1 app tile icon, then box art and poster art from
   // logo.html, at the larger of the two sizes Partner Center accepts for each.
@@ -135,7 +136,7 @@ async function renderListing() {
  */
 async function renderPage(page, file, width, height, scale, script = "") {
   const win = offscreen(width, height, scale);
-  await win.loadFile(path.join(__dirname, page));
+  await win.loadFile(path.join(STORE, page));
   await win.webContents.executeJavaScript(`${script}; document.fonts.ready.then(() => true)`);
   await capture(win, file, { width: width * scale, height: height * scale });
   win.destroy();
@@ -146,7 +147,7 @@ app.on("window-all-closed", () => {});
 
 app.whenReady().then(async () => {
   if (!fs.existsSync(path.join(DIST, "index.html"))) throw new Error("No apps/windows/dist/: run it with `npm run store:assets`, which builds the page first.");
-  await renderIcon(path.join(WINDOWS, "electron", "icon.png"), 1024, 1024, 1);
+  await renderIcon(path.join(WINDOWS, "src", "main", "icon.png"), 1024, 1024, 1);
   await renderTiles();
   await renderListing();
   app.quit();

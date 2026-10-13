@@ -4,11 +4,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "icons": "electron render-icons.cjs",
+    "icons": "electron scripts/render-icons.cjs",
+    "dev": "node scripts/dev.mjs",
     "sync": "vite build && cap sync android",
-    "run": "npm run sync && node gradle.cjs installDebug --launch",
-    "apk": "npm run sync && node gradle.cjs assembleDebug",
-    "aab": "npm run sync && node gradle.cjs bundleRelease"
+    "run": "npm run sync && node scripts/gradle.cjs installDebug --launch",
+    "apk": "npm run sync && node scripts/gradle.cjs assembleDebug",
+    "aab": "npm run sync && node scripts/gradle.cjs bundleRelease"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.3",
