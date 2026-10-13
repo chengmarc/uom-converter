@@ -16,6 +16,7 @@
     "dev:windows": "npm run dev -w @uom/windows",
     "dev:android": "npm run dev -w @uom/android",
     "build:web": "npm run build -w @uom/web",
+    "check:web": "npm run check -w @uom/web",
     "preview:web": "npm run preview -w @uom/web",
     "deploy:web": "npm run deploy -w @uom/web",
     "app": "npm run start -w @uom/windows",

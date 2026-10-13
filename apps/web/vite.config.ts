@@ -13,6 +13,7 @@
 //   og.png              the preview image when a link is shared
 //   _headers            caching rules for Cloudflare
 //   _redirects          /<slug>.html and /index.html → the canonical address, permanently
+// scripts/check-pages.mjs (`npm run check:web`) checks the result as search engines read it.
 // The address it is served from is SITE_URL (default below); its path becomes Vite's base.
 
 import { createHash } from "node:crypto";
@@ -32,43 +33,104 @@ const STORE_URL = "https://apps.microsoft.com/detail/9PHZQBV736JC";
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-/** The page's own head: title, description, canonical address, share preview and app manifest. */
-function head(page: Page, noindex = false): string {
+/** The preview image when a link is shared: the Windows app's Store promo (apps/windows/scripts/render.cjs). */
+const OG_IMAGE = resolve(WINDOWS, "store/listing/screenshot-1-promo.png");
+const OG_ALT = "UOM Converter converting 12 AWG to 3.309 mm², with every converter listed beside it";
+
+/** Width and height from a PNG's header. */
+function pngSize(file: string): [number, number] {
+  const b = readFileSync(file);
+  return [b.readUInt32BE(16), b.readUInt32BE(20)];
+}
+
+/**
+ * What search engines read as data, as one graph: the site; the page; the converter on it, a free
+ * web application; and on a converter's page, the trail back to the home page, ending at `name`,
+ * the converter's name as its page shows it.
+ */
+function structuredData(page: Page, name: string): object {
   const url = SITE_URL + page.slug;
-  const title = `${page.title} | ${NAME}`;
-  const ld = {
-    "@context": "https://schema.org",
+  const website = { "@id": `${SITE_URL}#website` };
+  const app = {
     "@type": "WebApplication",
+    "@id": `${url}#app`,
     name: page.slug ? page.title : NAME,
     url,
     description: page.description,
     applicationCategory: "UtilitiesApplication",
     operatingSystem: "Any",
+    browserRequirements: "Requires JavaScript",
+    isAccessibleForFree: true,
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-    ...(page.slug ? { isPartOf: { "@type": "WebSite", name: NAME, url: SITE_URL } } : { sameAs: [STORE_URL] }),
+    ...(page.slug ? {} : { sameAs: [STORE_URL] }),
   };
+  const webpage = {
+    "@type": "WebPage",
+    "@id": `${url}#webpage`,
+    url,
+    name: `${page.title} | ${NAME}`,
+    description: page.description,
+    inLanguage: "en",
+    isPartOf: website,
+    mainEntity: { "@id": app["@id"] },
+    primaryImageOfPage: { "@type": "ImageObject", url: `${SITE_URL}og.png` },
+    ...(page.slug ? { breadcrumb: { "@id": `${url}#breadcrumb` } } : {}),
+  };
+  const graph: object[] = [webpage, app];
+  if (page.slug) {
+    graph.push({
+      "@type": "BreadcrumbList",
+      "@id": `${url}#breadcrumb`,
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Converters", item: SITE_URL },
+        { "@type": "ListItem", position: 2, name, item: url },
+      ],
+    });
+  } else {
+    graph.unshift({ "@type": "WebSite", ...website, url: SITE_URL, name: NAME, description: HOME.description, inLanguage: "en" });
+  }
+  return { "@context": "https://schema.org", "@graph": graph };
+}
+
+/** The page's own head: title, description, canonical address, share preview, structured data and app manifest. */
+function head(page: Page, name: string, noindex = false): string {
+  const url = SITE_URL + page.slug;
+  const title = esc(`${page.title} | ${NAME}`);
+  const description = esc(page.description);
+  const [width, height] = pngSize(OG_IMAGE);
   return [
-    `<title>${esc(title)}</title>`,
-    `<meta name="description" content="${esc(page.description)}" />`,
-    noindex ? `<meta name="robots" content="noindex" />` : `<link rel="canonical" href="${url}" />`,
+    `<title>${title}</title>`,
+    `<meta name="description" content="${description}" />`,
+    noindex
+      ? `<meta name="robots" content="noindex" />`
+      : `<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />\n    <link rel="canonical" href="${url}" />`,
     `<meta property="og:type" content="website" />`,
     `<meta property="og:site_name" content="${NAME}" />`,
-    `<meta property="og:title" content="${esc(title)}" />`,
-    `<meta property="og:description" content="${esc(page.description)}" />`,
+    `<meta property="og:locale" content="en_US" />`,
+    `<meta property="og:title" content="${title}" />`,
+    `<meta property="og:description" content="${description}" />`,
     `<meta property="og:url" content="${url}" />`,
     `<meta property="og:image" content="${SITE_URL}og.png" />`,
+    `<meta property="og:image:type" content="image/png" />`,
+    `<meta property="og:image:width" content="${width}" />`,
+    `<meta property="og:image:height" content="${height}" />`,
+    `<meta property="og:image:alt" content="${esc(OG_ALT)}" />`,
     `<meta name="twitter:card" content="summary_large_image" />`,
+    `<meta name="twitter:title" content="${title}" />`,
+    `<meta name="twitter:description" content="${description}" />`,
+    `<meta name="twitter:image" content="${SITE_URL}og.png" />`,
+    `<meta name="twitter:image:alt" content="${esc(OG_ALT)}" />`,
     `<meta name="theme-color" content="#f7f6f3" media="(prefers-color-scheme: light)" />`,
     `<meta name="theme-color" content="#131312" media="(prefers-color-scheme: dark)" />`,
     `<link rel="manifest" href="${BASE}manifest.webmanifest" />`,
     `<link rel="apple-touch-icon" href="${BASE}icon-256.png" />`,
-    // A data block, not a script: the page's CSP doesn't apply to it.
-    `<script type="application/ld+json">${JSON.stringify(ld).replace(/</g, "\\u003c")}</script>`,
+    // A data block, not a script: the page's CSP doesn't apply to it. A page kept out of search has none.
+    ...(noindex ? [] : [`<script type="application/ld+json">${JSON.stringify(structuredData(page, name)).replace(/</g, "\\u003c")}</script>`]),
   ].join("\n    ");
 }
 
-function withHead(html: string, page: Page, noindex = false): string {
-  const out = html.replace(/<title>[^<]*<\/title>\s*<meta name="description"[^>]*>/, head(page, noindex));
+function withHead(html: string, page: Page, name: string, noindex = false): string {
+  const out = html.replace(/<title>[^<]*<\/title>\s*<meta name="description"[^>]*>/, head(page, name, noindex));
   if (out === html) throw new Error("index.html: expected <title> followed by <meta name=\"description\">");
   return out;
 }
@@ -156,7 +218,10 @@ function sitePages(): Plugin {
       const all = [HOME, missing, ...pages];
       const bodies = await prerender(shell, all.map((p) => BASE + p.slug));
       all.forEach((page, i) => {
-        const html = withHead(shell, page, page === missing).replace(BODY, (_, open, __, close) => open + bodies[i] + close);
+        const h1 = bodies[i].match(/<h1[^>]*>([^<]*)<\/h1>/)?.[1];
+        if (!h1) throw new Error(`${page.slug || "index"}.html: expected an <h1>`);
+        const name = h1.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&amp;/g, "&");
+        const html = withHead(shell, page, name, page === missing).replace(BODY, (_, open, __, close) => open + bodies[i] + close);
         writeFileSync(join(OUT, `${page.slug || "index"}.html`), html);
       });
 
@@ -173,7 +238,7 @@ function sitePages(): Plugin {
 
       // Rendered for the Windows app by apps/windows/scripts/render.cjs.
       copyFileSync(resolve(WINDOWS, "store/appx/Square44x44Logo.targetsize-256_altform-unplated.png"), join(OUT, "icon-256.png"));
-      copyFileSync(resolve(WINDOWS, "store/listing/screenshot-1-promo.png"), join(OUT, "og.png"));
+      copyFileSync(OG_IMAGE, join(OUT, "og.png"));
       writeFileSync(
         join(OUT, "manifest.webmanifest"),
         JSON.stringify(

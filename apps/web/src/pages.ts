@@ -106,11 +106,11 @@ export const PAGES: Record<string, Page> = {
   length: {
     slug: "feet-to-metres",
     title: "Feet to Metres and Inches to mm Converter",
-    description: "Convert feet, metres, inches and millimetres. Free, works offline.",
+    description: "Convert feet to metres and inches to millimetres, and back. 1 ft = 0.3048 m, 1 in = 25.4 mm. Free, works offline.",
   },
   temperature: {
     slug: "celsius-to-fahrenheit",
-    title: "Celsius to Fahrenheit Converter (60, 75, 90 °C Ratings)",
+    title: "Celsius to Fahrenheit Converter (60/75/90 °C Ratings)",
     description: "Convert °C and °F, including the 60, 75 and 90 °C conductor insulation and termination ratings.",
   },
   power: {
@@ -121,7 +121,7 @@ export const PAGES: Record<string, Page> = {
   light: {
     slug: "foot-candles-to-lux",
     title: "Foot-Candles to Lux Converter",
-    description: "Convert foot-candles (fc) and lux (lx) for lighting levels.",
+    description: "Convert foot-candles (fc) to lux (lx) and back, for lighting levels. 1 fc = 10.764 lx. Free, works offline.",
   },
   torque: {
     slug: "torque-lb-in-to-nm",
@@ -131,7 +131,7 @@ export const PAGES: Record<string, Page> = {
   weight: {
     slug: "pounds-to-kg",
     title: "Pounds to Kilograms Converter",
-    description: "Convert pounds and kilograms. Free, works offline.",
+    description: "Convert pounds (lb) to kilograms (kg) and back. 1 kg = 2.2046 lb, 1 lb = 0.4536 kg. Free, works offline.",
   },
   metal: {
     slug: "copper-price-per-lb-to-kg",
@@ -172,9 +172,9 @@ export const PAGES: Record<string, Page> = {
 
 export const HOME: Page = {
   slug: "",
-  title: "Electrical Unit Converter: Wire Size, Voltage Drop, Pricing",
+  title: "Electrical Converter: Wire Size, Voltage Drop, Pricing",
   description:
-    "Free converters for the electrical trade: AWG to mm², voltage drop, conduit, kVA and amps, price per E/C/M, multipliers, margins and UOM codes. US, Canada and Europe.",
+    "Free converters for the electrical trade: AWG to mm², voltage drop, conduit, kVA and amps, price per E/C/M, margins and UOM codes. US, Canada and Europe.",
 };
 
 /** The converter a site path opens, if any: "/voltage-drop-calculator" → "vdrop". */
