@@ -14,7 +14,8 @@ the repo root.
    bump `version` in the root `package.json` to match: run `npm version <version> --no-git-tag-version`,
    which also updates `package-lock.json`. It sets the Store package version (`<version>.0`).
 3. **Write it up.** Move the entries under `[Unreleased]` in [CHANGELOG.md](../../docs/CHANGELOG.md) into a
-   dated `[<version>]` section, and add `docs/release/RELEASE_NOTES_<version>.md`.
+   dated `[<version>]` section. That section is also the GitHub release's description (step 9),
+   so write it for people downloading the app.
 4. **Check:**
 
    ```
@@ -50,10 +51,12 @@ the repo root.
    git push origin main v<version>
    ```
 
-9. **Publish** the two exe files to GitHub, with the release notes as the description:
+9. **Publish** the two exe files to GitHub, with the version's CHANGELOG section as the
+   description. [release-notes.cjs](release-notes.cjs) copies it to `apps/windows/release/RELEASE_NOTES.md`:
 
    ```
-   gh release create v<version> apps/windows/release/UOM-Converter-setup.exe apps/windows/release/UOM-Converter-portable.exe --title "UOM Converter <version>" --notes-file docs/release/RELEASE_NOTES_<version>.md
+   node apps/windows/release-notes.cjs <version>
+   gh release create v<version> apps/windows/release/UOM-Converter-setup.exe apps/windows/release/UOM-Converter-portable.exe --title "UOM Converter <version>" --notes-file apps/windows/release/RELEASE_NOTES.md
    ```
 
    The README's download badge points at `releases/latest/download/UOM-Converter-setup.exe`, so it
@@ -88,6 +91,7 @@ In `apps/windows/release/`:
 | `UOM-Converter-setup.exe` | GitHub Releases |
 | `UOM-Converter-portable.exe` | GitHub Releases |
 | `UOM-Converter-<version>.appx` | Microsoft Store (Partner Center) only |
+| `RELEASE_NOTES.md` | The GitHub release's description (from `release-notes.cjs`) |
 
 Everything else electron-builder leaves there (`win-unpacked/`, `.blockmap` files,
 `builder-debug.yml`) is intermediate and isn't published.
