@@ -15,5 +15,6 @@ export const temperature = unitConverter({
     { key: "C", name: "Celsius", symbol: "°C", toBase: (n) => n, fromBase: (n) => n, digits: 1 },
   ],
   formula: ["°C = (°F − 32) × 5 ÷ 9.", "°F = °C × 9 ÷ 5 + 32."],
+  common: { C: [-40, 0, 20, 30, 40, 60, 75, 90, 105], F: [-40, 32, 68, 86, 104, 140, 167, 194] },
   visual: (n, from) => temperatureScale(from.toBase(n)),
 });

@@ -46,6 +46,35 @@ describe("converters", () => {
   }
 });
 
+describe("unit converters' common values", () => {
+  it("list each value in every unit", () => {
+    setNumberStyle(REGIONS[0].number);
+    const table = tool("weight").table!();
+    expect(table.columns).toEqual(["Pounds", "Kilograms"]);
+    expect(table.rows).toContainEqual({ key: "lb:50", cells: ["50 lb", "22.68 kg"] });
+  });
+
+  it("highlight the row for the value entered", () => {
+    expect(answer("weight", { value: "50", unit: "lb" })?.highlight).toBe("lb:50");
+    expect(tool("weight").table!().rows.some((r) => "key" in r && r.key === "lb:50")).toBe(true);
+  });
+});
+
+describe("price per E/C/M", () => {
+  it("keeps the unit code a capital in the heading: (M) is per 1,000, (m) would be a metre", () => {
+    setNumberStyle(REGIONS[0].number);
+    expect(answer("price", { price: "450", uom: "M" })?.heading).toBe("$450.00 per 1,000 (M) equals");
+  });
+});
+
+const tool = (id: string) => TOOLS.find((t) => t.id === id)!;
+
+/** A converter's answer in the US, for the given inputs over its defaults. */
+function answer(id: string, set: Record<string, string>) {
+  const out = tool(id).compute(formValues(tool(id), "us", set));
+  return out && "rows" in out ? out : undefined;
+}
+
 /** A form filled in the way the app fills it for an example: the example's values over each field's default. */
 function formValues(t: Converter, region: Values["region"], set: Record<string, string>): Values {
   const v: Values = {

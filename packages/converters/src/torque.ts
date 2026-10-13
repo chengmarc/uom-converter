@@ -15,4 +15,5 @@ export const torque = unitConverter({
     linear("nm", "Newton-metres", "N·m", 1, 2),
   ],
   formula: ["1 lbf·in = 0.113 N·m. 1 lbf·ft = 12 lbf·in = 1.356 N·m."],
+  common: { lbin: [5, 10, 20, 25, 35, 50, 100, 200, 375], lbft: [5, 10, 25, 50, 100, 250], nm: [0.5, 1, 2, 2.5, 5, 10, 25, 50] },
 });

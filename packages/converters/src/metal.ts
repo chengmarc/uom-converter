@@ -12,4 +12,5 @@ export const metal = unitConverter({
   units: [linear("lb", "Per pound", "/lb", 1 / LB_PER_KG, 4), linear("kg", "Per kilogram", "/kg", 1, 4)],
   format: (n, u) => `${money(n)}${u.symbol}`,
   formula: ["1 kg = 2.20462 lb, so price per kg = price per lb × 2.20462."],
+  common: { lb: [0.5, 1, 2, 3, 4, 5], kg: [1, 2, 5, 8, 10] },
 });

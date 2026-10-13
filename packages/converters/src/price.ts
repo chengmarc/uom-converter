@@ -37,7 +37,9 @@ export const price: Converter = {
     if (p === undefined) return undefined;
     if (Number.isNaN(p)) return { error: "Enter a number, like 125 or 0.45.", fields: ["price"] };
     const from = v.str("uom") as PriceUom;
-    const fromName = PRICE_UNITS.find((u) => u.uom === from)!.name.toLowerCase();
+    // "Per 1,000 (M)" → "per 1,000 (M)": only the first letter. The code stays a capital (lowercase m is a metre).
+    const name = PRICE_UNITS.find((u) => u.uom === from)!.name;
+    const fromName = name[0].toLowerCase() + name.slice(1);
     return {
       heading: `${money(p)} ${fromName} equals`,
       rows: PRICE_UNITS.filter((u) => u.uom !== from).map((u) => {

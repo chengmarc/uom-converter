@@ -16,4 +16,5 @@ export const length = unitConverter({
     linear("mm", "Millimetres", "mm", 1000, 2),
   ],
   formula: ["1 ft = 0.3048 m exactly.", "1 in = 25.4 mm exactly."],
+  common: { ft: [1, 3, 10, 25, 50, 100, 500, 1000], m: [1, 3, 10, 50, 100, 1000], in: [0.5, 1, 2, 6, 12, 24], mm: [1, 10, 25, 100, 300, 1000] },
 });

@@ -2,7 +2,7 @@
 
 import type { Region } from "@uom/core/region";
 import { fmt, plain, typed } from "./format";
-import { dyn, type Converter, type Dyn, type Topic, type Values } from "./model";
+import { dyn, type Converter, type Dyn, type Table, type Topic, type Values } from "./model";
 import type { Visual } from "./visual";
 
 export interface Unit {
@@ -45,6 +45,8 @@ export function unitConverter(opts: {
   /** The unit people expect as the answer for each input unit (mm → in, ft → m); shown first. */
   counterpart?: Record<string, string>;
   visual?: (value: number, from: Unit, v: Values) => Visual | undefined;
+  /** Values people often look up, by unit key: shown as a reference table in every unit. */
+  common?: Record<string, number[]>;
 }): Converter {
   const format = opts.format ?? ((n, u) => `${fmt(n, u.digits)} ${u.symbol}`);
   const unit = (key: string) => opts.units.find((u) => u.key === key)!;
@@ -83,7 +85,28 @@ export function unitConverter(opts: {
           }),
         formula: opts.formula,
         visual: opts.visual?.(n, from, v),
+        highlight: key(from, n),
       };
     },
+    table: opts.common && (() => commonTable(opts.title, opts.units, opts.common!, format)),
+  };
+}
+
+const key = (u: Unit, n: number) => `${u.key}:${n}`;
+
+/** Each unit's common values in every unit, grouped under the unit they start from. */
+function commonTable(title: string, units: Unit[], common: Record<string, number[]>, format: (n: number, u: Unit) => string): Table {
+  return {
+    summary: `Common ${title.toLowerCase()} conversions`,
+    columns: units.map((u) => u.name),
+    rows: units.flatMap((from) =>
+      common[from.key]
+        ? [
+            { group: from.name },
+            ...common[from.key].map((n) => ({ key: key(from, n), cells: units.map((u) => format(u.fromBase(from.toBase(n)), u)) })),
+          ]
+        : [],
+    ),
+    wide: units.length > 3,
   };
 }
