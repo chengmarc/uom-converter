@@ -28,7 +28,8 @@
   --bad-soft: #fbe9e7;
   --shadow: none;
   --font: Arial, "Helvetica Neue", Helvetica, sans-serif;
-  --header: 64px;
+  /* The header scrolls away with the page: nothing to leave room for when scrolling to a heading. */
+  --header: 0px;
   --ease: ease;
   color-scheme: light;
 }
@@ -89,8 +90,6 @@ a:hover { color: var(--accent-hover); }
 .skip { position: absolute; left: 16px; top: -48px; z-index: 30; padding: 0.5rem 0.9rem; border-radius: 3px; background: var(--accent); color: var(--accent-ink); }
 .skip:focus { top: 8px; }
 
-.icon { width: 1.1em; height: 1.1em; flex: none; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
-
 /* ---------- Buttons ---------- */
 
 .button {
@@ -114,253 +113,72 @@ a:hover { color: var(--accent-hover); }
 
 /* ---------- Header ---------- */
 
-.site-header {
-  position: sticky;
-  top: 0;
-  z-index: 20; /* above the page, below the skip link */
-  background: var(--brand);
-  color: var(--brand-ink);
-  border-bottom: 3px solid var(--accent);
-}
-
-.header-row {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto auto;
-  align-items: center;
-  gap: 1.25rem;
-  height: var(--header);
-}
+/* Two rows, scrolling away with the page: the name with the region and the Windows app, then the
+   category menu. */
+.site-header { background: var(--brand); color: var(--brand-ink); }
+.header-row { display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; min-height: 56px; }
 .brand {
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
   color: var(--text);
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   text-decoration: none;
   white-space: nowrap;
 }
 .brand img { display: block; }
 .site-header .brand, .site-header .brand:hover { color: var(--brand-ink); }
+.header-tools { display: flex; align-items: center; gap: 1.25rem; font-size: 0.85rem; }
+.region { display: flex; align-items: center; gap: 0.45rem; color: var(--brand-muted); }
+.region select { height: 28px; padding: 0 0.3rem; border: 1px solid transparent; border-radius: 2px; background: #ffffff; color: #222831; font: inherit; }
+.get-app, .get-app:hover { color: var(--brand-ink); }
 
-.search { position: relative; justify-self: center; width: 100%; max-width: 420px; }
-.search input {
-  width: 100%;
-  height: 40px;
-  padding: 0 2.5rem 0 0.9rem;
-  border: 1px solid var(--line-strong);
-  border-radius: 3px;
-  background: var(--surface);
-  color: var(--text);
-  font: inherit;
-  font-size: 0.95rem;
-}
-.search input::placeholder { color: var(--muted); }
-.search input:hover { border-color: var(--muted); }
-.search input:focus { outline: 2px solid var(--accent); outline-offset: 0; }
-.site-header .search input { border-color: transparent; background: #ffffff; color: #222831; }
-.site-header .search input::placeholder { color: #6b7480; }
-.search input::-webkit-search-cancel-button { display: none; }
-.search kbd {
-  position: absolute;
-  right: 0.6rem;
-  top: 50%;
-  translate: 0 -50%;
-  min-width: 1.4rem;
-  padding: 0 0.3rem;
-  border: 1px solid var(--line-strong);
-  border-radius: 2px;
-  color: var(--muted);
-  font: inherit;
-  font-size: 0.75rem;
-  text-align: center;
-  pointer-events: none;
-}
-.search:focus-within kbd { display: none; }
+/* The categories, on a lighter bar; the one being shown filled in blue. */
+.category-nav { background: #1d3a66; border-bottom: 3px solid var(--accent); }
+.category-nav ul { display: flex; margin: 0 auto; list-style: none; overflow-x: auto; scrollbar-width: none; }
+.category-nav a { display: block; padding: 0.7rem 1rem; color: var(--brand-ink); font-size: 0.9rem; font-weight: 700; text-decoration: none; white-space: nowrap; }
+.category-nav a:hover { color: var(--brand-ink); text-decoration: underline; }
+.category-nav a[aria-current] { background: var(--accent); }
+@media (prefers-color-scheme: dark) { .category-nav { background: #142a4a; } }
 
-.search-results {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  right: 0;
-  margin: 0;
-  padding: 6px;
-  list-style: none;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  box-shadow: var(--shadow);
-}
-.result {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 1rem;
-  padding: 0.55rem 0.7rem;
-  border-radius: 3px;
-  cursor: pointer;
-}
-.result[aria-selected="true"] { background: var(--accent-soft); }
-.result-title { font-weight: 600; }
-.result[aria-selected="true"] .result-title { color: var(--accent); }
-.result-topic { color: var(--muted); font-size: 0.85rem; white-space: nowrap; }
-.result-empty { padding: 0.55rem 0.7rem; color: var(--muted); }
-
-.region { display: flex; gap: 2px; padding: 3px; border: 1px solid var(--line-strong); border-radius: 3px; background: var(--surface); }
-.region button {
-  height: 32px;
-  padding: 0 0.7rem;
-  border: 0;
-  border-radius: 2px;
-  background: transparent;
-  color: var(--muted);
-  font: inherit;
-  font-size: 0.9rem;
-  cursor: pointer;
-}
-.region button:hover { color: var(--text); background: var(--hover); }
-.region button[aria-pressed="true"] { background: var(--text); color: var(--bg); font-weight: 600; }
-.get-app { height: 40px; }
-/* On the navy bar: outlined in white, the picked region filled. */
-.site-header .region { background: transparent; border-color: rgb(255 255 255 / 0.35); }
-.site-header .region button { color: var(--brand-muted); }
-.site-header .region button:hover { color: var(--brand-ink); background: rgb(255 255 255 / 0.1); }
-.site-header .region button[aria-pressed="true"] { background: var(--brand-ink); color: var(--brand); }
-.site-header .get-app { background: transparent; border-color: rgb(255 255 255 / 0.5); color: var(--brand-ink); }
-.site-header .get-app:hover { border-color: var(--brand-ink); background: rgb(255 255 255 / 0.1); color: var(--brand-ink); }
-
-@media (max-width: 1023px) {
-  .get-app { display: none; }
-  .header-row { grid-template-columns: auto minmax(0, 1fr) auto; }
-}
-/* Phones: brand and region on the first row, the search under them. */
 @media (max-width: 640px) {
-  .header-row { grid-template-columns: 1fr auto; grid-template-areas: "brand region" "search search"; gap: 0.6rem 0.75rem; height: auto; padding-block: 0.6rem; }
-  .brand { grid-area: brand; }
-  .region { grid-area: region; }
-  .search { grid-area: search; max-width: none; }
-  .search kbd { display: none; }
-  .region button { padding: 0 0.5rem; font-size: 0.85rem; }
+  .header-row { padding-block: 0.5rem; }
   .brand { font-size: 1rem; }
-  html { scroll-padding-top: 128px; }
+  .get-app { display: none; }
+  .region span { display: none; }
 }
 
 /* ---------- Home ---------- */
 
-.hero {
-  position: relative;
-  isolation: isolate;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
-  align-items: center;
-  gap: 3rem;
-  padding-block: 3rem;
-  color: var(--brand-ink);
+/* The topics' photos side by side, about a third of the screen tall, each with its name on a bar. */
+.category-strip ul { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); margin: 0; padding: 0; list-style: none; }
+.category-strip li { min-width: 0; }
+.category-strip a { position: relative; display: block; height: clamp(160px, 30vh, 300px); overflow: hidden; background: var(--brand); color: var(--brand-ink); text-decoration: none; }
+.category-strip li + li a { border-left: 2px solid #ffffff; }
+.category-strip img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.category-strip span { position: absolute; left: 0; right: 0; bottom: 0; padding: 0.5rem 0.75rem; background: rgb(19 41 75 / 0.85); font-weight: 700; font-size: 0.95rem; }
+.category-strip a:hover span { background: var(--accent); text-decoration: underline; }
+@media (max-width: 640px) {
+  .category-strip ul { grid-template-columns: repeat(5, 9rem); overflow-x: auto; }
+  .category-strip a { height: 140px; }
 }
-/* The photo across the opening, the full width of the window (main.ts), under the brand colour:
-   heavier behind the headline, lighter where the demo sits. Without a photo, the brand colour. */
-.hero-photo {
-  position: absolute;
-  inset: 0 calc(50% - 50vw);
-  z-index: -2;
-  width: 100vw;
-  height: 100%;
-  object-fit: cover;
-  object-position: 65% 50%;
-}
-.hero::before {
-  content: "";
-  position: absolute;
-  inset: 0 calc(50% - 50vw);
-  z-index: -1;
-  background: var(--brand);
-  pointer-events: none;
-}
-.hero:has(.hero-photo)::before { background: linear-gradient(90deg, rgb(19 41 75 / 0.94) 0%, rgb(19 41 75 / 0.9) 40%, rgb(19 41 75 / 0.55) 100%); }
-@media (max-width: 1023px) {
-  .hero:has(.hero-photo)::before { background: rgb(19 41 75 / 0.9); }
-}
-.hero h1 {
-  margin: 0;
-  max-width: 20ch;
-  font-size: clamp(2rem, 3.4vw, 2.75rem);
-  line-height: 1.15;
-}
-.hero .lede { color: var(--brand-muted); }
-.hero .button.primary { background: var(--brand-ink); border-color: var(--brand-ink); color: var(--brand); }
-.hero .button.primary:hover { background: #dfe6ef; border-color: #dfe6ef; color: var(--brand); }
-/* The site in facts: how many converters, where, and what it asks of you. */
-.facts {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, max-content));
-  gap: 0.5rem 2.5rem;
-  margin: 2rem 0 0;
-  padding: 1rem 0 0;
-  max-width: 40rem;
-  border-top: 1px solid rgb(255 255 255 / 0.25);
-  list-style: none;
-  color: var(--brand-muted);
-  font-size: 0.9rem;
-}
-.facts strong { color: var(--brand-ink); font-weight: 700; }
-.lede { margin: 1rem 0 0; max-width: 46ch; color: var(--muted); font-size: 1.05rem; line-height: 1.55; }
-.actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem; }
 
-.demo {
-  padding: 1.5rem;
-  background: var(--surface);
-  color: var(--text);
-  border: 1px solid var(--line);
-  border-radius: 4px;
-}
-/* The demo is one card: the form and the answer sit in it without boxes of their own. */
-.demo .converter h2 { font-size: 1.15rem; }
-.demo .blurb { margin-bottom: 1rem; font-size: 0.95rem; }
-.demo .flow { grid-template-columns: 1fr; }
-.demo .box { padding: 0; border: 0; background: none; gap: 1rem; }
-.demo .from { padding-bottom: 1.25rem; }
-.demo .from .box-title { display: none; }
-.demo .to { padding-top: 1.25rem; border-top: 1px solid var(--line); border-radius: 0; }
-/* Just the answer and its diagram here; "Open the full converter" has the rest. */
-.demo .more, .demo .rows, .demo .how, .demo .note { display: none; }
-.demo .flow { gap: 0; }
-.demo-link { display: inline-block; margin-top: 1.25rem; font-weight: 600; text-decoration: none; }
-.demo-link::after { content: " →"; }
-.demo-link:hover { text-decoration: underline; }
+.home-intro { padding-block: 1.75rem 0; }
+.home-intro h1 { margin: 0; font-size: 1.75rem; line-height: 1.2; }
+.home-intro p { margin: 0.5rem 0 0; max-width: 80ch; color: var(--text); }
 
-.directory { padding-block: 3rem; }
-.directory-head h2, .app-copy h2 { margin: 0; font-size: 1.6rem; line-height: 1.2; }
-.roles { display: flex; gap: 0.5rem; margin-top: 1.5rem; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  flex: none;
-  height: 38px;
-  padding: 0 0.9rem;
-  border: 1px solid var(--line-strong);
-  border-radius: 3px;
-  background: var(--surface);
-  color: var(--text);
-  font: inherit;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: border-color 0.15s var(--ease), background-color 0.15s var(--ease);
-}
-.chip .icon { color: var(--muted); }
-.chip:hover { border-color: var(--text); }
-.chip[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: var(--brand-ink); font-weight: 700; }
-.chip[aria-pressed="true"] .icon { color: inherit; }
-.roles-desc { margin: 0.9rem 0 0; color: var(--muted); }
+.directory { padding-block: 2rem 1rem; }
+.directory-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 1rem; }
+.directory-head h2, .app-note h2 { margin: 0; font-size: 1.35rem; line-height: 1.2; }
+.directory-head .side-role { margin: 0; display: flex; align-items: center; gap: 0.5rem; }
 
-/* Each topic a block under a rule: its name and photo on the left, its converters beside them. */
-.topics { display: grid; margin-top: 2rem; border-bottom: 1px solid var(--line); }
-.topic { display: grid; grid-template-columns: 14rem minmax(0, 1fr); gap: 2rem; padding-block: 1.75rem; border-top: 1px solid var(--line); }
-.topic-title { display: flex; align-items: center; gap: 0.55rem; margin: 0; font-size: 1.05rem; font-weight: 700; }
-.topic-title .icon { width: 1.35rem; height: 1.35rem; color: var(--accent); }
-.topic .topic-head { align-self: start; position: sticky; top: calc(var(--header) + 1.5rem); display: grid; gap: 1rem; }
-.topic-thumb { display: block; width: 100%; max-width: 12rem; aspect-ratio: 4 / 3; overflow: hidden; border-radius: 3px; background: var(--sunken); }
-.topic-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+/* Each topic under a grey bar with its name, its converters in columns below. */
+.topics { display: grid; gap: 1.5rem; margin-top: 1.25rem; }
+.topic { border: 1px solid var(--line); border-radius: 4px; }
+.topic-title { display: flex; align-items: center; gap: 0.55rem; margin: 0; font-size: 1rem; font-weight: 700; }
+.topic > .topic-title { padding: 0.55rem 0.9rem; background: var(--sunken); border-bottom: 1px solid var(--line); }
+.topic > .tiles { padding: 0.9rem; }
 
 /* Lists of converters: a link per entry, in blue, with a line of description under it. */
 .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: 1.1rem 2rem; margin: 0; padding: 0; list-style: none; }
@@ -369,30 +187,15 @@ a:hover { color: var(--accent-hover); }
 .tile:hover .tile-title { color: var(--accent-hover); text-decoration: underline; }
 .tile-text { color: var(--muted); font-size: 0.9rem; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
-.app-promo {
-  display: grid;
-  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-  align-items: center;
-  gap: 3rem;
-  padding-block: 3rem 4rem;
-}
-.app-copy p { margin: 1rem 0 1.75rem; max-width: 38ch; color: var(--muted); font-size: 1.05rem; }
-.app-shot { overflow: hidden; border: 1px solid var(--line); border-radius: 4px; background: var(--sunken); }
-.app-shot img { display: block; width: 100%; height: auto; }
-
-@media (max-width: 1023px) {
-  .hero, .app-promo { grid-template-columns: 1fr; gap: 2.5rem; }
-  .hero { padding-block: 2.5rem; }
-  .hero h1 { max-width: none; }
-  .topic { grid-template-columns: 1fr; gap: 1rem; }
-  .topic .topic-head { position: static; }
-  .topic-thumb { display: none; }
-}
-@media (max-width: 640px) {
-  .hero { padding-block: 2rem; }
-  .directory, .app-promo { padding-block: 3rem; }
-  .demo { padding: 1.1rem; }
-}
+/* The Windows app, in a line, in a grey box. */
+.app-note { margin-block: 1.5rem 3rem; }
+.app-box { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; background: var(--sunken); border: 1px solid var(--line); border-radius: 4px; }
+.app-box p { margin: 0.35rem 0 0; }
+.app-thumb { flex: none; width: 5rem; aspect-ratio: 1; object-fit: cover; border-radius: 2px; }
+/* At the foot of the menu: narrower, the picture above the text. */
+.side .app-box { display: grid; gap: 0.6rem; margin-top: 1.25rem; padding: 0.85rem; font-size: 0.9rem; }
+.side .app-box h2 { margin: 0; font-size: 0.95rem; }
+.side .app-thumb { width: 100%; aspect-ratio: 2 / 1; }
 
 /* ---------- A converter's page ---------- */
 
@@ -430,7 +233,6 @@ a:hover { color: var(--accent-hover); }
 .side-group { display: grid; padding-bottom: 0.4rem; }
 .side-group + .side-group { border-top: 1px solid var(--line); }
 .side-group .topic-title { margin-bottom: 0.3rem; padding: 0.5rem 0.75rem; background: var(--sunken); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text); }
-.side-group .topic-title .icon { width: 1rem; height: 1rem; }
 .side-group a {
   padding: 0.3rem 0.75rem;
   border-left: 3px solid transparent;
@@ -466,7 +268,6 @@ a:hover { color: var(--accent-hover); }
 .topic-title a { color: inherit; text-decoration: none; }
 .topic-title a:hover { text-decoration: underline; }
 .topic-h1 { display: flex; align-items: center; gap: 0.6rem; margin: 0; font-size: 2rem; line-height: 1.15; }
-.topic-h1 .icon { width: 1.6rem; height: 1.6rem; flex: none; color: var(--brand-ink); }
 .topic-page .lede { max-width: 75ch; margin: 0 0 2rem; font-size: 1rem; color: var(--text); }
 /* An entry with a thumbnail (the other topics): the picture beside the title and text. */
 .tile.has-thumb { grid-template-columns: 4.5rem minmax(0, 1fr); column-gap: 1rem; }

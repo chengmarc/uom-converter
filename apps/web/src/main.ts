@@ -10,22 +10,13 @@ import { dyn, type Converter, type Topic, type Values } from "@uom/converters/mo
 import { guessRegion, regionInfo, REGIONS } from "@uom/converters/regions";
 import { AUDIENCES, type Audience } from "@uom/ui/audiences";
 import { el, renderConverter } from "@uom/ui/converter";
-import { icon } from "@uom/ui/icons";
 import { HOME, idFromPath, PAGES, topicFromPath, TOPIC_PAGES } from "./pages";
 import { registerOffline, STORE_URL } from "./site";
-
-// The Windows app's own Store screenshots, light and dark (apps/windows/scripts/render.cjs).
-// Imported, not new URL(…, import.meta.url): that would make addresses on the build machine when
-// vite.config.ts runs this script to write each page's HTML.
-import APP_LIGHT from "../../windows/store/listing/screenshot-3-voltage-drop.png";
-import APP_DARK from "../../windows/store/listing/screenshot-8-conduit-dark.png";
 
 // The site's base path, from SITE_URL in vite.config.ts.
 declare const __SITE_BASE__: string;
 const BASE = __SITE_BASE__;
 const NAME = "UOM Converter";
-/** The converter that runs on the home page: one field, and a diagram for an answer. */
-const DEMO = "awg";
 
 const byId = new Map(TOOLS.map((t) => [t.id, t]));
 const EVERYTHING: Audience = {
@@ -139,10 +130,25 @@ function link(href: string, text: string, cls?: string) {
   return a;
 }
 
-/** A converter's tile: its name and what it works out. */
+/** A topic's square photo, small, for beside a link: decorative, so the link's text says it all. */
+function thumbnail(topic: Topic, cls: string): HTMLImageElement | undefined {
+  const img = photo(`${TOPIC_PAGES[topic].slug}-thumb`, "5rem", "", cls);
+  if (img) img.loading = "lazy";
+  return img;
+}
+
+/**
+ * A converter's tile: its topic's photo, its name and what it works out. Every converter on a
+ * topic shows the same photo, as a supplier's catalogue shows one picture for a product line.
+ */
 function tile(t: Converter) {
   const a = el("a", "tile");
   a.href = pathFor(t.id);
+  const thumb = thumbnail(t.topic, "tile-thumb");
+  if (thumb) {
+    a.classList.add("has-thumb");
+    a.append(thumb);
+  }
   a.append(el("span", "tile-title", t.title), el("span", "tile-text", blurb(t)));
   return a;
 }
@@ -157,11 +163,9 @@ function tiles(tools: Converter[]) {
   return list;
 }
 
-/** A topic's name with its icon, linked to the topic's page unless `current` (it's this page). */
+/** A topic's name, linked to the topic's page unless `current` (it's this page). */
 function topicHeading(tag: "h2" | "h3", topic: Topic, current = false) {
   const h = el(tag, "topic-title");
-  const i = icon(topic);
-  if (i) h.append(i);
   if (current) h.append(topic);
   else h.append(link(topicPath(topic), topic));
   return h;
@@ -173,10 +177,9 @@ const shownTopics = () => TOPICS.filter((topic) => toolsFor(topic).length);
 
 // Built once per region, so a converter keeps what was typed while you look at others.
 let panels = new Map<string, HTMLElement>();
-function panel(id: string, heading: "h1" | "h2") {
-  const key = `${id}:${heading}`;
-  if (!panels.has(key)) panels.set(key, renderConverter(byId.get(id)!, region, heading));
-  return panels.get(key)!;
+function panel(id: string) {
+  if (!panels.has(id)) panels.set(id, renderConverter(byId.get(id)!, region, "h1"));
+  return panels.get(id)!;
 }
 
 /** Redraws the parts of the current page that list converters, when the audience changes. */
@@ -184,46 +187,58 @@ let refreshLists = () => {};
 
 // ---------- Home ----------
 
+/** The "Show converters for" choice, as a plain dropdown. `sync` sets it to the current audience. */
+function audienceSelect() {
+  const pick = el("label", "side-role");
+  const select = el("select");
+  for (const a of ALL_AUDIENCES) select.append(Object.assign(el("option", undefined, a.label), { value: a.id }));
+  select.addEventListener("change", () => setAudience(ALL_AUDIENCES.find((a) => a.id === select.value)!));
+  pick.append(el("span", undefined, "Show converters for"), select);
+  return { pick, sync: () => (select.value = audience.id) };
+}
+
+/**
+ * Across the top of the home page: a strip of the topics' photos, each linked to its topic with
+ * its name on it, as a supplier's site opens on its product lines. A topic without a photo yet
+ * shows its name on the brand colour.
+ */
+function categoryStrip(): HTMLElement {
+  const strip = el("nav", "category-strip");
+  strip.setAttribute("aria-label", "Topics");
+  const list = el("ul");
+  for (const t of TOPICS) {
+    const a = link(topicPath(t), "");
+    const img = photo(`${TOPIC_PAGES[t].slug}-thumb`, "(max-width: 640px) 50vw, 20vw", "");
+    if (img) {
+      img.setAttribute("fetchpriority", "high");
+      a.append(img);
+    }
+    a.append(el("span", undefined, t));
+    const li = el("li");
+    li.append(a);
+    list.append(li);
+  }
+  strip.append(list);
+  return strip;
+}
+
 function homeView(missing: boolean): Node[] {
-  const hero = el("section", "hero wrap");
-  const copy = el("div", "hero-copy");
+  const intro = el("section", "home-intro wrap");
   if (missing) {
-    copy.append(
+    intro.append(
       el("h1", undefined, "Page not found"),
-      el("p", "lede", "There's no converter at this address. Search for one above, or pick one from the list below."),
+      el("p", undefined, "There's no converter at this address. Pick a category above, or a converter from the list below."),
     );
   } else {
-    copy.append(
+    intro.append(
       el("h1", undefined, "Unit conversions for the electrical trade"),
-      el("p", "lede", "Price units, wire sizes, voltage drop and product codes. Free in your browser, for the US, Canada and Europe."),
+      el(
+        "p",
+        undefined,
+        `${TOOLS.length} converters for price units, wire sizes, voltage drop and product codes, for the US, Canada and Europe. ` +
+          "Free to use in your browser, with no account, and they keep working offline once loaded.",
+      ),
     );
-  }
-  const actions = el("div", "actions");
-  actions.append(link("#converters", "Browse converters", "button primary"));
-  // What the site is, in facts: how much, which codes, and what it asks of you (nothing).
-  const facts = el("ul", "facts");
-  facts.setAttribute("aria-label", "About these converters");
-  for (const [n, text] of [
-    [String(TOOLS.length), "converters"],
-    [String(REGIONS.length), `regions: ${REGIONS.map((r) => r.label).join(", ")}`],
-    ["Works", "offline"],
-    ["No", "account, no tracking"],
-  ]) {
-    const li = el("li");
-    li.append(el("strong", undefined, n), ` ${text}`);
-    facts.append(li);
-  }
-  copy.append(actions, facts);
-
-  const demo = el("div", "demo");
-  demo.append(panel(DEMO, "h2"), link(pathFor(DEMO), "Open the full converter", "demo-link"));
-  hero.append(copy, demo);
-  // Behind the opening, faded into the page on the left (style.css). The first thing on the page,
-  // so it's fetched first rather than when it scrolls into view.
-  const backdrop = photo("hero", "100vw", "", "hero-photo");
-  if (backdrop && !missing) {
-    backdrop.setAttribute("fetchpriority", "high");
-    hero.prepend(backdrop);
   }
 
   const dir = el("section", "directory wrap");
@@ -232,75 +247,51 @@ function homeView(missing: boolean): Node[] {
   const head = el("div", "directory-head");
   const h = el("h2", undefined, "All converters");
   h.id = "dir-h";
-  const roles = el("div", "roles");
-  roles.setAttribute("role", "group");
-  roles.setAttribute("aria-label", "Show converters for");
-  const desc = el("p", "roles-desc");
-  head.append(h, roles, desc);
+  const picker = audienceSelect();
+  head.append(h, picker.pick);
   const topics = el("div", "topics");
   dir.append(head, topics);
 
   refreshLists = () => {
-    roles.replaceChildren(
-      ...ALL_AUDIENCES.map((a) => {
-        const b = el("button", "chip");
-        b.type = "button";
-        const i = icon(a.id);
-        if (i) b.append(i);
-        b.append(a.label);
-        b.setAttribute("aria-pressed", String(a === audience));
-        b.addEventListener("click", () => setAudience(a));
-        return b;
-      }),
-    );
-    desc.textContent = audience.description;
+    picker.sync();
     topics.replaceChildren(
       ...shownTopics().map((topic) => {
         const s = el("section", "topic");
         s.id = topicAnchor(topic);
-        // The topic's heading, and under it the topic's photo, linked to its page as the heading is.
-        const head = el("div", "topic-head");
-        head.append(topicHeading("h3", topic));
-        const thumb = photo(`${TOPIC_PAGES[topic].slug}-thumb`, "14rem", "");
-        if (thumb) {
-          thumb.loading = "lazy";
-          const a = link(topicPath(topic), "", "topic-thumb");
-          // The heading is the link to follow; this one is a second way to the same page.
-          a.tabIndex = -1;
-          a.setAttribute("aria-hidden", "true");
-          a.append(thumb);
-          head.append(a);
-        }
-        s.append(head, tiles(toolsFor(topic)));
+        s.append(topicHeading("h3", topic), tiles(toolsFor(topic)));
         return s;
       }),
     );
   };
   refreshLists();
 
-  return [hero, dir, windowsApp()];
+  return [categoryStrip(), intro, dir, windowsApp()];
 }
 
+/** The Windows app, in a line: what it is and where to get it. */
 function windowsApp() {
-  const s = el("section", "app-promo wrap");
-  s.setAttribute("aria-labelledby", "app-h");
-  const copy = el("div", "app-copy");
-  const h = el("h2", undefined, "Also on Windows");
-  h.id = "app-h";
-  const get = link(STORE_URL, "Get the Windows app", "button primary");
-  get.rel = "noopener";
-  copy.append(h, el("p", undefined, "The same converters in their own window, working offline. Free from the Microsoft Store."), get);
-  const pic = el("picture");
-  const dark = el("source");
-  dark.media = "(prefers-color-scheme: dark)";
-  dark.srcset = APP_DARK;
-  const img = el("img");
-  Object.assign(img, { src: APP_LIGHT, alt: "The UOM Converter Windows app", width: 2732, height: 1536, loading: "lazy", decoding: "async" });
-  pic.append(dark, img);
-  const frame = el("div", "app-shot");
-  frame.append(pic);
-  s.append(copy, frame);
+  const s = el("aside", "app-note wrap");
+  s.setAttribute("aria-label", "Windows app");
+  s.append(appBox("h2"));
   return s;
+}
+
+/**
+ * The Windows app in a grey box, with the wire-reel photo the Wire & conduit topic uses: on the
+ * home page, and at the foot of every converter page's menu.
+ */
+function appBox(heading: "h2" | "h3") {
+  const box = el("div", "app-box");
+  const img = thumbnail("Wire & conduit", "app-thumb");
+  if (img) box.append(img);
+  const get = link(STORE_URL, "Get it from the Microsoft Store");
+  get.rel = "noopener";
+  const p = el("p", undefined, "The same converters in their own window, working offline. Free. ");
+  p.append(get);
+  const text = el("div");
+  text.append(el(heading, undefined, "Windows app"), p);
+  box.append(text);
+  return box;
 }
 
 // ---------- A converter's page ----------
@@ -309,15 +300,11 @@ function windowsApp() {
 function sidebar(current: { id?: string; topic?: Topic }) {
   const side = el("aside", "side");
   side.setAttribute("aria-label", "Converters");
-  const pick = el("label", "side-role");
-  const select = el("select");
-  for (const a of ALL_AUDIENCES) select.append(Object.assign(el("option", undefined, a.label), { value: a.id }));
-  select.addEventListener("change", () => setAudience(ALL_AUDIENCES.find((a) => a.id === select.value)!));
-  pick.append(el("span", undefined, "Show converters for"), select);
+  const picker = audienceSelect();
   const nav = el("nav");
-  side.append(pick, nav);
+  side.append(picker.pick, nav, appBox("h2"));
   refreshLists = () => {
-    select.value = audience.id;
+    picker.sync();
     nav.replaceChildren(
       ...shownTopics().map((topic) => {
         const g = el("div", "side-group");
@@ -376,7 +363,7 @@ function converterView(id: string): Node[] {
   const band = categoryBand(conv.topic, [link(BASE, "Converters"), link(topicPath(conv.topic), conv.topic)], title);
 
   const article = el("article", "doc");
-  article.append(panel(id, "h1"));
+  article.append(panel(id));
   const worked = workedExamples(conv);
   if (worked) article.append(worked);
 
@@ -456,10 +443,7 @@ function topicView(topic: Topic): Node[] {
   const layout = el("div", "doc-layout wrap");
   const side = sidebar({ topic });
 
-  const h1 = el("h1", "topic-h1");
-  const i = icon(topic);
-  if (i) h1.append(i);
-  h1.append(page.heading);
+  const h1 = el("h1", "topic-h1", page.heading);
   const band = categoryBand(topic, [link(BASE, "Converters")], h1, page.photo);
 
   const article = el("article", "doc topic-page");
@@ -493,9 +477,8 @@ function topicView(topic: Topic): Node[] {
   for (const t of TOPICS.filter((x) => x !== topic)) {
     const a = el("a", "tile");
     a.href = topicPath(t);
-    const thumb = photo(`${TOPIC_PAGES[t].slug}-thumb`, "5rem", "", "tile-thumb");
+    const thumb = thumbnail(t, "tile-thumb");
     if (thumb) {
-      thumb.loading = "lazy";
       a.classList.add("has-thumb");
       a.append(thumb);
     }
@@ -516,11 +499,11 @@ function topicView(topic: Topic): Node[] {
 let drawnPath: string | undefined;
 
 function render() {
-  closeSearch();
   // Same page, new #anchor: just scroll there.
   if (location.pathname === drawnPath) return scrollToHash();
   drawnPath = location.pathname;
   const r = route();
+  markCategory(r);
   if (r.kind === "converter") {
     main.replaceChildren(...converterView(r.id));
     setHead(PAGES[r.id].title, pathFor(r.id));
@@ -567,107 +550,34 @@ function setRegion(r: Region) {
   window.scrollTo(0, y);
 }
 
-const regionBar = document.querySelector<HTMLElement>("#region")!;
+const regionSelect = document.querySelector<HTMLSelectElement>("#region")!;
+regionSelect.addEventListener("change", () => setRegion(regionSelect.value as Region));
 function drawRegion() {
-  regionBar.replaceChildren(
-    ...REGIONS.map((r) => {
-      const b = el("button", undefined, r.label);
-      b.type = "button";
-      b.title = `${r.code}, ${r.hz} Hz`;
-      b.setAttribute("aria-pressed", String(r.id === region));
-      b.addEventListener("click", () => setRegion(r.id));
-      return b;
-    }),
+  regionSelect.replaceChildren(
+    ...REGIONS.map((r) => Object.assign(el("option", undefined, `${r.label} (${r.code}, ${r.hz} Hz)`), { value: r.id, selected: r.id === region })),
   );
 }
 
-// ---------- Header search ----------
+// ---------- The category menu ----------
 
-const q = document.querySelector<HTMLInputElement>("#q")!;
-const results = document.querySelector<HTMLUListElement>("#q-results")!;
-let matches: Converter[] = [];
-let active = -1;
+const categoryNav = document.querySelector<HTMLUListElement>("#category-nav")!;
+categoryNav.replaceChildren(
+  ...[{ href: BASE, text: "All converters" }, ...TOPICS.map((t) => ({ href: topicPath(t), text: t }))].map(({ href, text }) => {
+    const li = el("li");
+    li.append(link(href, text));
+    return li;
+  }),
+);
 
-/** Converters matching the search: name matches before description matches, each in the audience's order. */
-function search(query: string): Converter[] {
-  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
-  const has = (text: string) => words.every((w) => text.toLowerCase().includes(w));
-  const byName = (t: Converter) => has(`${t.title} ${t.topic} ${t.id} ${PAGES[t.id].title}`);
-  const rank = (t: Converter) =>
-    (byName(t) ? 0 : 2 * TOOLS.length) + (audience.tools.includes(t.id) ? audience.tools.indexOf(t.id) : TOOLS.length + TOOLS.indexOf(t));
-  return TOOLS.filter((t) => byName(t) || has(blurb(t))).sort((a, b) => rank(a) - rank(b));
+/** Marks the menu entry for the page shown: its topic, or All converters on the home page. */
+function markCategory(r: Route) {
+  const topic = r.kind === "topic" ? r.topic : r.kind === "converter" ? byId.get(r.id)!.topic : undefined;
+  const current = r.kind === "home" ? BASE : topic ? topicPath(topic) : undefined;
+  categoryNav.querySelectorAll("a").forEach((a) => {
+    if (a.getAttribute("href") === current) a.setAttribute("aria-current", "page");
+    else a.removeAttribute("aria-current");
+  });
 }
-
-function drawResults() {
-  const query = q.value.trim();
-  matches = query ? search(query).slice(0, 8) : [];
-  results.replaceChildren(
-    ...matches.map((t, i) => {
-      const li = el("li", "result");
-      li.id = `q-${t.id}`;
-      li.setAttribute("role", "option");
-      li.append(el("span", "result-title", t.title), el("span", "result-topic", t.topic));
-      li.addEventListener("pointerdown", (e) => e.preventDefault()); // keep focus in the box
-      li.addEventListener("click", () => choose(t.id));
-      li.addEventListener("pointermove", () => mark(i));
-      return li;
-    }),
-  );
-  if (query && !matches.length) results.append(el("li", "result-empty", "No converter matches."));
-  results.hidden = !query;
-  q.setAttribute("aria-expanded", String(!!query));
-  mark(matches.length ? 0 : -1);
-}
-
-function mark(i: number) {
-  active = i;
-  results.querySelectorAll("[role=option]").forEach((li, j) => li.setAttribute("aria-selected", String(j === i)));
-  if (i >= 0) q.setAttribute("aria-activedescendant", `q-${matches[i].id}`);
-  else q.removeAttribute("aria-activedescendant");
-}
-
-function closeSearch() {
-  results.hidden = true;
-  q.setAttribute("aria-expanded", "false");
-  q.removeAttribute("aria-activedescendant");
-}
-
-function choose(id: string) {
-  q.value = "";
-  q.blur();
-  go(pathFor(id));
-  // Straight into the first field, ready to type.
-  main.querySelector<HTMLElement>("input[data-field]")?.focus();
-}
-
-q.addEventListener("input", drawResults);
-q.addEventListener("focus", () => q.value.trim() && drawResults());
-q.addEventListener("blur", closeSearch);
-q.addEventListener("keydown", (e) => {
-  if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-    if (!matches.length) return;
-    e.preventDefault();
-    mark((active + (e.key === "ArrowDown" ? 1 : matches.length - 1)) % matches.length);
-  } else if (e.key === "Enter" && active >= 0) {
-    e.preventDefault();
-    choose(matches[active].id);
-  } else if (e.key === "Escape") {
-    e.preventDefault(); // otherwise the box clears itself without closing the list
-    if (q.value) q.value = "";
-    else q.blur();
-    closeSearch();
-  }
-});
-
-// "/" or Ctrl+K jumps to the search, as on most sites; Ctrl+F stays the browser's own find.
-document.addEventListener("keydown", (e) => {
-  const typing = (e.target as Element).closest("input, textarea, select, [contenteditable]");
-  if ((e.key === "/" && !typing) || ((e.ctrlKey || e.metaKey) && !e.altKey && e.key.toLowerCase() === "k")) {
-    e.preventDefault();
-    q.focus();
-    q.select();
-  }
-});
 
 // ---------- Links ----------
 

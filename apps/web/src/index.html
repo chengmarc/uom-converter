@@ -15,30 +15,18 @@
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
-    <!-- One header on every page: home, search, region, and the Windows app. -->
+    <!-- One header on every page: the name, the region and the Windows app, then the categories. -->
     <header class="site-header">
       <div class="wrap header-row">
         <a class="brand" href="/" data-home><img src="/app-icon.svg" alt="" width="24" height="24" />UOM Converter</a>
-        <div class="search" role="search">
-          <label class="sr" for="q">Search converters</label>
-          <input
-            id="q"
-            type="search"
-            placeholder="Search converters"
-            autocomplete="off"
-            spellcheck="false"
-            role="combobox"
-            aria-expanded="false"
-            aria-controls="q-results"
-            aria-autocomplete="list"
-            aria-keyshortcuts="/ Control+K"
-          />
-          <kbd aria-hidden="true">/</kbd>
-          <ul id="q-results" class="search-results" role="listbox" aria-label="Converters" hidden></ul>
+        <div class="header-tools">
+          <label class="region"><span>Region</span><select id="region"></select></label>
+          <a class="get-app" id="get-app" rel="noopener">Windows app</a>
         </div>
-        <div class="region" role="group" aria-label="Region" id="region"></div>
-        <a class="button get-app" id="get-app" rel="noopener">Get the Windows app</a>
       </div>
+      <nav class="category-nav" aria-label="Categories">
+        <ul class="wrap" id="category-nav"></ul>
+      </nav>
     </header>
     <main id="main" tabindex="-1"></main>
     <footer class="site-footer">

@@ -17,12 +17,8 @@ const OUT = resolve(import.meta.dirname, "../src/images");
 
 /** Each use of a photo: its crop, and the widths it's written at (never wider than the crop). */
 const SLOTS = {
-  // Home page opening, behind the headline: the big coil, without the worker on the left, the
-  // reel with a maker's name on the right, or the machine above it. Lower quality than the rest:
-  // it sits behind a fade, and fine copper strands compress poorly.
-  hero: { from: "hero.jpg", crop: { left: 1900, top: 1780, width: 3750, height: 2080 }, widths: [1280, 1920, 2560], quality: 60 },
-
-  // Topic pages: a 3:1 banner under the heading, and a square for the topic's thumbnail.
+  // Each topic: a 3:1 banner for the band across its pages, and a square for the home page's strip
+  // and the topic's thumbnail.
   // Narrower than the photo: a worker at a desk on the right edge is left out.
   "pricing-banner": { from: "1800x1200-3.jpg", crop: { left: 0, top: 230, width: 1560, height: 520 }, widths: [800, 1200, 1560] },
   "pricing-thumb": { from: "1800x1200-3.jpg", crop: { left: 120, top: 180, width: 860, height: 860 }, widths: [240, 480] },
