@@ -179,12 +179,18 @@ export interface TopicPage extends Page {
   heading: string;
   /** What the topic covers and who it's for, in two or three sentences. */
   intro: string;
+  /**
+   * What the topic's banner photo shows, for anyone who can't see it (its alt text). The photo is
+   * src/images/<slug>-banner-*.webp, made by scripts/images.mjs: change this with the photo.
+   */
+  photo: string;
 }
 
 /** By topic, in the order the converters list them. pages.test.ts checks every topic has one. */
 export const TOPIC_PAGES: Record<Topic, TopicPage> = {
   Pricing: {
     slug: "pricing",
+    photo: "Aisles of tall pallet racking stocked with boxed electrical supplies in a distributor's warehouse.",
     title: "Electrical Pricing: E/C/M, Multiplier and Margin Tools",
     description:
       "Calculators for electrical distribution pricing: E/C/M price units, wire price per foot or metre, list × multiplier, margin and markup, packs and reels.",
@@ -194,6 +200,7 @@ export const TOPIC_PAGES: Record<Topic, TopicPage> = {
   },
   "Wire & conduit": {
     slug: "wire-and-conduit",
+    photo: "Reels of building wire in many colours on warehouse racking.",
     title: "Wire Size and Conduit Converters: AWG, mm², Trade Size",
     description:
       "Convert AWG and kcmil wire sizes to mm² and back, and conduit trade sizes to metric designators with their knockout punch sizes.",
@@ -203,6 +210,7 @@ export const TOPIC_PAGES: Record<Topic, TopicPage> = {
   },
   Electrical: {
     slug: "electrical",
+    photo: "Open control panels with rows of terminal blocks, relays and coloured wiring.",
     title: "Electrical Calculators: Voltage Drop, kVA, Ohm's Law",
     description:
       "Electrical calculators: kVA and amps, voltage drop, power factor, transformer fault current, motor slip, line-to-neutral voltage, Ohm's law, energy cost.",
@@ -212,6 +220,7 @@ export const TOPIC_PAGES: Record<Topic, TopicPage> = {
   },
   Units: {
     slug: "units",
+    photo: "Hand tools hung on a pegboard: wrenches, pliers and screwdrivers.",
     title: "Unit Converters: Length, Torque, Power, Temperature",
     description:
       "Unit converters for the electrical trade: feet to metres, inch fractions to mm, °C to °F, hp to kW, foot-candles to lux, torque, weight and box fill.",
@@ -221,6 +230,7 @@ export const TOPIC_PAGES: Record<Topic, TopicPage> = {
   },
   "Product data": {
     slug: "product-data",
+    photo: "A handheld scanner reading barcode labels on shipping cartons.",
     title: "Product Data Tools: UOM Codes, ETIM, GTIN-14",
     description:
       "Tools for electrical product data: UN/ECE Rec 20 UOM codes, spec values to metric for ETIM, unit prices from price quantities, UOM mix-ups and GTIN-14s.",

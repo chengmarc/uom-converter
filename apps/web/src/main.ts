@@ -3,9 +3,6 @@
 // (pages.ts). Following a link between them doesn't reload the page: it's pushed onto history, so
 // Back and Forward work as usual. Each converter is drawn by packages/ui/src/converter.ts.
 
-// Bundled with the site: the page may only load its own files (see the CSP in index.html).
-// Weight and optical-size axes: headings and big result values get display-cut letterforms.
-import "@fontsource-variable/inter/opsz.css";
 import type { Region } from "@uom/core/region";
 import { TOOLS } from "@uom/converters";
 import { parseNumber, setNumberStyle } from "@uom/converters/format";
@@ -45,6 +42,35 @@ const pathFor = (id: string) => BASE + PAGES[id].slug;
 const topicPath = (t: Topic) => BASE + TOPIC_PAGES[t].slug;
 
 const main = document.querySelector<HTMLElement>("#main")!;
+
+// ---------- Photos ----------
+
+// As scripts/images.mjs writes them: "<slot>-<width>.webp", each slot at a few widths.
+const PHOTO_FILES = import.meta.glob<string>("./images/*.webp", { eager: true, query: "?url", import: "default" });
+const PHOTOS = new Map<string, { width: number; url: string }[]>();
+for (const [path, url] of Object.entries(PHOTO_FILES)) {
+  const base = path.slice(path.lastIndexOf("/") + 1, -".webp".length);
+  const dash = base.lastIndexOf("-");
+  const slot = base.slice(0, dash);
+  PHOTOS.set(slot, [...(PHOTOS.get(slot) ?? []), { width: Number(base.slice(dash + 1)), url }].sort((a, b) => a.width - b.width));
+}
+
+/**
+ * A photo slot as an <img> with every width it comes in, so the browser loads the one it needs
+ * for `sizes` (how wide it's shown). `alt` is empty when the photo only decorates. Undefined
+ * when the slot has no photo yet: the page goes without.
+ */
+function photo(slot: string, sizes: string, alt: string, cls?: string): HTMLImageElement | undefined {
+  const files = PHOTOS.get(slot);
+  if (!files) return undefined;
+  const img = el("img", cls);
+  img.src = files.at(-1)!.url;
+  img.srcset = files.map((f) => `${f.url} ${f.width}w`).join(", ");
+  img.sizes = sizes;
+  img.alt = alt;
+  img.decoding = "async";
+  return img;
+}
 
 function stored(key: string): string | undefined {
   try {
@@ -174,11 +200,31 @@ function homeView(missing: boolean): Node[] {
   }
   const actions = el("div", "actions");
   actions.append(link("#converters", "Browse converters", "button primary"));
-  copy.append(actions);
+  // What the site is, in facts: how much, which codes, and what it asks of you (nothing).
+  const facts = el("ul", "facts");
+  facts.setAttribute("aria-label", "About these converters");
+  for (const [n, text] of [
+    [String(TOOLS.length), "converters"],
+    [String(REGIONS.length), `regions: ${REGIONS.map((r) => r.label).join(", ")}`],
+    ["Works", "offline"],
+    ["No", "account, no tracking"],
+  ]) {
+    const li = el("li");
+    li.append(el("strong", undefined, n), ` ${text}`);
+    facts.append(li);
+  }
+  copy.append(actions, facts);
 
   const demo = el("div", "demo");
   demo.append(panel(DEMO, "h2"), link(pathFor(DEMO), "Open the full converter", "demo-link"));
   hero.append(copy, demo);
+  // Behind the opening, faded into the page on the left (style.css). The first thing on the page,
+  // so it's fetched first rather than when it scrolls into view.
+  const backdrop = photo("hero", "100vw", "", "hero-photo");
+  if (backdrop && !missing) {
+    backdrop.setAttribute("fetchpriority", "high");
+    hero.prepend(backdrop);
+  }
 
   const dir = el("section", "directory wrap");
   dir.id = "converters";
@@ -212,7 +258,20 @@ function homeView(missing: boolean): Node[] {
       ...shownTopics().map((topic) => {
         const s = el("section", "topic");
         s.id = topicAnchor(topic);
-        s.append(topicHeading("h3", topic), tiles(toolsFor(topic)));
+        // The topic's heading, and under it the topic's photo, linked to its page as the heading is.
+        const head = el("div", "topic-head");
+        head.append(topicHeading("h3", topic));
+        const thumb = photo(`${TOPIC_PAGES[topic].slug}-thumb`, "14rem", "");
+        if (thumb) {
+          thumb.loading = "lazy";
+          const a = link(topicPath(topic), "", "topic-thumb");
+          // The heading is the link to follow; this one is a second way to the same page.
+          a.tabIndex = -1;
+          a.setAttribute("aria-hidden", "true");
+          a.append(thumb);
+          head.append(a);
+        }
+        s.append(head, tiles(toolsFor(topic)));
         return s;
       }),
     );
@@ -290,13 +349,34 @@ function crumbs(trail: HTMLAnchorElement[]) {
   return nav;
 }
 
+/**
+ * The band across the top of a topic's pages: its photo under the brand colour, the breadcrumb,
+ * and a title, white on it. `title` is the topic page's <h1>, or on a converter's page the
+ * topic's name (the converter's own <h1> follows the band).
+ */
+function categoryBand(topic: Topic, trail: HTMLAnchorElement[], title: HTMLElement, alt = ""): HTMLElement {
+  const band = el("section", "category-band");
+  const img = photo(`${TOPIC_PAGES[topic].slug}-banner`, "100vw", alt, "category-photo");
+  if (img) {
+    img.setAttribute("fetchpriority", "high");
+    band.append(img);
+  }
+  const inner = el("div", "wrap category-inner");
+  inner.append(crumbs(trail), title);
+  band.append(inner);
+  return band;
+}
+
 function converterView(id: string): Node[] {
   const conv = byId.get(id)!;
   const layout = el("div", "doc-layout wrap");
   const side = sidebar({ id });
+  const title = el("p", "category-title");
+  title.append(link(topicPath(conv.topic), TOPIC_PAGES[conv.topic].heading));
+  const band = categoryBand(conv.topic, [link(BASE, "Converters"), link(topicPath(conv.topic), conv.topic)], title);
 
   const article = el("article", "doc");
-  article.append(crumbs([link(BASE, "Converters"), link(topicPath(conv.topic), conv.topic)]), panel(id, "h1"));
+  article.append(panel(id, "h1"));
   const worked = workedExamples(conv);
   if (worked) article.append(worked);
 
@@ -310,7 +390,7 @@ function converterView(id: string): Node[] {
     article.append(related);
   }
   layout.append(side, article);
-  return [layout];
+  return [band, layout];
 }
 
 /** A converter's inputs as an example sets them, the rest at their defaults: no form needed. */
@@ -376,12 +456,14 @@ function topicView(topic: Topic): Node[] {
   const layout = el("div", "doc-layout wrap");
   const side = sidebar({ topic });
 
-  const article = el("article", "doc topic-page");
   const h1 = el("h1", "topic-h1");
   const i = icon(topic);
   if (i) h1.append(i);
   h1.append(page.heading);
-  article.append(crumbs([link(BASE, "Converters")]), h1, el("p", "lede", page.intro), tiles(convs));
+  const band = categoryBand(topic, [link(BASE, "Converters")], h1, page.photo);
+
+  const article = el("article", "doc topic-page");
+  article.append(el("p", "lede", page.intro), tiles(convs));
 
   // One answer from each converter: the first example, as the converter works it out.
   const answers = el("section", "answers");
@@ -396,7 +478,8 @@ function topicView(topic: Topic): Node[] {
     const li = el("li");
     // "Weight: 50 lb → Kilograms: 22.68 kg", from the heading "50 lb equals".
     const question = out.heading.replace(/\s+(equals|is|gives)$/, "");
-    li.append(link(pathFor(t.id), t.title), ": ", el("span", undefined, `${question} → ${answer.label}: ${answer.value}`));
+    // The colon keeps name and answer apart as text; the layout puts them in columns.
+    li.append(link(pathFor(t.id), t.title), el("span", "sr", ": "), el("span", undefined, `${question} → ${answer.label}: ${answer.value}`));
     list.append(li);
   }
   answers.append(ah, list);
@@ -410,6 +493,12 @@ function topicView(topic: Topic): Node[] {
   for (const t of TOPICS.filter((x) => x !== topic)) {
     const a = el("a", "tile");
     a.href = topicPath(t);
+    const thumb = photo(`${TOPIC_PAGES[t].slug}-thumb`, "5rem", "", "tile-thumb");
+    if (thumb) {
+      thumb.loading = "lazy";
+      a.classList.add("has-thumb");
+      a.append(thumb);
+    }
     a.append(el("span", "tile-title", TOPIC_PAGES[t].heading), el("span", "tile-text", TOPIC_PAGES[t].description));
     const li = el("li");
     li.append(a);
@@ -419,7 +508,7 @@ function topicView(topic: Topic): Node[] {
   article.append(others);
 
   layout.append(side, article);
-  return [layout];
+  return [band, layout];
 }
 
 // ---------- Drawing the page for the address ----------
@@ -603,6 +692,7 @@ window.addEventListener("popstate", render);
 
 document.querySelectorAll<HTMLAnchorElement>("a[data-home]").forEach((a) => (a.href = BASE));
 document.querySelectorAll<HTMLAnchorElement>("#get-app, #footer-app").forEach((a) => (a.href = STORE_URL));
+document.querySelector("#footer-year")!.textContent = String(new Date().getFullYear());
 document.querySelector("#footer-topic-list")!.replaceChildren(
   ...TOPICS.map((t) => {
     const li = el("li");

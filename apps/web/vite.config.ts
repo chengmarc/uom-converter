@@ -354,8 +354,9 @@ function sitePages(): Plugin {
         ),
       );
 
-      // The home page's screenshots of the Windows app are left to be cached when first shown.
-      const offline = assets.filter((a) => !a.endsWith(".png"));
+      // Pictures (the Windows app's screenshots, the photos at every width) are left to be cached
+      // when first shown: the offline copy is for the converters.
+      const offline = assets.filter((a) => ![".png", ".webp"].some((ext) => a.endsWith(ext)));
       const files = [BASE, ...pages.map((p) => BASE + p.slug), ...offline.map((a) => BASE + a), `${BASE}app-icon.svg`, `${BASE}icon-256.png`];
       // Asset names carry a content hash, so a new build with any change gets a new cache.
       const version = createHash("sha256").update(JSON.stringify(files) + JSON.stringify(pages)).digest("hex").slice(0, 12);
