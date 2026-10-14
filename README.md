@@ -2,10 +2,9 @@
 
   <img src="packages/brand/public/app-icon.svg" width="180"><br>
 
-  <a href="https://uom-converter.com/"><img src="docs/badges/badge-browser.svg" height="50"></a>
-  <a href="https://play.google.com/store/apps/details?id=com.uomconverter.app"><img src="docs/badges/badge-google-play.svg" height="50"></a>
-  <a href="https://apps.microsoft.com/detail/9PHZQBV736JC"><img src="docs/badges/badge-microsoft-store.svg" height="50"></a>
   <a href="https://github.com/chengmarc/uom-converter/releases/latest/download/UOM-Converter-setup.exe"><img src="docs/badges/badge-download.svg" height="50"></a>
+  <a href="https://apps.microsoft.com/detail/9PHZQBV736JC"><img src="docs/badges/badge-microsoft-store.svg" height="50"></a>
+  <a href="https://play.google.com/store/apps/details?id=com.uomconverter.app"><img src="docs/badges/badge-google-play.svg" height="50"></a>
   <h1>UOM Converter - Unit Converter for Electrical Industry</h1>
 
   <img src="apps/windows/store/listing/screenshot-1-promo.png">
