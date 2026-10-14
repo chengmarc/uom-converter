@@ -91,7 +91,7 @@ land in `apps/windows/release/`.
 
 ```
 npm run app        # build the page and open it in the desktop shell
-npm run dist:win   # UOM-Converter-setup.exe and UOM-Converter-portable.exe
+npm run dist:win   # UOM-Converter-setup.exe
 ```
 
 ## Microsoft Store (.appx)

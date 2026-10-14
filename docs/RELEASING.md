@@ -1,7 +1,7 @@
 # Releasing
 
-How the source tree becomes the three release files: an installer and a portable exe for GitHub
-Releases, and an `.appx` for the Microsoft Store. electron-builder builds all three from
+How the source tree becomes the two release files: an installer for GitHub Releases, and an
+`.appx` for the Microsoft Store. electron-builder builds both from
 [packaging/electron-builder.config.cjs](../apps/windows/packaging/electron-builder.config.cjs), into `apps/windows/release/`. Commands run from
 the repo root.
 
@@ -32,7 +32,7 @@ the repo root.
 6. **Build:**
 
    ```
-   npm run dist:win     # UOM-Converter-setup.exe and UOM-Converter-portable.exe
+   npm run dist:win     # UOM-Converter-setup.exe
    npm run dist:store   # UOM-Converter-<version>.appx
    ```
 
@@ -51,12 +51,12 @@ the repo root.
    git push origin main v<version>
    ```
 
-9. **Publish** the two exe files to GitHub, with the version's CHANGELOG section as the
+9. **Publish** the installer to GitHub, with the version's CHANGELOG section as the
    description. [packaging/release-notes.cjs](../apps/windows/packaging/release-notes.cjs) copies it to `apps/windows/release/RELEASE_NOTES.md`:
 
    ```
    node apps/windows/packaging/release-notes.cjs <version>
-   gh release create v<version> apps/windows/release/UOM-Converter-setup.exe apps/windows/release/UOM-Converter-portable.exe --title "UOM Converter <version>" --notes-file apps/windows/release/RELEASE_NOTES.md
+   gh release create v<version> apps/windows/release/UOM-Converter-setup.exe --title "UOM Converter <version>" --notes-file apps/windows/release/RELEASE_NOTES.md
    ```
 
    The README's download badge points at `releases/latest/download/UOM-Converter-setup.exe`, so it
@@ -67,7 +67,7 @@ the repo root.
 ## Microsoft Store
 
 The Store takes the `.appx` and signs it itself, so it needs no code-signing certificate. It
-rejects unsigned exe installers, so the exe files are for GitHub only and the `.appx` is never
+rejects unsigned exe installers, so the installer is for GitHub only and the `.appx` is never
 published there.
 
 1. **One time:** copy the three values under Partner Center → the app → Product identity into
@@ -89,7 +89,6 @@ In `apps/windows/release/`:
 | File | Published to |
 |---|---|
 | `UOM-Converter-setup.exe` | GitHub Releases |
-| `UOM-Converter-portable.exe` | GitHub Releases |
 | `UOM-Converter-<version>.appx` | Microsoft Store (Partner Center) only |
 | `RELEASE_NOTES.md` | The GitHub release's description (from `packaging/release-notes.cjs`) |
 

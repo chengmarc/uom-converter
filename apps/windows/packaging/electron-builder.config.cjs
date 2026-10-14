@@ -1,4 +1,4 @@
-// electron-builder's settings for the .exe files and the Store's .appx, run from apps/windows/ with
+// electron-builder's settings for the installer and the Store's .appx, run from apps/windows/ with
 // --config packaging/electron-builder.config.cjs, so the paths below are relative to apps/windows/.
 // The version is the repo's (one for every app, in the root package.json); the packaged app's
 // package.json also gets the repo's name, so it reads the same as before the apps had their own.
@@ -20,7 +20,7 @@ module.exports = {
   electronVersion: require(path.join(electron, "package.json")).version,
   electronDist: path.join(electron, "dist"),
   win: {
-    target: ["nsis", "portable"],
+    target: ["nsis"],
     icon: "src/main/icon.png",
   },
   nsis: {
@@ -28,9 +28,6 @@ module.exports = {
     perMachine: false,
     allowToChangeInstallationDirectory: true,
     artifactName: "UOM-Converter-setup.exe",
-  },
-  portable: {
-    artifactName: "UOM-Converter-portable.exe",
   },
   appx: {
     identityName: "chengmarc.UOMConverter",

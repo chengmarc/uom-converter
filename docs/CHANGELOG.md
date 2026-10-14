@@ -12,6 +12,10 @@ match the release tags (`v<version>`).
 - the website, at https://uom-converter.com/: every converter at its own address with
   its own title and description, a sitemap, and an offline copy once visited
 
+### Removed
+
+- the portable exe: GitHub Releases has the installer only
+
 ## [1.0.0] - 2026-10-10
 
 First release.
