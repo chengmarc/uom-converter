@@ -86,7 +86,7 @@ to build it for another address.
 
 The page wrapped in Electron (`apps/windows/src/main/main.cjs`). It is served from a private
 `app://` scheme, with no Node access in the page, a sandboxed renderer and a content security
-policy. electron-builder's settings are in `apps/windows/electron-builder.config.cjs`, and builds
+policy. electron-builder's settings are in `apps/windows/packaging/electron-builder.config.cjs`, and builds
 land in `apps/windows/release/`.
 
 ```
@@ -121,9 +121,9 @@ root `package.json` (1.2.3 is Play's versionCode 10203).
 
 ## Releasing
 
-Windows releases follow the [release guide](apps/windows/RELEASING.md): the `.exe` files go
+Windows releases follow the [release guide](docs/RELEASING.md): the `.exe` files go
 on GitHub Releases, the `.appx` to the Microsoft Store. Changes are listed in the
-[changelog](docs/CHANGELOG.md), and the app's [privacy policy](docs/PRIVACY.md) covers every edition.
+[changelog](docs/CHANGELOG.md), and the app's [privacy policy](PRIVACY.md) covers every edition.
 
 ## License
 

@@ -1,6 +1,6 @@
 // Writes one version's section of docs/CHANGELOG.md, without its heading, to apps/windows/release/RELEASE_NOTES.md:
 // the GitHub release's description, so the notes are written once, in the changelog.
-// `node apps/windows/scripts/release-notes.cjs <version>`. A file, not stdout, because Windows PowerShell
+// `node apps/windows/packaging/release-notes.cjs <version>`. A file, not stdout, because Windows PowerShell
 // re-encodes what it pipes between programs.
 
 const fs = require("node:fs");
@@ -8,7 +8,7 @@ const path = require("node:path");
 
 const version = process.argv[2];
 if (!version) {
-  console.error("Usage: node apps/windows/scripts/release-notes.cjs <version>");
+  console.error("Usage: node apps/windows/packaging/release-notes.cjs <version>");
   process.exit(1);
 }
 

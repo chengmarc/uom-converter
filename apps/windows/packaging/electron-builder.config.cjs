@@ -1,10 +1,11 @@
-// electron-builder's settings for the .exe files and the Store's .appx, run from this folder.
+// electron-builder's settings for the .exe files and the Store's .appx, run from apps/windows/ with
+// --config packaging/electron-builder.config.cjs, so the paths below are relative to apps/windows/.
 // The version is the repo's (one for every app, in the root package.json); the packaged app's
 // package.json also gets the repo's name, so it reads the same as before the apps had their own.
 
 const path = require("node:path");
 
-const { version } = require("../../package.json");
+const { version } = require("../../../package.json");
 // npm installs Electron at the repo root, where electron-builder doesn't look for it.
 const electron = path.dirname(require.resolve("electron/package.json"));
 
@@ -14,7 +15,7 @@ module.exports = {
   files: ["dist/**", "src/main/**", "!**/*.test.ts", "package.json"],
   directories: {
     output: "release",
-    buildResources: "store",
+    buildResources: "packaging",
   },
   electronVersion: require(path.join(electron, "package.json")).version,
   electronDist: path.join(electron, "dist"),

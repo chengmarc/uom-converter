@@ -36,7 +36,7 @@ const STORE_URL = "https://apps.microsoft.com/detail/9PHZQBV736JC";
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-/** The preview image when a link is shared: the Windows app's Store promo (apps/windows/scripts/render.cjs). */
+/** The preview image when a link is shared: the Windows app's Store promo (apps/windows/store/render.cjs). */
 const OG_IMAGE = resolve(WINDOWS, "store/listing/screenshot-1-promo.png");
 const OG_ALT = "UOM Converter converting 12 AWG to 3.309 mm², with every converter listed beside it";
 
@@ -244,7 +244,7 @@ function llmsTxt(converters: { page: Page; topic?: Topic }[], regions: string[])
       [
         item("Windows app", STORE_URL, "the same converters as a free Windows app from the Microsoft Store, working offline"),
         item("Source code", REPO_URL, "the website and apps, open source under the Apache 2.0 license"),
-        item("Privacy", `${REPO_URL}/blob/main/docs/PRIVACY.md`, "what the website and apps do and don't collect"),
+        item("Privacy", `${REPO_URL}/blob/main/PRIVACY.md`, "what the website and apps do and don't collect"),
         item("Sitemap", `${SITE_URL}sitemap.xml`, "every page's address"),
       ].join("\n"),
   ].join("\n\n") + "\n";
@@ -329,8 +329,8 @@ function sitePages(): Plugin {
       // Search engines read robots.txt only at a domain's root, which is where the site lives.
       writeFileSync(join(OUT, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${SITE_URL}sitemap.xml\n`);
 
-      // Rendered for the Windows app by apps/windows/scripts/render.cjs.
-      copyFileSync(resolve(WINDOWS, "store/appx/Square44x44Logo.targetsize-256_altform-unplated.png"), join(OUT, "icon-256.png"));
+      // Rendered for the Windows app by apps/windows/store/render.cjs.
+      copyFileSync(resolve(WINDOWS, "packaging/appx/Square44x44Logo.targetsize-256_altform-unplated.png"), join(OUT, "icon-256.png"));
       copyFileSync(OG_IMAGE, join(OUT, "og.png"));
       writeFileSync(
         join(OUT, "manifest.webmanifest"),

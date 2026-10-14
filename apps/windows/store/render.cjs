@@ -1,6 +1,6 @@
 // Renders every image derived from the app's own sources, so they never drift from it:
 //   src/main/icon.png      the desktop window, taskbar and installer icon
-//   store/appx/            tile and taskbar icons packed into the MSIX (electron-builder's buildResources)
+//   packaging/appx/        tile and taskbar icons packed into the MSIX (electron-builder's buildResources)
 //   store/listing/         images uploaded to Partner Center: store logo, promo and screenshots
 // The icons come from @uom/brand's app-icon.svg; screenshots from the built page.
 // Run with `npm run store:assets` (builds apps/windows/dist/ first).
@@ -87,7 +87,7 @@ async function renderIcon(file, width, height, share, background = "transparent"
 }
 
 async function renderTiles() {
-  const dir = path.join(STORE, "appx");
+  const dir = path.join(WINDOWS, "packaging", "appx");
   fs.rmSync(dir, { recursive: true, force: true });
   for (const [name, w, h, share] of TILES) {
     for (const s of SCALES) await renderIcon(path.join(dir, `${name}.scale-${s}.png`), Math.round((w * s) / 100), Math.round((h * s) / 100), share);

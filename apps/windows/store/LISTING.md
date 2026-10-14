@@ -112,7 +112,7 @@ Leave empty.
 
 ## Elsewhere in the submission
 
-- **Properties → Privacy policy URL:** `https://github.com/chengmarc/uom-converter/blob/main/docs/PRIVACY.md`
+- **Properties → Privacy policy URL:** `https://github.com/chengmarc/uom-converter/blob/main/PRIVACY.md`
 - **Submission options → runFullTrust:**
 
   ```
