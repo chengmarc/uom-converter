@@ -1,8 +1,9 @@
 // Renders every image derived from the app's own sources, so they never drift from it:
 //   src/main/icon.png      the desktop window, taskbar and installer icon
 //   packaging/appx/        tile and taskbar icons packed into the MSIX (electron-builder's buildResources)
-//   store/listing/         images uploaded to Partner Center: store logo, promo and screenshots
-// The icons come from @uom/brand's app-icon.svg; screenshots from the built page.
+//   store/listing/         images uploaded to Partner Center: store logos and screenshots
+// The icons come from @uom/brand's app-icon.svg; screenshots from the built page, captured into build/shots/ and
+// framed by shots.html.
 // Run with `npm run store:assets` (builds apps/windows/dist/ first).
 
 const { app, BrowserWindow, nativeTheme, net, protocol } = require("electron");
@@ -13,6 +14,7 @@ const { pathToFileURL } = require("node:url");
 const WINDOWS = path.join(__dirname, "..");
 const DIST = path.join(WINDOWS, "dist");
 const STORE = path.join(WINDOWS, "store");
+const BUILD = path.join(WINDOWS, "build");
 const ICON = fs.readFileSync(require.resolve("@uom/brand/app-icon.svg"), "utf8");
 const SCALES = [100, 200];
 
@@ -30,19 +32,9 @@ const TILES = [
 const TARGET_SIZES = [16, 24, 32, 48, 256];
 
 /**
- * Partner Center screenshots after the promo (screenshot-1-promo.png, from promo.html): who,
- * where, which converter, and the theme. Each opens on its first example.
+ * The layout's design size (main.cjs MIN_SIZE), rendered at 2× for sharp Store images: both the captures of the app
+ * and the screenshots made from them (shots.html, which lists the shots).
  */
-const SHOTS = [
-  ["2-awg", "?for=electrician&region=us#awg", "light"], // also the promo's picture
-  ["3-voltage-drop", "?for=electrician&region=us#vdrop", "light"],
-  ["4-price-units", "?for=distributor&region=us#price", "light"],
-  ["5-kva-amps", "?for=engineer&region=eu#load", "light"],
-  ["6-reels", "?for=counter&region=ca#reels", "light"],
-  ["7-uom-codes", "?for=pim&region=eu#uom-codes", "light"],
-  ["8-conduit-dark", "?for=electrician&region=us#conduit", "dark"],
-];
-/** The layout's design size (main.cjs MIN_SIZE), rendered at 2× for sharp Store images. */
 const SHOT_SIZE = { width: 1366, height: 768, scale: 2 };
 
 protocol.registerSchemesAsPrivileged([{ scheme: "app", privileges: { standard: true, secure: true, supportFetchAPI: true } }]);
@@ -112,31 +104,40 @@ async function renderListing() {
     if (file !== DIST && !file.startsWith(DIST + path.sep)) return new Response("Not found", { status: 404 });
     return net.fetch(pathToFileURL(file).toString());
   });
-  const { width, height, scale } = SHOT_SIZE;
-  for (const [name, query, theme] of SHOTS) {
-    nativeTheme.themeSource = theme;
-    const win = offscreen(width, height, scale);
-    await win.loadURL(`app://uom/index.html${query}`);
-    await capture(win, path.join(dir, `screenshot-${name}.png`), { width: width * scale, height: height * scale });
-    win.destroy();
-  }
 
-  // The promo shows the AWG screenshot, so it comes last. Its converter count is read
-  // from the list in @uom/converters (its index.ts) rather than written into the page.
-  nativeTheme.themeSource = "light";
+  // The shots, in upload order, as shots.html lists them; their captions stay in that page.
+  const lister = offscreen(SHOT_SIZE.width, SHOT_SIZE.height);
+  await lister.loadFile(path.join(STORE, "shots.html"));
+  const shots = Object.entries(await lister.webContents.executeJavaScript("SHOTS"));
+  lister.destroy();
+
+  // The converter count on every shot is read from the list in @uom/converters (its index.ts).
   const list = fs.readFileSync(require.resolve("@uom/converters"), "utf8");
   const count = /export const TOOLS: Converter\[\] = \[([^\]]*)\]/.exec(list)[1].split(",").filter((t) => t.trim()).length;
-  await renderPage("promo.html", path.join(dir, "screenshot-1-promo.png"), width, height, scale, `document.querySelector("#count").textContent = "${count} converters"`);
+
+  const { width, height, scale } = SHOT_SIZE;
+  const captures = path.join(BUILD, "shots");
+  fs.rmSync(captures, { recursive: true, force: true });
+  for (const [i, [name, { query, theme, scroll = 0 }]] of shots.entries()) {
+    nativeTheme.themeSource = theme;
+    const page = offscreen(width, height, scale);
+    await page.loadURL(`app://uom/index.html${query}`);
+    await page.webContents.executeJavaScript(`document.querySelector("#content").scrollTop = ${scroll}`);
+    await capture(page, path.join(captures, `${name}.png`), { width: width * scale, height: height * scale });
+    page.destroy();
+    await renderPage(`shots.html#${name}`, path.join(dir, `screenshot-${i + 1}-${name}.png`), width, height, scale, `document.querySelector("#count").textContent = "${count} converters"`);
+  }
 }
 
 /**
- * One of the designed pages in this folder (promo.html, logo.html) at width × height CSS pixels,
+ * One of the designed pages in this folder (shots.html, logo.html) at width × height CSS pixels,
  * rendered at `scale`. Pages are laid out small and rendered large, since Windows keeps even an
  * offscreen window within the screen. `script` fills in anything the page can't know itself.
  */
 async function renderPage(page, file, width, height, scale, script = "") {
+  const [html, hash] = page.split("#");
   const win = offscreen(width, height, scale);
-  await win.loadFile(path.join(STORE, page));
+  await win.loadFile(path.join(STORE, html), { hash });
   await win.webContents.executeJavaScript(`${script}; document.fonts.ready.then(() => true)`);
   await capture(win, file, { width: width * scale, height: height * scale });
   win.destroy();

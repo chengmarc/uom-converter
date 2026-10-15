@@ -1,0 +1,138 @@
+<!doctype html>
+<!-- The Store's screenshots: render.cjs loads this page at 1366 × 768 (rendered at 2×) once per shot, named by the
+     hash (#promo, #vdrop, …). Each is the brand and facts across the top, the need it meets as the headline, and the
+     real app below it, cropped by the bottom edge: a capture of the built page (build/shots/<name>.png) that
+     render.cjs takes first, from each shot's `query` and `theme` below. Colours come from the icon's tile and bolt. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="brand.css" />
+    <style>
+      html, body { width: 1366px; height: 768px; }
+      /* The grid fades out behind the app. */
+      body::before { mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.5) 30%, transparent 55%); }
+
+      .top { position: absolute; left: 72px; right: 72px; top: 34px; display: flex; align-items: center; justify-content: space-between; }
+      .brand { display: flex; align-items: center; gap: 13px; }
+      .brand img { width: 46px; height: 46px; filter: drop-shadow(0 8px 14px rgba(8, 10, 60, 0.45)); }
+      .brand span { font-size: 19px; font-weight: 650; letter-spacing: -0.01em; }
+      .brand small { display: block; margin-top: 1px; font-size: 13px; font-weight: 500; color: rgba(255, 255, 255, 0.72); }
+
+      .facts { display: flex; gap: 8px; }
+      .facts span {
+        padding: 6px 13px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 560;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+      }
+
+      h1 {
+        position: absolute;
+        left: 72px;
+        top: 106px;
+        margin: 0;
+        font-size: 40px;
+        line-height: 1;
+        font-weight: 760;
+        letter-spacing: -0.03em;
+        font-variation-settings: "opsz" 32;
+      }
+      h1 em { font-style: normal; color: var(--bolt); }
+      .text { position: absolute; left: 72px; top: 158px; margin: 0; font-size: 17px; font-weight: 450; color: rgba(255, 255, 255, 0.85); }
+
+      /* The app window at its design size (1366 × 768, main.cjs MIN_SIZE), scaled down and run off the bottom edge.
+         Windows 11's 9 px corners, a hairline border and a deep shadow. */
+      .window {
+        position: absolute;
+        left: 50%;
+        top: 204px;
+        width: 1366px;
+        transform: translateX(-50%) scale(0.8);
+        transform-origin: top center;
+        border-radius: 11px 11px 0 0;
+        overflow: hidden;
+        box-shadow:
+          0 0 0 1.25px rgba(255, 255, 255, 0.22),
+          0 36px 90px rgba(5, 8, 50, 0.6),
+          0 10px 26px rgba(5, 8, 50, 0.38);
+      }
+      .window > img { display: block; width: 1366px; }
+      /* The minimize, maximize and close buttons Windows draws over the page's own title bar. */
+      .caption-buttons { position: absolute; top: 0; right: 0; display: flex; color: #1c1b19; }
+      .caption-buttons.dark { color: #edebe6; }
+      .caption-buttons i { width: 46px; height: 40px; display: grid; place-items: center; font: normal 10px "Segoe Fluent Icons", "Segoe MDL2 Assets"; }
+    </style>
+  </head>
+  <body>
+    <div class="top">
+      <div class="brand"><img src="../../../packages/brand/public/app-icon.svg" alt="" /><span>UOM Converter<small>For the electrical trade</small></span></div>
+      <div class="facts" id="facts"></div>
+    </div>
+    <h1 id="title"></h1>
+    <p class="text" id="text"></p>
+    <div class="window" id="window"></div>
+
+    <script>
+      // The same on every shot: how much it covers, where, and what it doesn't need. render.cjs fills in the count
+      // from @uom/converters.
+      const FACTS = ['<span id="count">Every converter</span>', "US · Canada · Europe", "Works offline", "No account"];
+
+      // Each shot, in upload order: the need it meets in the customer's words (the last phrase in the bolt colour),
+      // how the app meets it, and the app as it opens on `query` (role, region and converter; each converter opens on
+      // its first worked example) in `theme`. `scroll` scrolls the converter so its answer is above the crop.
+      const SHOTS = {
+        promo: {
+          title: "Every number on the job, <em>converted.</em>",
+          text: "Wire sizes, voltage drop, prices and unit codes in one window, each answer with its formula.",
+          query: "?for=electrician&region=us#awg",
+          theme: "light",
+        },
+        "voltage-drop": {
+          title: "Will that wire carry the run? <em>Know first.</em>",
+          text: "Enter the run and the load: see the drop, and the smallest wire that keeps it within your target.",
+          query: "?for=electrician&region=us#vdrop",
+          theme: "light",
+          scroll: 150,
+        },
+        "price-units": {
+          title: "Per C, per M, <em>per each.</em>",
+          text: "Turn prices per 100 and per 1,000 into the price of one, and back, in one click.",
+          query: "?for=distributor&region=us#price",
+          theme: "light",
+        },
+        "kva-amps": {
+          title: "From kVA to amps, <em>in one step.</em>",
+          text: "kVA, kW and amps, single- or three-phase, at the voltages your region uses.",
+          query: "?for=engineer&region=eu#load",
+          theme: "light",
+        },
+        reels: {
+          title: "How many reels for this job? <em>Answered.</em>",
+          text: "Enter the run and the wires pulled: see how many coils or reels cover it.",
+          query: "?for=counter&region=ca#reels",
+          theme: "light",
+        },
+        "uom-codes": {
+          title: "Clean units in every <em>supplier file.</em>",
+          text: "Turn EA, ft, box or lbs into the UN/ECE codes BMEcat, ETIM and e-invoicing expect.",
+          query: "?for=pim&region=eu#uom-codes",
+          theme: "light",
+        },
+      };
+
+      const name = location.hash.slice(1);
+      if (name) {
+        const shot = SHOTS[name];
+        if (!shot) throw new Error("Unknown shot " + location.hash);
+        document.getElementById("facts").innerHTML = FACTS.map((f) => (f.startsWith("<") ? f : `<span>${f}</span>`)).join("");
+        document.getElementById("title").innerHTML = shot.title;
+        document.getElementById("text").textContent = shot.text;
+        document.getElementById("window").innerHTML =
+          `<img src="../build/shots/${name}.png" alt="" />` +
+          `<div class="caption-buttons ${shot.theme}"><i>&#xE921;</i><i>&#xE922;</i><i>&#xE8BB;</i></div>`;
+      }
+    </script>
+  </body>
+</html>

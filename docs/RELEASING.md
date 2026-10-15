@@ -75,10 +75,9 @@ published there.
    Until then they hold placeholders, and the Store rejects a package whose identity doesn't match.
 2. **Build** with `npm run dist:store`.
 3. **Upload** `apps/windows/release/UOM-Converter-<version>.appx` in a new Partner Center
-   submission. For a first submission or new screenshots, upload the images in
-   `apps/windows/store/listing/` in their numbered order, and give [`PRIVACY.md`](../PRIVACY.md)'s GitHub
-   address as the privacy policy URL.
-4. When asked about the `runFullTrust` capability: it's a desktop app built with Electron.
+   submission. Every other field (listing text, images in their numbered order, privacy policy,
+   `runFullTrust` justification, certification notes) is in
+   [apps/windows/store/LISTING.md](../apps/windows/store/LISTING.md), ready to paste.
 
 ## Reference
 
@@ -104,4 +103,4 @@ Everything else electron-builder leaves there (`win-unpacked/`, `.blockmap` file
 |---|---|
 | `src/main/icon.png` | The window, taskbar and installer icon |
 | `packaging/appx/` | Start, tile and taskbar icons inside the `.appx` |
-| `store/listing/` | Partner Center: store logo, box and poster art (designed in `store/logo.html`), the promo (`store/promo.html`) and screenshots |
+| `store/listing/` | Partner Center: store logo, box and poster art (designed in `store/logo.html`) and screenshots (captions in `store/shots.html`, around captures of the app in `build/shots/`) |

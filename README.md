@@ -13,9 +13,9 @@
 
 ## Screenshots
 
-<img src="apps/windows/store/listing/screenshot-2-awg.png">
-<img src="apps/windows/store/listing/screenshot-3-voltage-drop.png">
-<img src="apps/windows/store/listing/screenshot-6-reels.png">
+<img src="apps/windows/store/listing/screenshot-2-voltage-drop.png">
+<img src="apps/windows/store/listing/screenshot-3-price-units.png">
+<img src="apps/windows/store/listing/screenshot-5-reels.png">
 
 ## Quick start
 

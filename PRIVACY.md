@@ -1,10 +1,10 @@
 # Privacy Policy
 
 **UOM Converter**
-Last updated: October 13, 2026
+Last updated: October 15, 2026
 
 This policy covers UOM Converter in every form it ships in: the Microsoft Store edition, the
-Windows installer, the portable exe, and the website at <https://uom-converter.com/>.
+Windows installer, and the website at <https://uom-converter.com/>.
 
 ## Summary
 
@@ -19,7 +19,7 @@ once loaded: it works out every answer in your browser and sends nothing back.
 - **Settings stay on your computer.** The app remembers the role and region you picked, and the
   window's size and position, in its data folder on your computer:
   - Microsoft Store edition: `%LOCALAPPDATA%\Packages\<package>\` (removed when you uninstall the app)
-  - Installer and portable exe: `%APPDATA%\UOM Converter\`
+  - Installer: `%APPDATA%\UOM Converter\`
 - **Your numbers aren't saved.** Values you type are used to work out the answer on screen and are
   not stored or sent anywhere. When you click a result, it is copied to your clipboard and nothing
   else.
