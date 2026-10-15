@@ -15,7 +15,12 @@
         text-align: center;
       }
       /* The grid fades out from the edges toward the icon. */
-      body::before { mask-image: radial-gradient(closest-side, transparent 30%, #000 100%); }
+      /* Darker behind the icon and name; the coil in the photo frames them. */
+      body { --shade: radial-gradient(closest-side, rgba(10, 6, 4, 0.45), transparent); --focus: 62% 60%; --blur: 0.6vmin; }
+      /* The square box art shows more of the photo's width: keep to the coils on the right, clear of the worker. */
+      /* The grid fades out from the edges toward the icon. */
+      body::after { mask-image: radial-gradient(closest-side, transparent 30%, #000 100%); }
+      @media (aspect-ratio: 1) { body { --focus: 100% 60%; } }
 
       img {
         position: relative;

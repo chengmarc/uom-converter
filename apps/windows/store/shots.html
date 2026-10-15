@@ -10,8 +10,11 @@
     <style>
       html, body { width: 1366px; height: 768px; }
       /* The grid fades out behind the app. */
-      body::before { mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.5) 30%, transparent 55%); }
+      /* Darker across the top, under the headline; the coils show around the app. */
+      body { --shade: linear-gradient(180deg, rgba(10, 6, 4, 0.6) 0%, rgba(10, 6, 4, 0.35) 30%, transparent 60%); --focus: 50% 65%; }
 
+      /* The grid fades out behind the app. */
+      body::after { mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.5) 30%, transparent 55%); }
       .top { position: absolute; left: 72px; right: 72px; top: 34px; display: flex; align-items: center; justify-content: space-between; }
       .brand { display: flex; align-items: center; gap: 13px; }
       .brand img { width: 46px; height: 46px; filter: drop-shadow(0 8px 14px rgba(8, 10, 60, 0.45)); }
@@ -58,6 +61,8 @@
           0 36px 90px rgba(5, 8, 50, 0.6),
           0 10px 26px rgba(5, 8, 50, 0.38);
       }
+      /* Acrylic: the app's frame is see-through (its `desktop` style), and Windows blurs what's behind the window. */
+      .window { backdrop-filter: blur(30px) saturate(1.3); }
       .window > img { display: block; width: 1366px; }
       /* The minimize, maximize and close buttons Windows draws over the page's own title bar. */
       .caption-buttons { position: absolute; top: 0; right: 0; display: flex; color: #1c1b19; }
@@ -77,7 +82,7 @@
     <script>
       // The same on every shot: how much it covers, where, and what it doesn't need. render.cjs fills in the count
       // from @uom/converters.
-      const FACTS = ['<span id="count">Every converter</span>', "US · Canada · Europe", "Works offline", "No account"];
+      const FACTS = ['<span id="count">Every converter</span>', "US · Canada · Europe", "Works offline"];
 
       // Each shot, in upload order: the need it meets in the customer's words (the last phrase in the bolt colour),
       // how the app meets it, and the app as it opens on `query` (role, region and converter; each converter opens on

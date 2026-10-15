@@ -122,7 +122,8 @@ async function renderListing() {
     nativeTheme.themeSource = theme;
     const page = offscreen(width, height, scale);
     await page.loadURL(`app://uom/index.html${query}`);
-    await page.webContents.executeJavaScript(`document.querySelector("#content").scrollTop = ${scroll}`);
+    // As in the real window (main.cjs): the frame is translucent over Windows 11's Acrylic, which shots.html draws.
+    await page.webContents.executeJavaScript(`document.documentElement.classList.add("desktop"); document.querySelector("#content").scrollTop = ${scroll}`);
     await capture(page, path.join(captures, `${name}.png`), { width: width * scale, height: height * scale });
     page.destroy();
     await renderPage(`shots.html#${name}`, path.join(dir, `screenshot-${i + 1}-${name}.png`), width, height, scale, `document.querySelector("#count").textContent = "${count} converters"`);
