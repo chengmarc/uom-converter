@@ -2,7 +2,7 @@
   "name": "uom-converter",
   "description": "Unit-of-measure conversions for the electrical industry.",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "license": "Apache-2.0",
   "type": "module",
   "workspaces": [

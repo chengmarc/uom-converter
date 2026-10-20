@@ -7,10 +7,20 @@ match the release tags (`v<version>`).
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-20
+
 ### Added
 
+- a table of common values on the length, weight, temperature, power, light level, torque,
+  box fill volume and metal price converters: each value in every unit, with the row for the
+  value you entered highlighted
 - the website, at https://uom-converter.com/: every converter at its own address with
   its own title and description, a sitemap, and an offline copy once visited
+
+### Fixed
+
+- the E/C/M price heading reads "per 1,000 (M)" instead of "per 1,000 (m)", which looked
+  like metres
 
 ### Removed
 
