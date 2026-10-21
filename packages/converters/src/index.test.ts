@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { setNumberStyle } from "./format";
-import { REGIONS } from "./regions";
+import type { Region } from "@uom/core/region";
+import { regionInfo, REGIONS } from "./regions";
 import { dyn, exampleValues, type Values } from "./model";
 import { TOOLS } from ".";
 
@@ -61,15 +62,81 @@ describe("unit converters' common values", () => {
 
 describe("price per E/C/M", () => {
   it("keeps the unit code a capital in the heading: (M) is per 1,000, (m) would be a metre", () => {
-    setNumberStyle(REGIONS[0].number);
     expect(answer("price", { price: "450", uom: "M" })?.heading).toBe("$450.00 per 1,000 (M) equals");
+  });
+});
+
+describe("voltage drop", () => {
+  // 12 AWG copper at 16 A, 120 V single-phase, against the default 3% target: 50 ft drops 2.58%,
+  // 70 ft 3.61%, 100 ft 5.15%.
+  const drop = (set: Record<string, string>, region: Region = "us") =>
+    answer("vdrop", { size: "12", amps: "16", volts: "120", ...set }, region)!;
+
+  it("is good within the target", () => {
+    expect(drop({ len: "50" }).rows[0]).toMatchObject({ status: "good", detail: "within your 3% target" });
+  });
+
+  it("warns between the target and 5%", () => {
+    expect(drop({ len: "70" }).rows[0]).toMatchObject({ status: "warn", detail: "over your 3% target" });
+  });
+
+  it("is bad over 5%", () => {
+    expect(drop({ len: "100" }).rows[0]).toMatchObject({ status: "bad", detail: "over 5%" });
+  });
+
+  it("has no warning band when the target is 5% or more", () => {
+    const out = drop({ len: "100", target: "6" });
+    expect(out.rows[0]).toMatchObject({ status: "good", detail: "within your 6% target" });
+    expect(out.visual).toMatchObject({ marks: [{ at: 6 }] });
+  });
+
+  it("warns when no listed size meets the target", () => {
+    expect(drop({ len: "3000", amps: "400" }).rows[3]).toMatchObject({ value: "Over 1000 kcmil", status: "warn" });
+  });
+
+  it("measures runs in feet in the US and metres elsewhere", () => {
+    expect(drop({ len: "100" }).heading).toContain("100 ft");
+    expect(drop({ len: "100" }, "ca").heading).toContain("100 m");
+  });
+});
+
+describe("UOM mix-up check", () => {
+  it("corrects whichever price is the higher one", () => {
+    expect(answer("mixup", { a: "1.25", b: "125" })!.rows[2]).toMatchObject({ label: "B corrected", value: "$1.25" });
+    expect(answer("mixup", { a: "450", b: "0.46" })!.rows[2]).toMatchObject({ label: "A corrected", value: "$0.45" });
+  });
+});
+
+describe("boxes & packs", () => {
+  it("warns when whole packs leave some over", () => {
+    expect(answer("packs", { need: "250", size: "100" })!.rows[1]).toMatchObject({ value: "300 each", status: "warn" });
+    expect(answer("packs", { need: "300", size: "100" })!.rows[1]).toMatchObject({ status: "good" });
+  });
+});
+
+describe("packaging levels", () => {
+  it("refuses a case that doesn't divide into whole inner packs", () => {
+    expect(output("packaging", { case: "100", inner: "12" })).toMatchObject({ fields: ["inner", "case"] });
+  });
+});
+
+describe("power factor correction", () => {
+  it("refuses a target that isn't higher than the present power factor", () => {
+    expect(output("pf", { kw: "100", pf1: "0.9", pf2: "0.85" })).toMatchObject({ fields: ["pf2"] });
+    expect(output("pf", { kw: "100", pf1: "0.9", pf2: "0.9" })).toMatchObject({ fields: ["pf2"] });
   });
 });
 
 const tool = (id: string) => TOOLS.find((t) => t.id === id)!;
 
-/** A converter's answer in the US, for the given inputs over its defaults. */
-function answer(id: string, set: Record<string, string>) {
-  const out = tool(id).compute(exampleValues(tool(id), set, "us"));
+/** What a converter gives in a region for the given inputs over its defaults, read and shown in the region's number style. */
+function output(id: string, set: Record<string, string>, region: Region = "us") {
+  setNumberStyle(regionInfo(region).number);
+  return tool(id).compute(exampleValues(tool(id), set, region));
+}
+
+/** The same, when it's an answer (not an error, or nothing yet). */
+function answer(id: string, set: Record<string, string>, region: Region = "us") {
+  const out = output(id, set, region);
   return out && "rows" in out ? out : undefined;
 }
