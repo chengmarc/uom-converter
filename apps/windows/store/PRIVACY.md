@@ -1,21 +1,27 @@
 Privacy Policy
 
 UOM Converter
-Last updated: October 15, 2026
+Last updated: October 21, 2026
 
-This policy covers UOM Converter in every form it ships in: the Microsoft Store edition, the Windows installer, and the website at https://uom-converter.com/.
+This policy covers UOM Converter in every form it ships in: the Microsoft Store edition, the Windows installer, the Android app on Google Play, and the website at https://uom-converter.com/.
 
 Summary
 
-UOM Converter does not collect, store, send, or share any personal information. The Windows app works entirely on your computer and never connects to the internet. The website does the same once loaded: it works out every answer in your browser and sends nothing back.
+UOM Converter does not collect, store, send, or share any personal information. The Windows and Android apps work entirely on your device and never connect to the internet. The website does the same once loaded: it works out every answer in your browser and sends nothing back.
 
-What the app does with data
+The Windows app
 
 • No network access. UOM Converter has no telemetry, analytics, crash reporting, advertising, accounts, or update checks. It never sends data to the developer or to anyone else.
 • Settings stay on your computer. The app remembers the role and region you picked, and the window's size and position, in its data folder on your computer:
    – Microsoft Store edition: %LOCALAPPDATA%\Packages\<package>\ (removed when you uninstall the app)
    – Installer: %APPDATA%\UOM Converter\
 • Your numbers aren't saved. Values you type are used to work out the answer on screen and are not stored or sent anywhere. When you click a result, it is copied to your clipboard and nothing else.
+
+The Android app
+
+• No network access. Like the Windows app, it has no telemetry, analytics, crash reporting, advertising, accounts, or update checks, and it loads nothing but its own files.
+• Settings stay on your phone. The app remembers the role and region you picked and the converters you opened last, in its own storage on your phone. Uninstalling the app, or clearing its storage in Android's settings, removes them.
+• Your numbers aren't saved. Values you type are used to work out the answer on screen and are not stored or sent anywhere. When you tap a result, it is copied to your clipboard and nothing else.
 
 The website
 
@@ -26,7 +32,7 @@ The website
 
 Third parties
 
-UOM Converter does not include any third-party services that collect data. Microsoft may collect information about Store downloads and installs under the Microsoft Privacy Statement (https://privacy.microsoft.com/privacystatement). That collection is separate from UOM Converter.
+UOM Converter does not include any third-party services that collect data. Microsoft may collect information about Store downloads and installs under the Microsoft Privacy Statement (https://privacy.microsoft.com/privacystatement), and Google about Play downloads and installs under the Google Privacy Policy (https://policies.google.com/privacy). That collection is separate from UOM Converter.
 
 Children
 
