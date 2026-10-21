@@ -186,9 +186,9 @@ function show(focus: boolean) {
 }
 
 /** Open a converter, switching to Everything if the current audience doesn't list it. */
-function open(id: string, focus = true) {
+function open(id: string) {
   if (!audience.tools.includes(id)) setAudience(EVERYTHING);
-  if (routeId() === id) show(focus);
+  if (routeId() === id) show(true);
   else navigate(id);
 }
 

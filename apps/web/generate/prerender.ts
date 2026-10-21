@@ -6,7 +6,7 @@ import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { BASE, OUT, SITE_URL } from "./site";
 
 /** A link as the page draws it: its text, and the absolute address. */
-export interface Link {
+interface Link {
   name: string;
   url: string;
 }
