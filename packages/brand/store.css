@@ -1,11 +1,12 @@
-/* The look shared by the Store's designed images (shots.html, logo.html): a photo of a power line pylon at sunset under a
+/* The look shared by the app stores' designed images (the Windows app's store/shots.html and logo.html, the Android
+   app's store/shots.html and feature.html): a photo of a power line pylon at sunset under a
    faint measuring grid as the background, and the icon's gold bolt as the accent. Sizes are relative, so the same background fits the wide
    screenshots and the square and tall logos. */
 
 @font-face {
   font-family: "Inter Variable";
   font-weight: 100 900;
-  src: url(../../../node_modules/@fontsource-variable/inter/files/inter-latin-opsz-normal.woff2) format("woff2-variations");
+  src: url(../../node_modules/@fontsource-variable/inter/files/inter-latin-opsz-normal.woff2) format("woff2-variations");
 }
 
 :root {
@@ -29,7 +30,7 @@ body::before {
   content: "";
   position: absolute;
   inset: -24px;
-  background: var(--shade, none), url(../../../packages/brand/photos/backdrop-2560.webp) var(--focus, center) / cover no-repeat;
+  background: var(--shade, none), url(photos/backdrop-2560.webp) var(--focus, center) / cover no-repeat;
   filter: blur(var(--blur, 4px)) brightness(0.8) saturate(1.05);
 }
 

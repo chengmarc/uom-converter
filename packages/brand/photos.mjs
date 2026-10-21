@@ -50,7 +50,7 @@ const SLOTS = {
   "product-data-thumb": { from: "cat-pim.jpg", crop: { left: 150, top: 150, width: 720, height: 720 }, widths: [240, 480, 720] },
 
   // Not a topic's: a pylon and its lines against the evening sky, whole, behind the Windows app's
-  // Store images (apps/windows/store/brand.css) and in the website's grey either side of the page
+  // Store images (store.css) and in the website's grey either side of the page
   // (apps/web/src/style.css). Each shows it dimmed, blurred or under navy, so it can be lighter
   // than the others.
   backdrop: { from: "base.jpg", widths: [2560], quality: 64 },
