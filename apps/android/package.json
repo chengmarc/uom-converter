@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "icons": "electron scripts/render-icons.cjs",
+    "store": "vite build && electron store/render.cjs",
     "dev": "node scripts/dev.mjs",
     "emulator": "node scripts/emulator.cjs",
     "sync": "vite build && cap sync android",

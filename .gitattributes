@@ -12,5 +12,9 @@ packages/brand/rendered/*.png linguist-generated
 apps/android/native/app/src/main/res/mipmap-*/*.png linguist-generated
 apps/android/store/icon-512.png linguist-generated
 
+# apps/android/store/render.cjs (`npm run android:store`), from @uom/brand's store look and the built app
+apps/android/store/feature-graphic.png linguist-generated
+apps/android/store/screenshots/*/*.png linguist-generated
+
 # packages/brand/photos.mjs (`npm run photos -w @uom/brand`), from originals/ (not in git)
 packages/brand/photos/*.webp linguist-generated

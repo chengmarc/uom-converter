@@ -25,6 +25,7 @@
     "android:dev": "npm run dev -w @uom/android",
     "android:emulator": "npm run emulator -w @uom/android",
     "android:icons": "npm run icons -w @uom/android",
+    "android:store": "npm run store -w @uom/android",
     "android:sync": "npm run sync -w @uom/android",
     "android:run": "npm run run -w @uom/android",
     "android:apk": "npm run apk -w @uom/android",

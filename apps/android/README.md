@@ -1,7 +1,7 @@
 # The Android app
 
 The converters on a phone: its own touch screens (`src/`) in a Capacitor app (`native/`), package
-`com.uomconverter.app`. A home screen of converter cards (the ones opened last, then by topic,
+`com.chengmarc.uomconverter`. A home screen of converter cards (the ones opened last, then by topic,
 with search and a filter by role), a screen per converter, and region in a settings sheet.
 
 ← Back to the [README](../../README.md).
@@ -74,6 +74,20 @@ npm run android:icons
 Redraws the launcher icons (`native/app/src/main/res/mipmap-*/`) and the Play icon
 (`store/icon-512.png`) from `@uom/brand`'s `app-icon.svg` (`scripts/render-icons.cjs`).
 
+### Refresh the Play listing images
+
+```
+npm run android:store
+```
+
+Builds the page and runs `store/render.cjs`, which draws the feature graphic
+(`store/feature-graphic.png`, from `store/feature.html`) and the phone screenshots
+for phones, 7-inch and 10-inch tablets (`store/screenshots/<device>/`, 1080 × 1920): each a caption
+over the real app at that device's size, as listed in `SHOTS` in `store/shots.html` with the
+region, role and screen it opens on. `scroll` scrolls a converter so its answer shows above the
+crop, the same on every device or set per device. Look them over before committing. Every other Play Console field
+is in [store/LISTING.md](store/LISTING.md), ready to paste.
+
 ## Explanation
 
 **Its own screens, the shared converters.** A phone gets a different layout from the desktop and
@@ -103,3 +117,7 @@ from it in `native/app/build.gradle` (1.2.3 is 10203).
 | `scripts/dev.mjs`, `scripts/emulator.cjs` | `npm run android:dev`, `npm run android:emulator` |
 | `scripts/render-icons.cjs` | `npm run android:icons` |
 | `store/icon-512.png` | The Play listing icon (rendered) |
+| `store/render.cjs` | `npm run android:store`: the feature graphic and phone screenshots |
+| `store/feature.html`, `store/shots.html` | Their designs, in `@uom/brand`'s `store.css` look |
+| `store/feature-graphic.png`, `store/screenshots/<device>/` | The images to upload (rendered) |
+| `store/LISTING.md` | Every Play Console field, ready to paste |

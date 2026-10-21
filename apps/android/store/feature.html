@@ -1,0 +1,54 @@
+<!doctype html>
+<!-- Google Play's feature graphic (1024 × 500): render.cjs loads this page at that size. The icon, the name and who
+     it's for over @uom/brand's store look, as on the Windows app's box art. Play may crop the edges or lay its
+     own buttons over the bottom, so everything sits in the middle. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../packages/brand/store.css" />
+    <style>
+      html, body { width: 1024px; height: 500px; }
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 44px;
+      }
+      /* Darker behind the icon and name; the pylon on the left and the sunset frame them. */
+      body { --shade: radial-gradient(closest-side, rgba(10, 6, 4, 0.5), transparent); --focus: 30% 62%; --blur: 3px; }
+      /* The grid fades out toward the middle. */
+      body::after { mask-image: radial-gradient(closest-side, transparent 35%, #000 100%); }
+
+      img {
+        position: relative;
+        width: 176px;
+        height: 176px;
+        filter: drop-shadow(0 14px 24px rgba(5, 8, 50, 0.5));
+      }
+      h1 {
+        position: relative;
+        margin: 0;
+        font-size: 64px;
+        line-height: 1;
+        font-weight: 760;
+        letter-spacing: -0.03em;
+        font-variation-settings: "opsz" 32;
+      }
+      p {
+        position: relative;
+        margin: 16px 0 0;
+        font-size: 27px;
+        font-weight: 520;
+        color: rgba(255, 255, 255, 0.82);
+      }
+      p em { font-style: normal; color: var(--bolt); }
+    </style>
+  </head>
+  <body>
+    <img src="../../../packages/brand/app-icon.svg" alt="" />
+    <div>
+      <h1>UOM Converter</h1>
+      <p>For the <em>electrical</em> trade</p>
+    </div>
+  </body>
+</html>
