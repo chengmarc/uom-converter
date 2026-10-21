@@ -543,6 +543,21 @@ tr.hit td { background: var(--sunken); color: var(--accent); font-weight: 600; }
 
 /* 1. The page: a fixed-width column on grey. Everything full-width before stops at its edges. */
 body { background: var(--page); }
+/* Where there's grey to see, the trade behind the page: a pylon and its lines at dusk (@uom/brand's
+   backdrop, as behind the Store images), held still as the page scrolls, under navy so the page
+   stays in front. The tower falls in the left margin, sky and lines in the right. */
+@media (min-width: 1180px) {
+  body {
+    --backdrop-wash: 0.55;
+    background:
+      linear-gradient(rgb(var(--brand-rgb) / var(--backdrop-wash)), rgb(var(--brand-rgb) / var(--backdrop-wash))),
+      url("@uom/brand/photos/backdrop-2560.webp") left center / cover no-repeat fixed,
+      var(--page);
+  }
+}
+@media (min-width: 1180px) and (prefers-color-scheme: dark) {
+  body { --backdrop-wash: 0.8; }
+}
 .site-header, main, .site-footer { width: 100%; max-width: 1100px; margin-inline: auto; }
 main { background: var(--surface); border-inline: 1px solid var(--page-edge); }
 

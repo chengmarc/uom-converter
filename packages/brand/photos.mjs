@@ -49,10 +49,11 @@ const SLOTS = {
   "product-data-banner": { from: "cat-pim.jpg", crop: { left: 0, top: 230, width: 1620, height: 270 }, widths: [800, 1200, 1620] },
   "product-data-thumb": { from: "cat-pim.jpg", crop: { left: 150, top: 150, width: 720, height: 720 }, widths: [240, 480, 720] },
 
-  // Not in the apps: a pylon and its lines against the evening sky, whole, behind the Windows app's
-  // Store images (apps/windows/store/brand.css). Each image shows the part it needs, blurred and
-  // darkened, so it can be lighter than the others.
-  "store-backdrop": { from: "base.jpg", widths: [2560], quality: 64 },
+  // Not a topic's: a pylon and its lines against the evening sky, whole, behind the Windows app's
+  // Store images (apps/windows/store/brand.css) and in the website's grey either side of the page
+  // (apps/web/src/style.css). Each shows it dimmed, blurred or under navy, so it can be lighter
+  // than the others.
+  backdrop: { from: "base.jpg", widths: [2560], quality: 64 },
 };
 
 mkdirSync(OUT, { recursive: true });

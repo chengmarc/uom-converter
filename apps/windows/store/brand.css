@@ -22,14 +22,14 @@ body {
   background: #140d09;
 }
 
-/* The trade itself: a pylon and its lines against the evening sky (@uom/brand's store-backdrop), blurred and
+/* The trade itself: a pylon and its lines against the evening sky (@uom/brand's backdrop), blurred and
    darkened so text and the app stay readable. Each page sets --shade, a darker layer over the photo where its own
    text sits, and --focus, the part of the photo it shows. The inset hides the blur's soft edges. */
 body::before {
   content: "";
   position: absolute;
   inset: -24px;
-  background: var(--shade, none), url(../../../packages/brand/photos/store-backdrop-2560.webp) var(--focus, center) / cover no-repeat;
+  background: var(--shade, none), url(../../../packages/brand/photos/backdrop-2560.webp) var(--focus, center) / cover no-repeat;
   filter: blur(var(--blur, 4px)) brightness(0.8) saturate(1.05);
 }
 
