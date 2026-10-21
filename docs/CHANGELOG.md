@@ -7,6 +7,11 @@ match the release tags (`v<version>`).
 
 ## [Unreleased]
 
+### Fixed
+
+- in the US and Canada, a number with a comma that doesn't separate thousands, such as
+  "7,4", is an error instead of being read as 74
+
 ## [1.1.0] - 2026-10-20
 
 ### Added
