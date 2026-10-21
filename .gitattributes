@@ -1,0 +1,16 @@
+# Images made by the repo's own scripts, committed because they're used as files (store uploads,
+# the README, the website's build) and need Electron or the photo originals to make. GitHub folds
+# them in diffs and leaves them out of the language stats. Change the source and re-run, not these.
+
+# apps/windows/store/render.cjs (`npm run windows:assets`), from @uom/brand's app-icon.svg and the built app
+apps/windows/src/main/icon.png linguist-generated
+apps/windows/packaging/appx/*.png linguist-generated
+apps/windows/store/listing/*.png linguist-generated
+packages/brand/rendered/*.png linguist-generated
+
+# apps/android/scripts/render-icons.cjs (`npm run android:icons`), from @uom/brand's app-icon.svg
+apps/android/native/app/src/main/res/mipmap-*/*.png linguist-generated
+apps/android/store/icon-512.png linguist-generated
+
+# packages/brand/photos.mjs (`npm run photos -w @uom/brand`), from originals/ (not in git)
+packages/brand/photos/*.webp linguist-generated
