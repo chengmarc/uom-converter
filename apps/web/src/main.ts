@@ -8,8 +8,10 @@ import { TOOLS } from "@uom/converters";
 import { parseNumber, setNumberStyle } from "@uom/converters/format";
 import { dyn, type Converter, type Topic, type Values } from "@uom/converters/model";
 import { guessRegion, regionInfo, REGIONS } from "@uom/converters/regions";
-import { AUDIENCES, type Audience } from "@uom/ui/audiences";
+import { ALL_AUDIENCES, EVERYTHING, type Audience } from "@uom/ui/audiences";
 import { el, renderConverter } from "@uom/ui/converter";
+import { photoLibrary, TOPIC_SLOTS } from "@uom/ui/photos";
+import { store, stored } from "@uom/ui/storage";
 import { HOME, idFromPath, PAGES, topicFromPath, TOPIC_PAGES } from "./pages";
 import { registerOffline, STORE_URL } from "./site";
 
@@ -19,13 +21,6 @@ const BASE = __SITE_BASE__;
 const NAME = "UOM Converter";
 
 const byId = new Map(TOOLS.map((t) => [t.id, t]));
-const EVERYTHING: Audience = {
-  id: "all",
-  label: "Everything",
-  description: "Every converter, grouped by topic.",
-  tools: TOOLS.map((t) => t.id),
-};
-const ALL_AUDIENCES = [EVERYTHING, ...AUDIENCES];
 /** Topics in the order of their first converter. */
 const TOPICS = [...new Set(TOOLS.map((t) => t.topic))];
 const topicAnchor = (t: Topic) => t.toLowerCase().replace(/[^a-z]+/g, "-");
@@ -36,47 +31,14 @@ const main = document.querySelector<HTMLElement>("#main")!;
 
 // ---------- Photos ----------
 
-// As scripts/images.mjs writes them: "<slot>-<width>.webp", each slot at a few widths.
-const PHOTO_FILES = import.meta.glob<string>("./images/*.webp", { eager: true, query: "?url", import: "default" });
-const PHOTOS = new Map<string, { width: number; url: string }[]>();
-for (const [path, url] of Object.entries(PHOTO_FILES)) {
-  const base = path.slice(path.lastIndexOf("/") + 1, -".webp".length);
-  const dash = base.lastIndexOf("-");
-  const slot = base.slice(0, dash);
-  PHOTOS.set(slot, [...(PHOTOS.get(slot) ?? []), { width: Number(base.slice(dash + 1)), url }].sort((a, b) => a.width - b.width));
-}
-
-/**
- * A photo slot as an <img> with every width it comes in, so the browser loads the one it needs
- * for `sizes` (how wide it's shown). `alt` is empty when the photo only decorates. Undefined
- * when the slot has no photo yet: the page goes without.
- */
-function photo(slot: string, sizes: string, alt: string, cls?: string): HTMLImageElement | undefined {
-  const files = PHOTOS.get(slot);
-  if (!files) return undefined;
-  const img = el("img", cls);
-  img.src = files.at(-1)!.url;
-  img.srcset = files.map((f) => `${f.url} ${f.width}w`).join(", ");
-  img.sizes = sizes;
-  img.alt = alt;
-  img.decoding = "async";
-  return img;
-}
-
-function stored(key: string): string | undefined {
-  try {
-    return localStorage.getItem(key) ?? undefined;
-  } catch {
-    return undefined;
-  }
-}
-function store(key: string, value: string) {
-  try {
-    localStorage.setItem(key, value);
-  } catch {
-    // Storage blocked: the choice still applies for this visit via the URL.
-  }
-}
+// Every size of every photo (@uom/ui/photos), for srcset to choose from; not the apps' own ("app-…").
+const photo = photoLibrary(
+  import.meta.glob<string>(["../../../packages/brand/photos/*.webp", "!**/app-*.webp"], {
+    eager: true,
+    query: "?url",
+    import: "default",
+  }),
+);
 
 const params = new URLSearchParams(location.search);
 let audience = ALL_AUDIENCES.find((a) => a.id === (params.get("for") ?? stored("uom.audience"))) ?? EVERYTHING;
@@ -132,7 +94,7 @@ function link(href: string, text: string, cls?: string) {
 
 /** A topic's square photo, small, for beside a link: decorative, so the link's text says it all. */
 function thumbnail(topic: Topic, cls: string): HTMLImageElement | undefined {
-  const img = photo(`${TOPIC_PAGES[topic].slug}-thumb`, "5rem", "", cls);
+  const img = photo(`${TOPIC_SLOTS[topic]}-thumb`, "5rem", "", cls);
   if (img) img.loading = "lazy";
   return img;
 }
@@ -208,7 +170,7 @@ function categoryStrip(): HTMLElement {
   const list = el("ul");
   for (const t of TOPICS) {
     const a = link(topicPath(t), "");
-    const img = photo(`${TOPIC_PAGES[t].slug}-thumb`, "(max-width: 640px) 9rem, 20vw", "");
+    const img = photo(`${TOPIC_SLOTS[t]}-thumb`, "(max-width: 640px) 9rem, 20vw", "");
     if (img) {
       img.setAttribute("fetchpriority", "high");
       a.append(img);
@@ -351,7 +313,7 @@ function toTop() {
  */
 function categoryBand(topic: Topic, trail: HTMLAnchorElement[], title: HTMLElement, alt = ""): HTMLElement {
   const band = el("section", "category-band");
-  const img = photo(`${TOPIC_PAGES[topic].slug}-banner`, "100vw", alt, "category-photo");
+  const img = photo(`${TOPIC_SLOTS[topic]}-banner`, "100vw", alt, "category-photo");
   if (img) {
     img.setAttribute("fetchpriority", "high");
     band.append(img);

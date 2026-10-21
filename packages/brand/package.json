@@ -1,8 +1,15 @@
 {
   "name": "@uom/brand",
-  "description": "The app icon every app's icons are made from. public/ is each app's Vite public folder: served as-is in dev, copied into every build.",
+  "description": "What every app looks like: the app icon (public/, each app's Vite public folder: served as-is in dev, copied into every build) and the photos (photos/, made from originals/ by scripts/photos.mjs; @uom/ui/photos shows them).",
   "private": true,
+  "type": "module",
   "exports": {
     "./app-icon.svg": "./public/app-icon.svg"
+  },
+  "scripts": {
+    "photos": "node scripts/photos.mjs"
+  },
+  "devDependencies": {
+    "sharp": "0.35.5"
   }
 }

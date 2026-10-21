@@ -181,7 +181,7 @@ export interface TopicPage extends Page {
   intro: string;
   /**
    * What the topic's banner photo shows, for anyone who can't see it (its alt text). The photo is
-   * src/images/<slug>-banner-*.webp, made by scripts/images.mjs: change this with the photo.
+   * packages/brand/photos/<slot>-banner-*.webp, made by its scripts/photos.mjs: change this with the photo.
    */
   photo: string;
 }

@@ -2,6 +2,8 @@
 // that order, and the buttons follow the order of this list. Adding an audience is a data change
 // here, nothing else.
 
+import { TOOLS } from "@uom/converters";
+
 /** "all" is the Everything view. Each id has an icon in icons.ts. */
 export type AudienceId = "all" | "supplier" | "distributor" | "counter" | "electrician" | "engineer" | "pim";
 
@@ -51,3 +53,14 @@ export const AUDIENCES: Audience[] = [
     tools: ["uom-codes", "metric", "price-qty", "price", "wire-price", "mixup", "packaging", "packs"],
   },
 ];
+
+/** Everything: every converter, in the order they're listed. */
+export const EVERYTHING: Audience = {
+  id: "all",
+  label: "Everything",
+  description: "Every converter, grouped by topic.",
+  tools: TOOLS.map((t) => t.id),
+};
+
+/** Everything first, then the audiences: the choices the apps offer. */
+export const ALL_AUDIENCES = [EVERYTHING, ...AUDIENCES];

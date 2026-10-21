@@ -2,5 +2,5 @@ node_modules
 dist
 release
 .wrangler
-apps/web/src/img/
+packages/brand/originals/
 build

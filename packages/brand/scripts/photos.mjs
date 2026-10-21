@@ -1,30 +1,32 @@
-// Makes the website's photos (apps/web/src/images/) from the originals in apps/web/src/img/:
-// each slot below crops its original and writes WebP files at a few widths, so a page loads only
-// the size it shows. `npm run images -w @uom/web` after adding or changing an original.
+// Makes the apps' photos (photos/) from the originals in originals/: each slot below crops its
+// original and writes WebP files at a few widths, so a page loads only the size it shows. Each app
+// bundles the ones it uses (@uom/ui/photos). `npm run photos -w @uom/brand` after adding or
+// changing an original.
 //
 // The originals stay out of git (.gitignore): they're large, and only the crops are published.
-// To use a different photo for a slot, put it in src/img/ and change the slot's `from` and crops.
+// To use a different photo for a slot, put it in originals/ and change the slot's `from` and crops.
 //
 // Crops are { left, top, width, height } in the original's pixels. Pick them to keep faces,
-// brand names and clutter out of frame; `npm run images` prints each crop's size to check.
+// brand names and clutter out of frame; `npm run photos` prints each crop's size to check.
 
 import { mkdirSync, readdirSync, rmSync } from "node:fs";
 import { join, resolve } from "node:path";
 import sharp from "sharp";
 
-const SRC = resolve(import.meta.dirname, "../src/img");
-const OUT = resolve(import.meta.dirname, "../src/images");
+const SRC = resolve(import.meta.dirname, "../originals");
+const OUT = resolve(import.meta.dirname, "../photos");
 
 /** Each use of a photo: its crop, and the widths it's written at (never wider than the crop). */
 const SLOTS = {
   // Each topic: a banner for the band across its pages, and a square for the home page's strip and
-  // the thumbnails beside its converters.
+  // the thumbnails beside its converters. Every topic needs both (@uom/ui/photos TOPIC_SLOTS), at
+  // 240 and 800 at least: the Android app shows those two.
   //
-  // The band is the window's full width but only about 110px tall, so it shows a thin slice of the
-  // banner's middle. Banners are cut 6:1 around the slice worth seeing (rows of stock, of wiring,
-  // of tools, of labels) and written up to the photo's own width; under the band's navy, a photo
-  // stretched past that doesn't show it. Squares go up to their crop's size: the home page's strip
-  // shows them at a fifth of the window.
+  // On the website, the band is the window's full width but only about 110px tall, so it shows a
+  // thin slice of the banner's middle. Banners are cut 6:1 around the slice worth seeing (rows of
+  // stock, of wiring, of tools, of labels) and written up to the photo's own width; under the
+  // band's navy, a photo stretched past that doesn't show it. Squares go up to their crop's size:
+  // the home page's strip shows them at a fifth of the window.
   //
   // Above the worker at a desk on the right edge, so the full width can be used.
   "pricing-banner": { from: "1800x1200-3.jpg", crop: { left: 0, top: 320, width: 1800, height: 300 }, widths: [800, 1200, 1800] },
@@ -40,6 +42,12 @@ const SLOTS = {
   // The labels on the cartons.
   "product-data-banner": { from: "2D-Barcodes-scaled.jpg", crop: { left: 0, top: 230, width: 1620, height: 270 }, widths: [800, 1200, 1620] },
   "product-data-thumb": { from: "2D-Barcodes-scaled.jpg", crop: { left: 150, top: 150, width: 720, height: 720 }, widths: [240, 480, 720] },
+
+  // The Android app's home header (apps/android/src/style.css), under the logo's gradient: the
+  // shop floor, its coils, barriers and wall, right of the worker and left of the reel with its
+  // maker's name. 1.6:1, so shown a phone's width across it's taller than the header; 1080 is a
+  // phone's width in pixels. Its overlay hides fine detail, so it can be lighter than the others.
+  "app-header": { from: "hero.jpg", crop: { left: 1980, top: 62, width: 3681, height: 2301 }, widths: [1080], quality: 64 },
 };
 
 mkdirSync(OUT, { recursive: true });

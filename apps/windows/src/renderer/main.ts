@@ -2,24 +2,18 @@
 // Weight and optical-size axes: headings and big result values get display-cut letterforms.
 import "@fontsource-variable/inter/opsz.css";
 import type { Region } from "@uom/core/region";
-import { AUDIENCES, type Audience } from "@uom/ui/audiences";
+import { ALL_AUDIENCES, EVERYTHING, type Audience } from "@uom/ui/audiences";
 import { TOOLS } from "@uom/converters";
 import { icon } from "@uom/ui/icons";
 import { guessRegion, regionInfo, REGIONS } from "@uom/converters/regions";
 import { setNumberStyle } from "@uom/converters/format";
-import { dyn, type Converter, type Values } from "@uom/converters/model";
+import type { Converter } from "@uom/converters/model";
 import { el, renderConverter } from "@uom/ui/converter";
+import { search } from "@uom/ui/search";
+import { store, stored } from "@uom/ui/storage";
 
 // audiences.test.ts checks every id an audience lists exists.
 const byId = new Map(TOOLS.map((t) => [t.id, t]));
-
-const EVERYTHING: Audience = {
-  id: "all",
-  label: "Everything",
-  description: "Every converter, grouped by topic.",
-  tools: TOOLS.map((t) => t.id),
-};
-
 
 // ---------- Page ----------
 
@@ -35,23 +29,7 @@ const audienceBar = document.querySelector<HTMLElement>("#audience")!;
 const regionBar = document.querySelector<HTMLElement>("#region")!;
 const audienceDesc = document.querySelector<HTMLElement>("#audience-desc")!;
 
-function stored(key: string): string | undefined {
-  try {
-    return localStorage.getItem(key) ?? undefined;
-  } catch {
-    return undefined;
-  }
-}
-function store(key: string, value: string) {
-  try {
-    localStorage.setItem(key, value);
-  } catch {
-    // Storage blocked: the choice still applies for this visit via the URL.
-  }
-}
-
 const params = new URLSearchParams(location.search);
-const ALL_AUDIENCES = [EVERYTHING, ...AUDIENCES];
 let audience = ALL_AUDIENCES.find((a) => a.id === (params.get("for") ?? stored("uom.audience"))) ?? EVERYTHING;
 // A converter's own page always opens on that converter, whatever the audience last chosen.
 const landing = routeId();
@@ -83,16 +61,6 @@ function navLink(id: string, text: string) {
 
 const find = document.querySelector<HTMLInputElement>("#find")!;
 
-/** Converters matching the search: name matches before description matches, each in the audience's order. */
-function search(query: string): Converter[] {
-  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
-  const has = (text: string) => words.every((w) => text.toLowerCase().includes(w));
-  const byName = (t: Converter) => has(`${t.title} ${t.topic} ${t.id}`);
-  const blurb = (t: Converter) => dyn(t.blurb, { region } as Values); // descriptions only read the region
-  const rank = (t: Converter) =>
-    (byName(t) ? 0 : 2 * TOOLS.length) + (audience.tools.includes(t.id) ? audience.tools.indexOf(t.id) : TOOLS.length + TOOLS.indexOf(t));
-  return TOOLS.filter((t) => byName(t) || has(blurb(t))).sort((a, b) => rank(a) - rank(b));
-}
 
 function navGroup(title: string, tools: Converter[], topicIcon?: string) {
   const section = el("div", "nav-group");
@@ -108,7 +76,7 @@ function navGroup(title: string, tools: Converter[], topicIcon?: string) {
 function buildNav() {
   const query = find.value.trim();
   if (query) {
-    const found = search(query);
+    const found = search(query, audience, region);
     const mine = found.filter((t) => audience.tools.includes(t.id));
     const others = found.filter((t) => !audience.tools.includes(t.id));
     sidebar.replaceChildren();
