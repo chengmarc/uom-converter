@@ -7,7 +7,8 @@ Center by hand. Images are in [listing/](listing/), rendered by `npm run windows
 ## Properties
 
 - **Category:** Utilities & tools. **Subcategory:** none.
-- **Privacy policy:** paste [PRIVACY.md](PRIVACY.md) as it is; it's plain text, written for Partner Center's box.
+- **Privacy policy:** paste [PRIVACY.md](PRIVACY.md) as it is: it's the repo's [PRIVACY.md](../../../PRIVACY.md) as plain
+  text for Partner Center's box, written by [privacy.cjs](privacy.cjs) (run it after changing that one).
 - **Website:** `https://uom-converter.com/`
 - **Support contact info:** `https://github.com/chengmarc/uom-converter/issues`
 - **System requirements:** leave every row unchecked; the app runs on any PC that runs Windows 10 (1809) or later.

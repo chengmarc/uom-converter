@@ -1,6 +1,6 @@
 # Privacy Policy
 
-**UOM Converter**
+**UOM Converter**\
 Last updated: October 15, 2026
 
 This policy covers UOM Converter in every form it ships in: the Microsoft Store edition, the
