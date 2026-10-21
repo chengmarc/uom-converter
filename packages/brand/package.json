@@ -1,11 +1,12 @@
 {
   "name": "@uom/brand",
-  "description": "What every app looks like: the colours (tokens.css, which each app's stylesheet @imports), the app icon (app-icon.svg; vite.ts puts it at /app-icon.svg in the apps built with Vite) and the photos (photos/, made from originals/ by photos.mjs; @uom/ui/photos shows them).",
+  "description": "What every app looks like: the colours (tokens.css, which each app's stylesheet @imports; tokens.ts reads them where CSS can't reach), the app icon (app-icon.svg; vite.ts puts it at /app-icon.svg in the apps built with Vite) and the photos (photos/, made from originals/ by photos.mjs; @uom/ui/photos shows them).",
   "private": true,
   "type": "module",
   "exports": {
     "./app-icon.svg": "./app-icon.svg",
-    "./tokens.css": "./tokens.css"
+    "./tokens.css": "./tokens.css",
+    "./tokens": "./tokens.ts"
   },
   "scripts": {
     "photos": "node photos.mjs"

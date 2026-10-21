@@ -10,9 +10,11 @@
    exception is a photo, which may sit under a see-through navy (--brand-rgb) so white text reads
    on it. The app icon keeps its own vivid azure-to-indigo and gold, to stand out where people find
    the app; the apps themselves don't use them.
-   Some are copied where CSS can't reach, and a test checks each copy: the Windows app's frame
-   (--sunken, --text; apps/windows/src/main/theme.test.ts) and the Android splash and web view
-   (--bg; apps/android/src/theme.test.ts). */
+   Where CSS can't reach, tokens.ts reads them: the website's theme-color and web manifest
+   (--brand, --surface) come from it at build time. The copies made by hand are checked by a test
+   that reads them through it: the Windows app's frame (--sunken, --text;
+   apps/windows/src/main/theme.test.ts) and the Android splash and web view (--bg;
+   apps/android/src/theme.test.ts). */
 
 :root {
   /* The two blues, and what's written on them. */

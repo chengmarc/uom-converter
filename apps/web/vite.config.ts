@@ -25,6 +25,7 @@ import { pathToFileURL } from "node:url";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { defineConfig, type Plugin } from "vite";
 import type { Topic } from "@uom/converters/model";
+import { token } from "@uom/brand/tokens";
 import { appIcon } from "../../packages/brand/vite";
 import { HOME, PAGES, TOPIC_PAGES, type Page, type TopicPage } from "./src/pages";
 
@@ -144,8 +145,9 @@ function head(page: Page, kind: Kind, drawn: Drawn, leaf: string, noindex = fals
     `<meta name="twitter:description" content="${description}" />`,
     `<meta name="twitter:image" content="${SITE_URL}og.png" />`,
     `<meta name="twitter:image:alt" content="${esc(OG_ALT)}" />`,
-    `<meta name="theme-color" content="#f7f6f3" media="(prefers-color-scheme: light)" />`,
-    `<meta name="theme-color" content="#131312" media="(prefers-color-scheme: dark)" />`,
+    // The browser's bar takes the header's navy.
+    `<meta name="theme-color" content="${token("brand", "light")}" media="(prefers-color-scheme: light)" />`,
+    `<meta name="theme-color" content="${token("brand", "dark")}" media="(prefers-color-scheme: dark)" />`,
     `<link rel="manifest" href="${BASE}manifest.webmanifest" />`,
     `<link rel="apple-touch-icon" href="${BASE}icon-256.png" />`,
     // A data block, not a script: the page's CSP doesn't apply to it. A page kept out of search has none.
@@ -343,8 +345,9 @@ function sitePages(): Plugin {
             start_url: BASE,
             scope: BASE,
             display: "standalone",
-            background_color: "#f7f6f3",
-            theme_color: "#f7f6f3",
+            // The installed app opens on the page's white, under the header's navy.
+            background_color: token("surface", "light"),
+            theme_color: token("brand", "light"),
             icons: [
               { src: `${BASE}app-icon.svg`, sizes: "any", type: "image/svg+xml" },
               { src: `${BASE}icon-256.png`, sizes: "256x256", type: "image/png" },
