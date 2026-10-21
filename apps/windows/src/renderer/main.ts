@@ -59,7 +59,6 @@ function navLink(id: string, text: string) {
 
 const find = document.querySelector<HTMLInputElement>("#find")!;
 
-
 function navGroup(title: string, tools: Converter[], topicIcon?: string) {
   const section = el("div", "nav-group");
   const h = el("h2");

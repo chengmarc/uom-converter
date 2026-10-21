@@ -92,29 +92,28 @@ function thumbnail(topic: Topic, cls: string): HTMLImageElement | undefined {
   return img;
 }
 
-/**
- * A converter's tile: its topic's photo, its name and what it works out. Every converter on a
- * topic shows the same photo, as a supplier's catalogue shows one picture for a product line.
- */
-function tile(t: Converter) {
+/** A tile linking to a page: its topic's photo, its name and what it's for. */
+function tile(href: string, topic: Topic, title: string, text: string) {
   const a = el("a", "tile");
-  a.href = pathFor(t.id);
-  const thumb = thumbnail(t.topic, "tile-thumb");
+  a.href = href;
+  const thumb = thumbnail(topic, "tile-thumb");
   if (thumb) {
     a.classList.add("has-thumb");
     a.append(thumb);
   }
-  a.append(el("span", "tile-title", t.title), el("span", "tile-text", blurb(t, region)));
-  return a;
+  a.append(el("span", "tile-title", title), el("span", "tile-text", text));
+  const li = el("li");
+  li.append(a);
+  return li;
 }
 
+/**
+ * Converters' tiles. Every converter on a topic shows the same photo, as a supplier's catalogue
+ * shows one picture for a product line.
+ */
 function tiles(tools: Converter[]) {
   const list = el("ul", "tiles");
-  for (const t of tools) {
-    const li = el("li");
-    li.append(tile(t));
-    list.append(li);
-  }
+  list.append(...tools.map((t) => tile(pathFor(t.id), t.topic, t.title, blurb(t, region))));
   return list;
 }
 
@@ -447,19 +446,7 @@ function topicView(topic: Topic): Node[] {
   const oh = el("h2", undefined, "Other topics");
   oh.id = "others-h";
   const ul = el("ul", "tiles");
-  for (const t of TOPICS.filter((x) => x !== topic)) {
-    const a = el("a", "tile");
-    a.href = topicPath(t);
-    const thumb = thumbnail(t, "tile-thumb");
-    if (thumb) {
-      a.classList.add("has-thumb");
-      a.append(thumb);
-    }
-    a.append(el("span", "tile-title", TOPIC_PAGES[t].heading), el("span", "tile-text", TOPIC_PAGES[t].description));
-    const li = el("li");
-    li.append(a);
-    ul.append(li);
-  }
+  ul.append(...TOPICS.filter((x) => x !== topic).map((t) => tile(topicPath(t), t, TOPIC_PAGES[t].heading, TOPIC_PAGES[t].description)));
   others.append(oh, ul);
   article.append(others);
 
