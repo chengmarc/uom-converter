@@ -55,12 +55,3 @@ export const REGIONS: RegionInfo[] = [
 ];
 
 export const regionInfo = (id: Region) => REGIONS.find((r) => r.id === id)!;
-
-/** A first guess from the browser language: en-US → US, *-CA → Canada, European languages → Europe. */
-export function guessRegion(): Region {
-  const lang = (navigator.language || "en-US").toLowerCase();
-  if (lang.endsWith("-ca")) return "ca";
-  if (lang === "en-us" || lang === "en" || lang.endsWith("-us")) return "us";
-  if (/^(de|fr|nl|it|es|pt|sv|da|nb|nn|no|fi|pl|cs|sk|hu|ro|el|bg|hr|sl|et|lv|lt)\b/.test(lang) || lang === "en-gb" || lang === "en-ie") return "eu";
-  return "us";
-}

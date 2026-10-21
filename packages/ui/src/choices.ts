@@ -4,7 +4,7 @@
 
 import type { Region } from "@uom/core/region";
 import { setNumberStyle } from "@uom/converters/format";
-import { guessRegion, regionInfo, REGIONS } from "@uom/converters/regions";
+import { regionInfo, REGIONS } from "@uom/converters/regions";
 import { ALL_AUDIENCES, EVERYTHING, type Audience } from "./audiences";
 import { store, stored } from "./storage";
 
@@ -30,4 +30,13 @@ export function chosenRegion(params?: URLSearchParams): Region {
 export function chooseRegion(r: Region) {
   store("uom.region", r);
   setNumberStyle(regionInfo(r).number);
+}
+
+/** A first guess from the browser language: en-US → US, *-CA → Canada, European languages → Europe. */
+function guessRegion(): Region {
+  const lang = (navigator.language || "en-US").toLowerCase();
+  if (lang.endsWith("-ca")) return "ca";
+  if (lang === "en-us" || lang === "en" || lang.endsWith("-us")) return "us";
+  if (/^(de|fr|nl|it|es|pt|sv|da|nb|nn|no|fi|pl|cs|sk|hu|ro|el|bg|hr|sl|et|lv|lt)\b/.test(lang) || lang === "en-gb" || lang === "en-ie") return "eu";
+  return "us";
 }
