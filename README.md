@@ -113,7 +113,13 @@ SDK and passes `HTTPS_PROXY` on to Gradle.
 npm run android:run     # build, install and open on the running emulator or device
 npm run android:apk     # debug .apk in apps/android/native/app/build/outputs/apk/debug/
 npm run android:icons   # re-render the launcher icons and the Play icon from the app icon
+npm run android:emulator  # open the emulator with the app installed (or apps/android/emulator.cmd)
 ```
+
+Every emulator these scripts start gets this computer's proxy (Windows' system proxy, or
+`UOM_PROXY=host:port`), so where Google is only reachable through one, the Play Store still works.
+They draw in software (`UOM_GPU=host` for the GPU), since on some laptops with two GPUs, apps such
+as Chrome otherwise show black in the emulator's window.
 
 Its Capacitor settings are in `apps/android/capacitor.config.ts`. The version comes from the
 root `package.json` (1.2.3 is Play's versionCode 10203).

@@ -23,6 +23,7 @@
     "dist:win": "npm run dist -w @uom/windows",
     "dist:store": "npm run dist:store -w @uom/windows",
     "store:assets": "npm run store:assets -w @uom/windows",
+    "android:emulator": "npm run emulator -w @uom/android",
     "android:icons": "npm run icons -w @uom/android",
     "android:sync": "npm run sync -w @uom/android",
     "android:run": "npm run run -w @uom/android",

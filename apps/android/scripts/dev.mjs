@@ -1,7 +1,7 @@
 // Live preview of the Android app on an emulator or USB-connected phone (with neither, it starts
 // your emulator: sdk.cjs). Vite's dev server for the page, and a debug build of the app that loads
-// it from there, so a saved change appears on the phone at once. `npm run dev:android` (or preview.cmd); Ctrl+C or closing the
-// console stops it.
+// it from there, so a saved change appears on the phone at once. `npm run dev:android`; Ctrl+C or
+// closing the console stops it.
 //   1. builds the page and syncs the native project with UOM_DEV_URL set (capacitor.config.ts)
 //   2. installs and opens the app, with the phone's localhost:<port> reaching this computer's
 //   3. when stopped, syncs again without it, so the native project holds the real page again

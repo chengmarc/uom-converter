@@ -6,6 +6,7 @@
   "scripts": {
     "icons": "electron scripts/render-icons.cjs",
     "dev": "node scripts/dev.mjs",
+    "emulator": "node scripts/emulator.cjs",
     "sync": "vite build && cap sync android",
     "run": "npm run sync && node scripts/gradle.cjs installDebug --launch",
     "apk": "npm run sync && node scripts/gradle.cjs assembleDebug",
