@@ -38,7 +38,8 @@ packages/
                  formats and regions; diagrams and tables as data, so nothing here depends on a page
   ui/            @uom/ui: a converter drawn as HTML (form, result, diagrams), the roles and the
                  icons, for the apps built on a web page; each styles it its own way
-  brand/         @uom/brand: the app icon every app's icons are made from
+  brand/         @uom/brand: the look every app shares: colours, the app icon (every app's icons are
+                 made from it), the topic photos, and the rendered icon and share image
 apps/
   web/           the website: header, home page, a page per converter, footer, and its build
   windows/       the Electron app: its page (src/renderer/) and shell (src/main/), Store assets
@@ -99,7 +100,7 @@ The Store build is an MSIX package. Partner Center signs it on submission, so it
 certificate of its own.
 
 ```
-npm run windows:assets   # re-render the app icon and apps/windows/store/ from the icon and the built page
+npm run windows:assets   # re-render the icons, apps/windows/store/ and the website's icon and share image
 npm run windows:appx     # UOM-Converter-<version>.appx
 ```
 

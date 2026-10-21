@@ -23,7 +23,8 @@ the repo root.
    npm run typecheck
    ```
 
-5. **Refresh the images** if the app's look, the icon or the screenshots' converters changed:
+5. **Refresh the images** if the app's look, the icon or the screenshots' converters changed. This
+   also re-renders the website's icon and share image (below), which go live with its next deploy:
 
    ```
    npm run windows:assets
@@ -104,3 +105,4 @@ Everything else electron-builder leaves there (`win-unpacked/`, `.blockmap` file
 | `src/main/icon.png` | The window, taskbar and installer icon |
 | `packaging/appx/` | Start, tile and taskbar icons inside the `.appx` |
 | `store/listing/` | Partner Center: store logo, box and poster art (designed in `store/logo.html`) and screenshots (captions in `store/shots.html`, around captures of the app in `build/shots/`) |
+| `packages/brand/rendered/` (at the repo root) | The website: `icon-256.png` (its install icon) and `share.png` (the preview when a link is shared, published as `og.png`), copies of the 256 px tile icon and the promo screenshot |
