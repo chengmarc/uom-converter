@@ -49,12 +49,15 @@ export const moneyAmount = (n: number, copyDigits = 5) => ({ value: money(n), co
 /**
  * Accepts "1,250.50" / "1.250,50" (per the region), "$0.45", "12 €", and "-40" when `signed`.
  * A dot is always read as a decimal point when there's no comma, since spreadsheets and UK
- * users write 1.5 everywhere. Returns undefined for blank, NaN for anything else.
+ * users write 1.5 everywhere. Where the decimal mark is a dot, a comma must separate thousands (a
+ * digit before it, three after): "7,4" is someone used to decimal commas, and reading it as 74
+ * would be a silent tenfold error. Returns undefined for blank, NaN for anything else.
  */
 export function parseNumber(raw: string, signed = false): number | undefined {
   let s = raw.replace(/[$€£\s  ]/g, "");
   if (s === "") return undefined;
   if (style.decimalComma && s.includes(",")) s = s.replace(/\./g, "").replace(",", ".");
+  else if (/(^|\D),|,(?!\d{3}([.,]|$))/.test(s)) return NaN;
   else s = s.replace(/,/g, "");
   const re = signed ? /^-?(\d*\.?\d+|\d+\.)$/ : /^(\d*\.?\d+|\d+\.)$/;
   return re.test(s) ? Number(s) : NaN;

@@ -7,6 +7,15 @@ describe("parseNumber, in the US", () => {
 
   it("reads thousands separators and a decimal point", () => {
     expect(parseNumber("1,250.50")).toBe(1250.5);
+    expect(parseNumber("1,250,000")).toBe(1250000);
+  });
+
+  // "7,4" is someone used to decimal commas: reading it as 74 would be a silent tenfold error.
+  it("refuses a comma that isn't between thousands", () => {
+    expect(parseNumber("7,4")).toBeNaN();
+    expect(parseNumber("12,50")).toBeNaN();
+    expect(parseNumber("1,2345")).toBeNaN();
+    expect(parseNumber(",500")).toBeNaN();
   });
 
   it("ignores currency symbols and spaces", () => {
