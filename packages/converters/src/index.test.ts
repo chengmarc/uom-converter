@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { parseNumber, setNumberStyle } from "./format";
+import { setNumberStyle } from "./format";
 import { REGIONS } from "./regions";
-import { dyn, type Converter, type Values } from "./model";
+import { dyn, exampleValues, type Values } from "./model";
 import { TOOLS } from ".";
 
 describe("converters", () => {
@@ -33,7 +33,7 @@ describe("converters", () => {
       setNumberStyle(r.number);
       for (const t of TOOLS) {
         for (const ex of dyn(t.examples, { region: r.id } as Values)) {
-          const out = t.compute(formValues(t, r.id, ex.set));
+          const out = t.compute(exampleValues(t, ex.set, r.id));
           expect(out && "rows" in out, `${t.id} "${ex.label}": ${JSON.stringify(out)}`).toBe(true);
           if (out && "rows" in out) {
             expect(out.rows.length, `${t.id} "${ex.label}"`).toBeGreaterThan(0);
@@ -71,24 +71,6 @@ const tool = (id: string) => TOOLS.find((t) => t.id === id)!;
 
 /** A converter's answer in the US, for the given inputs over its defaults. */
 function answer(id: string, set: Record<string, string>) {
-  const out = tool(id).compute(formValues(tool(id), "us", set));
+  const out = tool(id).compute(exampleValues(tool(id), set, "us"));
   return out && "rows" in out ? out : undefined;
-}
-
-/** A form filled in the way the app fills it for an example: the example's values over each field's default. */
-function formValues(t: Converter, region: Values["region"], set: Record<string, string>): Values {
-  const v: Values = {
-    region,
-    str(id) {
-      if (id in set) return set[id];
-      const f = t.fields.find((x) => x.id === id)!;
-      if (f.kind === "choice") return f.value === undefined ? f.options[0].value : dyn(f.value, v);
-      return f.value === undefined ? "" : dyn(f.value, v);
-    },
-    num(id) {
-      const f = t.fields.find((x) => x.id === id)!;
-      return parseNumber(v.str(id), f.kind !== "choice" && f.signed);
-    },
-  };
-  return v;
 }

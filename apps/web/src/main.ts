@@ -5,8 +5,7 @@
 
 import type { Region } from "@uom/core/region";
 import { byId, TOOLS, TOPICS } from "@uom/converters";
-import { parseNumber } from "@uom/converters/format";
-import { blurb, dyn, type Converter, type Topic, type Values } from "@uom/converters/model";
+import { blurb, dyn, exampleValues, type Converter, type Topic, type Values } from "@uom/converters/model";
 import { REGIONS } from "@uom/converters/regions";
 import { ALL_AUDIENCES, EVERYTHING, type Audience } from "@uom/ui/audiences";
 import { chooseAudience, chooseRegion, chosenAudience, chosenRegion } from "@uom/ui/choices";
@@ -375,31 +374,10 @@ function converterView(id: string): Node[] {
   return [band, layout];
 }
 
-/** A converter's inputs as an example sets them, the rest at their defaults: no form needed. */
-class ExampleValues implements Values {
-  constructor(
-    private conv: Converter,
-    private set: Record<string, string>,
-    readonly region: Region,
-  ) {}
-
-  str(id: string): string {
-    if (id in this.set) return this.set[id];
-    const f = this.conv.fields.find((x) => x.id === id)!;
-    if (f.value !== undefined) return dyn(f.value, this).trim();
-    return f.kind === "choice" ? f.options[0].value : "";
-  }
-
-  num(id: string): number | undefined {
-    const f = this.conv.fields.find((x) => x.id === id)!;
-    return parseNumber(this.str(id), f.kind !== "choice" && f.signed);
-  }
-}
-
 /** A converter's answers to its examples, in the current region; examples it can't answer are left out. */
 function examplesWorkedOut(conv: Converter) {
   return dyn(conv.examples, { region } as Values).flatMap((ex) => {
-    const out = conv.compute(new ExampleValues(conv, ex.set, region));
+    const out = conv.compute(exampleValues(conv, ex.set, region));
     return out && "rows" in out && out.rows.length ? [out] : [];
   });
 }

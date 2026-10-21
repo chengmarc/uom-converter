@@ -1,9 +1,10 @@
 // What a converter is, apart from how any one app shows it: inputs ("from"), a compute function
 // that returns labelled result rows ("to"), worked examples, and optional diagrams and reference
-// tables described as data. Each platform renders these its own way (apps/web, which the
-// Windows app also uses for now); nothing here touches the page.
+// tables described as data. Each app renders these its own way (the ones built on a web page
+// through packages/ui/src/converter.ts); nothing here touches the page.
 
 import type { Region } from "@uom/core/region";
+import { parseNumber } from "./format";
 import type { Visual } from "./visual";
 
 export type Dyn<T> = T | ((v: Values) => T);
@@ -114,6 +115,27 @@ export interface Converter {
 }
 
 export const dyn = <T>(d: Dyn<T>, v: Values) => (typeof d === "function" ? (d as (v: Values) => T)(v) : d);
+
+/** A field's text as a number, as Values.num reads it: a "signed" field takes a minus sign. */
+export function fieldNumber(conv: Converter, id: string, text: string): number | undefined {
+  const f = conv.fields.find((x) => x.id === id)!;
+  return parseNumber(text, f.kind !== "choice" && f.signed);
+}
+
+/** A converter's inputs as an example sets them, the rest at their defaults: the form an example fills, with no page. */
+export function exampleValues(conv: Converter, set: Record<string, string>, region: Region): Values {
+  const v: Values = {
+    region,
+    str(id) {
+      if (id in set) return set[id];
+      const f = conv.fields.find((x) => x.id === id)!;
+      if (f.value !== undefined) return dyn(f.value, v).trim();
+      return f.kind === "choice" ? f.options[0].value : "";
+    },
+    num: (id) => fieldNumber(conv, id, v.str(id)),
+  };
+  return v;
+}
 
 /** A converter's description, where nothing is typed yet: descriptions only read the region. */
 export const blurb = (conv: Converter, region: Region) => dyn(conv.blurb, { region } as Values);

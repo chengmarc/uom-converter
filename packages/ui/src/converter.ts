@@ -3,8 +3,8 @@
 // web page (apps/web and apps/windows); each styles it in its own stylesheet.
 
 import type { Region } from "@uom/core/region";
-import { numberStyle, parseNumber } from "@uom/converters/format";
-import { dyn, type Converter, type Field, type Output, type Row, type Table, type Values } from "@uom/converters/model";
+import { numberStyle } from "@uom/converters/format";
+import { dyn, fieldNumber, type Converter, type Output, type Row, type Table, type Values } from "@uom/converters/model";
 import { drawVisual } from "./visuals";
 
 /** Reads a converter's inputs from its panel's form. */
@@ -16,20 +16,14 @@ class PanelValues implements Values {
   ) {}
 
   str(id: string): string {
-    const f = this.field(id);
-    if (f.kind === "choice") {
+    if (this.conv.fields.find((f) => f.id === id)!.kind === "choice") {
       return this.panel.querySelector<HTMLInputElement>(`input[name="${this.conv.id}-${id}"]:checked`)!.value;
     }
     return this.panel.querySelector<HTMLInputElement>(`[data-field="${id}"]`)!.value.trim();
   }
 
   num(id: string): number | undefined {
-    const f = this.field(id);
-    return parseNumber(this.str(id), f.kind !== "choice" && f.signed);
-  }
-
-  private field(id: string): Field {
-    return this.conv.fields.find((f) => f.id === id)!;
+    return fieldNumber(this.conv, id, this.str(id));
   }
 }
 
