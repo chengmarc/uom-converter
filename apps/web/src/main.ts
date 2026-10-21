@@ -34,7 +34,7 @@ const main = document.querySelector<HTMLElement>("#main")!;
 // Every size of every topic photo (@uom/ui/photos), for srcset to choose from; not the Windows
 // app's Store backdrop.
 const photo = photoLibrary(
-  import.meta.glob<string>(["../../../packages/brand/photos/*.webp", "!**/store-*.webp"], {
+  import.meta.glob<string>(["@uom/brand/photos/*.webp", "!**/store-*.webp"], {
     eager: true,
     query: "?url",
     import: "default",

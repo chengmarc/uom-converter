@@ -26,7 +26,7 @@ import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { defineConfig, type Plugin } from "vite";
 import type { Topic } from "@uom/converters/model";
 import { token } from "@uom/brand/tokens";
-import { appIcon } from "../../packages/brand/vite";
+import { appIcon, photos } from "@uom/brand/vite";
 import { HOME, PAGES, TOPIC_PAGES, type Page, type TopicPage } from "./src/pages";
 
 const SITE_URL = (process.env.SITE_URL ?? "https://uom-converter.com/").replace(/\/?$/, "/");
@@ -390,5 +390,5 @@ export default defineConfig({
   base: BASE,
   define: { __SITE_BASE__: JSON.stringify(BASE) },
   build: { outDir: OUT, emptyOutDir: true },
-  plugins: [appIcon(), sitePages()],
+  plugins: [appIcon(), photos(), sitePages()],
 });

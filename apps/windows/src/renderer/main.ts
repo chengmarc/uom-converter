@@ -124,7 +124,7 @@ function buildPanels() {
 // Each topic's banner (@uom/ui/photos), at every size: the window can be any width, and the
 // app's size doesn't matter much.
 const photo = photoLibrary(
-  import.meta.glob<string>("../../../../packages/brand/photos/*-banner-*.webp", { eager: true, query: "?url", import: "default" }),
+  import.meta.glob<string>("@uom/brand/photos/*-banner-*.webp", { eager: true, query: "?url", import: "default" }),
 );
 const backdrop = document.querySelector<HTMLElement>("#backdrop")!;
 let backdropTopic: Topic | undefined;

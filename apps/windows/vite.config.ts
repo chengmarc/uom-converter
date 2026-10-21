@@ -3,13 +3,13 @@
 
 import { resolve } from "node:path";
 import { defineConfig } from "vite";
-import { appIcon } from "../../packages/brand/vite";
+import { appIcon, photos } from "@uom/brand/vite";
 
 export default defineConfig({
   root: resolve(__dirname, "src", "renderer"),
   publicDir: false,
   base: "./",
   build: { outDir: resolve(__dirname, "dist"), emptyOutDir: true },
-  // The app icon, at /app-icon.svg.
-  plugins: [appIcon()],
+  // The app icon, at /app-icon.svg, and the photos.
+  plugins: [appIcon(), photos()],
 });

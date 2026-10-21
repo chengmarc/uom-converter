@@ -1,9 +1,10 @@
 // The photos in @uom/brand (packages/brand/photos/, made by its photos.mjs): each slot at a
 // few widths, as "<slot>-<width>.webp". An app chooses the files it bundles with its own
-// import.meta.glob, so it ships only the sizes it shows, and hands them to photoLibrary:
+// import.meta.glob, so it ships only the sizes it shows (through @uom/brand/vite's photos() plugin),
+// and hands them to photoLibrary:
 //
 //   const photo = photoLibrary(
-//     import.meta.glob("../../../packages/brand/photos/*.webp", { eager: true, query: "?url", import: "default" }),
+//     import.meta.glob("@uom/brand/photos/*.webp", { eager: true, query: "?url", import: "default" }),
 //   );
 
 import type { Topic } from "@uom/converters/model";

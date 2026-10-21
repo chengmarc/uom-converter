@@ -1,13 +1,18 @@
-// The app icon at /app-icon.svg in an app built with Vite (the website, the Windows app): served
-// by the dev server, and written into the build, the same file in every app. The page links it as
-// "/app-icon.svg"; that becomes the app's base path, as Vite does for a public folder's files.
+// What an app built with Vite takes from @uom/brand, through plugins: the app icon (the website, the
+// Windows app) and the photos (every app).
 
 import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import type { Plugin } from "vite";
 
-const ICON = resolve(__dirname, "app-icon.svg");
+const ICON = fileURLToPath(new URL("./app-icon.svg", import.meta.url));
+const PHOTOS = fileURLToPath(new URL("./photos", import.meta.url));
 
+/**
+ * The app icon at /app-icon.svg: served by the dev server, and written into the build, the same
+ * file in every app. The page links it as "/app-icon.svg"; that becomes the app's base path, as
+ * Vite does for a public folder's files.
+ */
 export function appIcon(): Plugin {
   let base = "/";
   return {
@@ -29,5 +34,16 @@ export function appIcon(): Plugin {
     generateBundle() {
       this.emitFile({ type: "asset", fileName: "app-icon.svg", source: readFileSync(ICON) });
     },
+  };
+}
+
+/**
+ * The photos as "@uom/brand/photos/", for an app's import.meta.glob (see @uom/ui/photos), which
+ * takes an alias but not a package's exports.
+ */
+export function photos(): Plugin {
+  return {
+    name: "uom-photos",
+    config: () => ({ resolve: { alias: [{ find: /^@uom\/brand\/photos\//, replacement: `${PHOTOS}/` }] } }),
   };
 }

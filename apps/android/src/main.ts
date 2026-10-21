@@ -47,7 +47,7 @@ function glyph(name: keyof typeof GLYPHS) {
 // every size; and the 6:1 banner under the tint of a topic's band, where its 800px look as sharp
 // as any.
 const photo = photoLibrary(
-  import.meta.glob<string>(["../../../packages/brand/photos/*-thumb-*.webp", "../../../packages/brand/photos/*-banner-800.webp"], {
+  import.meta.glob<string>(["@uom/brand/photos/*-thumb-*.webp", "@uom/brand/photos/*-banner-800.webp"], {
     eager: true,
     query: "?url",
     import: "default",

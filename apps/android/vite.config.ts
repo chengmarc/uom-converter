@@ -4,6 +4,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { defineConfig } from "vite";
+import { photos } from "@uom/brand/vite";
 
 // One version for every app: the repo's.
 const { version } = JSON.parse(readFileSync(resolve(__dirname, "../../package.json"), "utf8"));
@@ -13,4 +14,5 @@ export default defineConfig({
   base: "./",
   define: { __APP_VERSION__: JSON.stringify(version) },
   build: { outDir: resolve(__dirname, "dist"), emptyOutDir: true },
+  plugins: [photos()],
 });
