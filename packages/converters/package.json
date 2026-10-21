@@ -5,7 +5,10 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./*": "./src/*.ts"
+    "./format": "./src/format.ts",
+    "./model": "./src/model.ts",
+    "./regions": "./src/regions.ts",
+    "./visual": "./src/visual.ts"
   },
   "dependencies": {
     "@uom/core": "*"

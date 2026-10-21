@@ -1,9 +1,9 @@
 import { readdirSync } from "node:fs";
-import { resolve } from "node:path";
+import { PHOTOS } from "@uom/brand/vite";
 import { describe, expect, it } from "vitest";
 import { TOPIC_SLOTS } from "./photos";
 
-const files = new Set(readdirSync(resolve(import.meta.dirname, "../../brand/photos")));
+const files = new Set(readdirSync(PHOTOS));
 
 describe("topic photos", () => {
   // Every topic is in TOPIC_SLOTS (its type sees to that). The Android app bundles each topic's

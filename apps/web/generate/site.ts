@@ -6,8 +6,6 @@ import { resolve } from "node:path";
 export const SITE_URL = (process.env.SITE_URL ?? "https://uom-converter.com/").replace(/\/?$/, "/");
 export const BASE = new URL(SITE_URL).pathname;
 export const OUT = resolve(__dirname, "../dist");
-/** The Windows app, whose Store art the site reuses: its icon and share preview. */
-export const WINDOWS = resolve(__dirname, "../../windows");
 
 /** Text made safe for an HTML attribute or element. */
 export const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");

@@ -5,7 +5,7 @@
 
 import type { Region } from "@uom/core/region";
 import { parseNumber } from "./format";
-import type { Visual } from "./visual";
+import type { Status, Visual } from "./visual";
 
 export type Dyn<T> = T | ((v: Values) => T);
 
@@ -39,7 +39,7 @@ export type Field =
     })
   | (FieldBase & { kind: "choice"; label: string; options: { value: string; label: string }[]; value?: Dyn<string> });
 
-export type Status = "good" | "warn" | "bad";
+export type { Status };
 
 export interface Row {
   label: string;

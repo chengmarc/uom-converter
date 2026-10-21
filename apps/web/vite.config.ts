@@ -21,6 +21,7 @@
 // from is SITE_URL (generate/site.ts); its path becomes Vite's base.
 
 import { createHash } from "node:crypto";
+import { createRequire } from "node:module";
 import { copyFileSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { defineConfig, type Plugin } from "vite";
@@ -33,7 +34,7 @@ import { OG_IMAGE, withHead, type Kind } from "./generate/head";
 import { llmsTxt } from "./generate/llms-txt";
 import { manifest, serviceWorker } from "./generate/offline";
 import { BODY, prerender } from "./generate/prerender";
-import { BASE, OUT, WINDOWS } from "./generate/site";
+import { BASE, OUT } from "./generate/site";
 
 function sitePages(): Plugin {
   let assets: string[] = [];
@@ -70,8 +71,7 @@ function sitePages(): Plugin {
       writeFileSync(join(OUT, "llms.txt"), llmsTxt(converters.map((page, i) => ({ page, topic: topicOf(i) })), drawn[0].regions));
       writeFileSync(join(OUT, "robots.txt"), robots());
 
-      // Rendered for the Windows app by apps/windows/store/render.cjs.
-      copyFileSync(resolve(WINDOWS, "packaging/appx/Square44x44Logo.targetsize-256_altform-unplated.png"), join(OUT, "icon-256.png"));
+      copyFileSync(createRequire(import.meta.url).resolve("@uom/brand/icon-256.png"), join(OUT, "icon-256.png"));
       copyFileSync(OG_IMAGE, join(OUT, "og.png"));
       writeFileSync(join(OUT, "manifest.webmanifest"), manifest());
 

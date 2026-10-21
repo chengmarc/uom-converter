@@ -2,6 +2,7 @@
 //   src/main/icon.png      the desktop window, taskbar and installer icon
 //   packaging/appx/        tile and taskbar icons packed into the MSIX (electron-builder's buildResources)
 //   store/listing/         images uploaded to Partner Center: store logos and screenshots
+//   @uom/brand's rendered/ the icon at 256 and the share image (the promo shot), which the website uses too
 // The icons come from @uom/brand's app-icon.svg; screenshots from the built page, captured into build/shots/ and
 // framed by shots.html.
 // Run with `npm run store:assets` (builds apps/windows/dist/ first).
@@ -16,6 +17,8 @@ const DIST = path.join(WINDOWS, "dist");
 const STORE = path.join(WINDOWS, "store");
 const BUILD = path.join(WINDOWS, "build");
 const ICON = fs.readFileSync(require.resolve("@uom/brand/app-icon.svg"), "utf8");
+const ICON_256 = require.resolve("@uom/brand/icon-256.png");
+const SHARE = require.resolve("@uom/brand/share.png");
 const SCALES = [100, 200];
 
 /**
@@ -87,6 +90,7 @@ async function renderTiles() {
   for (const t of TARGET_SIZES) {
     await renderIcon(path.join(dir, `Square44x44Logo.targetsize-${t}_altform-unplated.png`), t, t, 1);
   }
+  fs.copyFileSync(path.join(dir, "Square44x44Logo.targetsize-256_altform-unplated.png"), ICON_256);
 }
 
 async function renderListing() {
@@ -126,7 +130,9 @@ async function renderListing() {
     await page.webContents.executeJavaScript(`document.documentElement.classList.add("desktop"); document.querySelector("#content").scrollTop = ${scroll}`);
     await capture(page, path.join(captures, `${name}.png`), { width: width * scale, height: height * scale });
     page.destroy();
-    await renderPage(`shots.html#${name}`, path.join(dir, `screenshot-${i + 1}-${name}.png`), width, height, scale, `document.querySelector("#count").textContent = "${count} converters"`);
+    const shot = path.join(dir, `screenshot-${i + 1}-${name}.png`);
+    await renderPage(`shots.html#${name}`, shot, width, height, scale, `document.querySelector("#count").textContent = "${count} converters"`);
+    if (name === "promo") fs.copyFileSync(shot, SHARE);
   }
 }
 

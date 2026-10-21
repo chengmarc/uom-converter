@@ -1,7 +1,8 @@
 // The diagrams a result can carry, as data. Each platform draws them its own way
 // (packages/ui/src/visuals.ts draws inline SVG). The constructors keep converter code reading like a call to a diagram.
 
-import type { Status } from "./model";
+/** How an answer reads against its limits; a gauge and a result row show it the same way. */
+export type Status = "good" | "warn" | "bad";
 
 export interface Section {
   label: string;

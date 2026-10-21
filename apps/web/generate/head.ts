@@ -1,15 +1,15 @@
 // Each page's own head: what search engines and link previews read.
 
 import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { createRequire } from "node:module";
 import { token } from "@uom/brand/tokens";
 import { HOME, type Page } from "../src/pages";
 import { NAME, STORE_URL } from "../src/site";
 import type { Drawn } from "./prerender";
-import { BASE, esc, SITE_URL, WINDOWS } from "./site";
+import { BASE, esc, SITE_URL } from "./site";
 
-/** The preview image when a link is shared: the Windows app's Store promo (apps/windows/store/render.cjs). */
-export const OG_IMAGE = resolve(WINDOWS, "store/listing/screenshot-1-promo.png");
+/** The preview image when a link is shared: @uom/brand's, the Windows app's Store promo (apps/windows/store/render.cjs). */
+export const OG_IMAGE = createRequire(import.meta.url).resolve("@uom/brand/share.png");
 const OG_ALT = "UOM Converter converting 12 AWG to 3.309 mm², with every converter listed beside it";
 
 /** Width and height from a PNG's header. */
