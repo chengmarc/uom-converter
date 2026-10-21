@@ -134,5 +134,3 @@ on GitHub Releases, the `.appx` to the Microsoft Store. Changes are listed in th
 ## License
 
 [Apache 2.0](LICENSE).
-
-Google Play and the Google Play logo are trademarks of Google LLC.
