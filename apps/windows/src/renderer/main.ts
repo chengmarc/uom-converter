@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 // Bundled with the app: the page may only load its own files (see the CSP in index.html).
 // Weight and optical-size axes: headings and big result values get display-cut letterforms.
 import "@fontsource-variable/inter/opsz.css";
@@ -7,8 +8,9 @@ import { TOOLS } from "@uom/converters";
 import { icon } from "@uom/ui/icons";
 import { guessRegion, regionInfo, REGIONS } from "@uom/converters/regions";
 import { setNumberStyle } from "@uom/converters/format";
-import type { Converter } from "@uom/converters/model";
+import type { Converter, Topic } from "@uom/converters/model";
 import { el, renderConverter } from "@uom/ui/converter";
+import { photoLibrary, TOPIC_SLOTS } from "@uom/ui/photos";
 import { search } from "@uom/ui/search";
 import { store, stored } from "@uom/ui/storage";
 
@@ -119,6 +121,22 @@ function buildPanels() {
   content.replaceChildren(...panels.values());
 }
 
+// Each topic's banner (@uom/ui/photos), at every size: the window can be any width, and the
+// app's size doesn't matter much.
+const photo = photoLibrary(
+  import.meta.glob<string>("../../../../packages/brand/photos/*-banner-*.webp", { eager: true, query: "?url", import: "default" }),
+);
+const backdrop = document.querySelector<HTMLElement>("#backdrop")!;
+let backdropTopic: Topic | undefined;
+
+/** The converter pane's background: the shown converter's topic photo, faint, at its foot (style.css .backdrop). */
+function showBackdrop(topic: Topic) {
+  if (topic === backdropTopic) return;
+  backdropTopic = topic;
+  const img = photo(`${TOPIC_SLOTS[topic]}-banner`, "100vw", "");
+  backdrop.replaceChildren(...(img ? [img] : []));
+}
+
 /** The converter the address asks for, if any. */
 function routeId(): string | undefined {
   const id = location.hash.slice(1);
@@ -167,6 +185,7 @@ function show(focus: boolean) {
   // The converter pane scrolls on its own, so a new converter starts at its top.
   if (id !== shown) content.scrollTop = 0;
   shown = id;
+  showBackdrop(byId.get(id)!.topic);
   markCurrent();
   picker.value = id;
   if (focus) panels.get(id)!.querySelector<HTMLElement>("input[data-field]")?.focus();

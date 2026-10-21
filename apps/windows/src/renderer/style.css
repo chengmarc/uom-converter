@@ -1,3 +1,6 @@
+/* The brand colours, the same in every app: --brand (navy) and --accent. */
+@import "@uom/brand/colors.css";
+
 :root {
   --bg: #f6f5f2;
   --chrome: #ecebe6;
@@ -6,8 +9,6 @@
   --text: #1c1b19;
   --muted: #5c5a53;
   --line: #dddad3;
-  --accent: #1f5fbf;
-  --accent-soft: #e8effa;
   --danger: #b3261e;
   --good: #1a7f37;
   --good-soft: #e6f4ea;
@@ -15,6 +16,11 @@
   --warn-soft: #fdf3d8;
   --bad: #b3261e;
   --bad-soft: #fbe9e7;
+  /* Depth: the converter's two boxes stand off the page (--raised), the cards in them a little
+     less (--lifted); a touch of the brand's navy in the softer layer. */
+  --lifted: 0 1px 2px rgb(0 0 0 / 0.06), 0 2px 6px -2px rgb(var(--brand-rgb) / 0.12);
+  --lifted-hover: 0 1px 2px rgb(0 0 0 / 0.08), 0 6px 14px -4px rgb(var(--brand-rgb) / 0.2);
+  --raised: 0 1px 3px rgb(0 0 0 / 0.06), 0 10px 28px -8px rgb(var(--brand-rgb) / 0.18);
   /* Made for screens, with even-width digits for result columns. */
   --font: "Inter Variable", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
   color-scheme: light;
@@ -29,8 +35,6 @@
     --text: #edebe6;
     --muted: #aca89e;
     --line: #34322e;
-    --accent: #7eaaf0;
-    --accent-soft: #1d2a3d;
     --danger: #f2877f;
     --good: #6fd58b;
     --good-soft: #17301f;
@@ -38,6 +42,10 @@
     --warn-soft: #33290f;
     --bad: #f2877f;
     --bad-soft: #3a1c1a;
+    /* On a dark page a shadow needs more weight to show. */
+    --lifted: 0 1px 2px rgb(0 0 0 / 0.4), 0 2px 6px -2px rgb(0 0 0 / 0.4);
+    --lifted-hover: 0 1px 2px rgb(0 0 0 / 0.45), 0 6px 14px -4px rgb(0 0 0 / 0.55);
+    --raised: 0 1px 3px rgb(0 0 0 / 0.45), 0 12px 32px -8px rgb(0 0 0 / 0.6);
     color-scheme: dark;
   }
 }
@@ -161,15 +169,38 @@ kbd {
 .nav-group a:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .sidebar-hint { margin: 0.5rem 0.6rem 0; font-size: 0.8125rem; color: var(--muted); }
 
+/* The converter pane: #content scrolls over #backdrop, its background, in the same cell. */
 #content {
+  position: relative;
   min-width: 0;
   padding: 28px 40px 56px;
+}
+.converter { max-width: 58rem; }
+
+/* The pane's background, which stays put while the converter scrolls: the page colour and, across
+   its lower part, the shown converter's topic photo (showBackdrop in main.ts), faint and fading
+   upward, so it sets the scene under the converter without competing with it. */
+.backdrop {
+  grid-area: content;
+  position: relative;
+  overflow: hidden;
   background: var(--bg);
   border: 1px solid var(--line);
   border-width: 1px 0 0 1px;
   border-top-left-radius: 8px;
 }
-.converter { max-width: 58rem; }
+.backdrop img {
+  position: absolute;
+  inset: auto 0 0;
+  width: 100%;
+  height: 50%;
+  object-fit: cover;
+  opacity: 0.3;
+  mask-image: linear-gradient(to bottom, transparent, #000 75%);
+}
+@media (prefers-color-scheme: dark) {
+  .backdrop img { opacity: 0.2; }
+}
 
 /* Wide windows: fixed frame, and the sidebar and converter scroll on their own. */
 @media (min-width: 52.01rem) {
@@ -184,7 +215,8 @@ kbd {
   .find { margin: 0 12px 10px; }
   .layout { grid-template-columns: 1fr; grid-template-rows: auto auto; grid-template-areas: "find" "content"; }
   #sidebar { display: none; }
-  #content { padding: 1rem; border-radius: 0; border-width: 1px 0 0; }
+  #content { padding: 1rem; }
+  .backdrop { border-radius: 0; border-width: 1px 0 0; }
   .audience-desc { display: block; flex-basis: 100%; }
   .picker { display: grid; gap: 0.35rem; padding: 0 12px 10px; }
   .picker select {
@@ -230,8 +262,8 @@ kbd {
   min-width: 0;
   align-content: start;
 }
-.from { background: var(--surface); border: 1px solid var(--line); }
-.to { background: var(--accent-soft); border: 1px solid transparent; }
+.from { background: var(--surface); border: 1px solid var(--line); box-shadow: var(--raised); }
+.to { background: var(--accent-soft); border: 1px solid transparent; box-shadow: var(--raised); }
 .box-title {
   margin: 0;
   font-size: 0.8rem;
@@ -331,6 +363,9 @@ input[aria-invalid="true"] { color: var(--danger); }
   text-align: left;
   cursor: pointer;
 }
+/* Click to copy: a little more lift under the pointer. */
+.row, .answer { box-shadow: var(--lifted); transition: box-shadow 120ms ease; }
+.row:hover, .answer:hover { box-shadow: var(--lifted-hover); }
 .row:hover { border-color: var(--accent); }
 .row:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .row-label { grid-area: label; display: grid; font-size: 0.95rem; }
@@ -493,7 +528,7 @@ tr.cat td {
 .how ul { margin: 0.5rem 0 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
 
 /* Diagrams */
-.visual { margin: 0; padding: 0.75rem; background: var(--surface); border-radius: 10px; }
+.visual { margin: 0; padding: 0.75rem; background: var(--surface); border-radius: 10px; box-shadow: var(--lifted); }
 .viz { display: block; width: 100%; height: auto; max-height: 11rem; overflow: visible; }
 .viz-text { font: 13px var(--font); fill: var(--muted); }
 .viz-text.strong { font-weight: 700; fill: var(--text); }
