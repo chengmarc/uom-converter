@@ -13,12 +13,11 @@ import { chooseAudience, chooseRegion, chosenAudience, chosenRegion } from "@uom
 import { el, renderConverter } from "@uom/ui/converter";
 import { photoLibrary, TOPIC_SLOTS } from "@uom/ui/photos";
 import { HOME, idFromPath, PAGES, topicFromPath, TOPIC_PAGES } from "./pages";
-import { registerOffline, STORE_URL } from "./site";
+import { NAME, registerOffline, STORE_URL } from "./site";
 
-// The site's base path, from SITE_URL in vite.config.ts.
+// The site's base path, from SITE_URL in build/site.ts.
 declare const __SITE_BASE__: string;
 const BASE = __SITE_BASE__;
-const NAME = "UOM Converter";
 
 const topicAnchor = (t: Topic) => t.toLowerCase().replace(/[^a-z]+/g, "-");
 const pathFor = (id: string) => BASE + PAGES[id].slug;
@@ -72,7 +71,7 @@ function go(path: string, hash = "") {
   render();
 }
 
-/** The page's own head, as a fresh load of this address has it (vite.config.ts writes those). */
+/** The page's own head, as a fresh load of this address has it (build/head.ts writes those). */
 function setHead(title: string, canonical?: string) {
   document.title = `${title} | ${NAME}`;
   const link = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
