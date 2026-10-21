@@ -42,20 +42,21 @@ function glyph(name: keyof typeof GLYPHS) {
   return svg;
 }
 
-// The topic photos (@uom/ui/photos), at the one width each that a phone needs: the square small
-// beside a card's name, and the 6:1 banner under the tint of a topic's band, where its 800px look
-// as sharp as any. All decorative: the text beside each names the topic.
+// The topic photos (@uom/ui/photos), all decorative (the text beside each names the topic): the
+// square, small beside a card's name and at a phone's width behind a converter's screen, so at
+// every size; and the 6:1 banner under the tint of a topic's band, where its 800px look as sharp
+// as any.
 const photo = photoLibrary(
-  import.meta.glob<string>(["../../../packages/brand/photos/*-thumb-240.webp", "../../../packages/brand/photos/*-banner-800.webp"], {
+  import.meta.glob<string>(["../../../packages/brand/photos/*-thumb-*.webp", "../../../packages/brand/photos/*-banner-800.webp"], {
     eager: true,
     query: "?url",
     import: "default",
   }),
 );
 
-/** A band with the topic's photo under a tint of the logo's indigo, and its icon and name on it. */
-function topicBand(topic: Topic, tag: "h2" | "p", cls: string) {
-  const band = el(tag, `topic-band ${cls}`);
+/** A band with the topic's photo under a tint of the brand's navy, and its icon and name on it. */
+function topicBand(topic: Topic) {
+  const band = el("h2", "topic-band");
   const img = photo(`${TOPIC_SLOTS[topic]}-banner`, "100vw", "", "topic-band-photo");
   if (img) band.append(img);
   const i = icon(topic);
@@ -118,7 +119,7 @@ function card(t: Converter, withTopic: boolean) {
 /** A heading and its cards: a topic's band, or else a plain heading and the topic on each card. */
 function group(title: string, tools: Converter[], topic?: Topic) {
   const s = el("section", "group");
-  const h = topic ? topicBand(topic, "h2", "group-band") : el("h2", "group-title", title);
+  const h = topic ? topicBand(topic) : el("h2", "group-title", title);
   const cards = el("div", "cards");
   cards.append(...tools.map((t) => card(t, !topic)));
   s.append(h, cards);
@@ -180,20 +181,24 @@ q.addEventListener("keydown", (e) => {
 // Built once per region, so a converter keeps what was typed while you look at others.
 let panels = new Map<string, HTMLElement>();
 function panel(id: string) {
-  if (!panels.has(id)) {
-    const conv = byId.get(id)!;
-    const p = renderConverter(conv, region, "h1");
-    // Its topic's band across the top, as the website's converter pages have.
-    p.prepend(topicBand(conv.topic, "p", "screen-band"));
-    panels.set(id, p);
-  }
+  if (!panels.has(id)) panels.set(id, renderConverter(byId.get(id)!, region, "h1"));
   return panels.get(id)!;
+}
+
+const backdrop = $("#backdrop");
+let backdropTopic: Topic | undefined;
+/** Behind a converter's screen: its topic's photo, faint, at the foot (style.css .backdrop), as in the Windows app. */
+function showBackdrop(topic: Topic) {
+  if (topic === backdropTopic) return;
+  backdropTopic = topic;
+  const img = photo(`${TOPIC_SLOTS[topic]}-thumb`, "100vw", "");
+  backdrop.replaceChildren(...(img ? [img] : []));
 }
 
 let homeScroll = 0;
 
 // The status bar's clock and icons, over the page since it draws edge to edge: light on the home
-// screen's blue header and in the dark theme, dark on a light converter screen.
+// screen's navy header and in the dark theme, dark on a light converter screen.
 const darkTheme = matchMedia("(prefers-color-scheme: dark)");
 function statusBar() {
   const light = !home.hidden || darkTheme.matches;
@@ -213,6 +218,7 @@ function show() {
   if (conv) {
     screenTitle.textContent = conv.title;
     content.replaceChildren(panel(id));
+    showBackdrop(conv.topic);
     window.scrollTo(0, 0);
     addRecent(id);
   } else {

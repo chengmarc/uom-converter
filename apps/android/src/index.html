@@ -15,19 +15,19 @@
   <body>
     <!-- Two screens, one shown at a time: the list of converters, and one converter. -->
     <section id="home" class="screen" aria-labelledby="home-title">
-      <header class="appbar">
-        <h1 id="home-title" class="appbar-title">UOM Converter</h1>
-        <button id="open-settings" class="icon-button" type="button" aria-label="Settings" aria-haspopup="dialog"></button>
-      </header>
+      <!-- The app bar, search and roles: one block, held at the top while the cards scroll. -->
+      <div class="home-head">
+        <header class="appbar">
+          <h1 id="home-title" class="appbar-title">UOM Converter</h1>
+          <button id="open-settings" class="icon-button" type="button" aria-label="Settings" aria-haspopup="dialog"></button>
+        </header>
+        <label class="search">
+          <span class="sr">Search converters</span>
+          <input id="q" type="search" placeholder="Search converters" autocomplete="off" spellcheck="false" enterkeyhint="search" />
+        </label>
+        <div id="roles" class="roles" role="group" aria-label="Show converters for"></div>
+      </div>
       <div class="home-body">
-        <!-- Stays under the app bar while the cards scroll. -->
-        <div class="home-tools">
-          <label class="search">
-            <span class="sr">Search converters</span>
-            <input id="q" type="search" placeholder="Search converters" autocomplete="off" spellcheck="false" enterkeyhint="search" />
-          </label>
-          <div id="roles" class="roles" role="group" aria-label="Show converters for"></div>
-        </div>
         <nav id="list" class="list" aria-label="Converters"></nav>
       </div>
     </section>
@@ -38,6 +38,8 @@
         <h1 id="screen-title" class="appbar-title"></h1>
       </header>
       <main id="content" class="screen-body"></main>
+      <!-- Behind the converter: its topic's photo, at the foot of the screen. -->
+      <div id="backdrop" class="backdrop" aria-hidden="true"></div>
     </section>
 
     <dialog id="settings" class="sheet" aria-labelledby="settings-title">

@@ -4,6 +4,10 @@
    Corners: pills for the search field and the sheet's button, 12px for chips, cards, fields and
    surfaces, 28px for the settings sheet's top edge. */
 
+/* The brand colours, the same in every app: --brand (navy: the home header, and the tint over the
+   topic photos) and --accent. */
+@import "@uom/brand/colors.css";
+
 :root {
   --bg: #f7f6f3;
   --surface: #ffffff;
@@ -13,17 +17,6 @@
   --muted: #5c5a53;
   --line: #e2e0d9;
   --line-strong: #cfccc3;
-  /* The logo's azure, deep enough for text on the light background. */
-  --accent: #1f66e0;
-  --accent-ink: #ffffff;
-  --accent-soft: #e8effa;
-  /* The logo's tile, azure to indigo (packages/brand/public/app-icon.svg; its sky-blue corner is
-     left out, too light under white text): the home screen's header. Channels, as --tint. */
-  --brand-from: 47 124 246;
-  --brand-to: 75 59 224;
-  /* The logo's deep indigo (its tile's shadow), tinting the topic photos under their white names:
-     channels, for rgb(var(--tint) / alpha). */
-  --tint: 27 22 112;
   --danger: #b3261e;
   --good: #1a7f37;
   --warn: #9a6700;
@@ -46,12 +39,6 @@
     --muted: #aca89e;
     --line: #2f2d29;
     --line-strong: #45423c;
-    --accent: #7eaaf0;
-    --accent-ink: #0f1a2e;
-    --accent-soft: #1d2a3d;
-    /* The logo's colours, deeper, so the header doesn't glare in the dark. */
-    --brand-from: 31 85 196;
-    --brand-to: 58 45 176;
     --danger: #f2877f;
     --good: #6fd58b;
     --warn: #e8c060;
@@ -110,33 +97,24 @@ a { color: var(--accent); }
 
 /* ---------- Home ---------- */
 
-/* The home screen's header (its app bar, search and roles): a shop floor of copper coils (the
-   app-header photo, packages/brand/scripts/photos.mjs) under the logo's gradient, white on it,
-   with a rounded lower edge the cards scroll up under. The status bar's icons turn light over it
-   (statusBar in main.ts). It's two pieces, the app bar and the part under it, so the photo is
-   sized by the width in both and the lower one's is moved up by the app bar's height: one photo
-   across them. The gradient runs left to right, so it meets itself too. */
-#home .appbar, .home-tools {
-  background:
-    linear-gradient(90deg, rgb(var(--brand-from) / 0.8), rgb(var(--brand-to) / 0.68)),
-    url("../../../packages/brand/photos/app-header-1080.webp") 0 0 / 100% auto no-repeat,
-    rgb(var(--brand-to));
+/* The home screen's header (its app bar, search and roles), held at the top while the cards
+   scroll up under its rounded lower edge: the brand's navy, white on it. The photos are the
+   topics' own, as in the Windows app. The status bar's icons turn light over it (statusBar in
+   main.ts). */
+.home-head {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding-bottom: 4px;
+  border-radius: 0 0 20px 20px;
+  background: var(--brand);
 }
-.home-tools { background-position: 0 0, 0 calc(-64px - var(--top)), 0 0; }
-#home .appbar { color: #ffffff; }
+/* Its app bar is part of the block: not held on its own, nor a background of its own. */
+#home .appbar { position: static; background: none; color: #ffffff; }
 #home .icon-button { color: #ffffff; }
 #home .icon-button:active { background: rgb(255 255 255 / 0.14); }
 
 .home-body { padding-bottom: calc(24px + var(--bottom)); }
-
-/* Search and roles, held under the app bar (64px plus the status bar) while the cards scroll. */
-.home-tools {
-  position: sticky;
-  top: calc(64px + var(--top));
-  z-index: 9;
-  padding-bottom: 4px;
-  border-radius: 0 0 20px 20px;
-}
 
 .search { display: block; padding: 4px 16px 12px; }
 .search input {
@@ -172,9 +150,9 @@ a { color: var(--accent); }
   font-size: 0.9rem;
 }
 .chip .icon { width: 18px; height: 18px; color: rgb(255 255 255 / 0.85); }
-/* The chosen role: white, the logo's indigo on it. */
-.chip[aria-pressed="true"] { background: #ffffff; border-color: #ffffff; color: rgb(var(--brand-to)); font-weight: 600; }
-.chip[aria-pressed="true"] .icon { color: rgb(var(--brand-to)); }
+/* The chosen role: white, the navy on it. */
+.chip[aria-pressed="true"] { background: #ffffff; border-color: #ffffff; color: var(--brand); font-weight: 600; }
+.chip[aria-pressed="true"] .icon { color: var(--brand); }
 
 .group { margin-top: 12px; }
 .group-title {
@@ -188,9 +166,9 @@ a { color: var(--accent); }
   color: var(--accent);
 }
 
-/* A topic's band (topicBand in main.ts): its photo under a light tint of the logo's indigo, a
+/* A topic's band (topicBand in main.ts): its photo under a light tint of the brand's navy, a
    little deeper behind the name on the left, and a soft shadow under the white name, so it reads
-   over any photo and the photo still shows. Heading a topic's cards, and atop its converters. */
+   over any photo and the photo still shows. Heading a topic's cards. */
 .topic-band {
   position: relative;
   isolation: isolate;
@@ -198,8 +176,12 @@ a { color: var(--accent); }
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 0;
-  background: rgb(var(--tint));
+  min-height: 64px;
+  margin: 4px 16px 10px;
+  padding: 0 18px;
+  border-radius: 12px;
+  background: rgb(var(--brand-rgb));
+  font-size: 1.05rem;
   color: #ffffff;
   font-weight: 650;
   letter-spacing: 0.01em;
@@ -210,14 +192,11 @@ a { color: var(--accent); }
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(90deg, rgb(var(--tint) / 0.45) 0%, rgb(var(--tint) / 0.3) 45%, rgb(var(--tint) / 0.1) 100%);
+  background: linear-gradient(90deg, rgb(var(--brand-rgb) / 0.45) 0%, rgb(var(--brand-rgb) / 0.3) 45%, rgb(var(--brand-rgb) / 0.1) 100%);
 }
 /* The icon is a stroke, which text-shadow skips. */
-.topic-band .icon { filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.55)); }
+.topic-band .icon { width: 22px; height: 22px; filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.55)); }
 .topic-band-photo { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; }
-.topic-band .icon { width: 22px; height: 22px; }
-.group-band { min-height: 64px; margin: 4px 16px 10px; padding: 0 18px; border-radius: 12px; font-size: 1.05rem; }
-.screen-band { min-height: 56px; margin: -16px -16px 16px; padding: 0 16px; font-size: 0.95rem; }
 
 .cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 0 16px; }
 /* A name of up to three lines, centred (most fit on one; a row's cards share its height), after
@@ -252,6 +231,21 @@ a { color: var(--accent); }
 .list-empty { padding: 24px 16px; color: var(--muted); }
 
 /* ---------- A converter ---------- */
+
+/* Behind a converter's screen (showBackdrop in main.ts), as in the Windows app: its topic's photo
+   across the lower half of the screen, faint and fading upward, staying put while the converter
+   scrolls over it. The square photo, since that part of a phone is about as tall as it's wide. */
+.backdrop { position: fixed; inset: auto 0 0; z-index: -1; height: 55vh; pointer-events: none; }
+.backdrop img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.3;
+  mask-image: linear-gradient(to bottom, transparent, #000 75%);
+}
+@media (prefers-color-scheme: dark) {
+  .backdrop img { opacity: 0.2; }
+}
 
 .screen-body { padding: 16px 16px calc(32px + var(--bottom)); }
 /* The app bar carries the name. */
