@@ -22,7 +22,7 @@ export interface Drawn {
   trail: Link[];
   /** A topic page's converters, in its list. */
   items: Link[];
-  /** The region buttons: "US (NEC, 60 Hz)". */
+  /** The region menu's choices: "US (NEC, 60 Hz)". */
   regions: string[];
 }
 
@@ -57,7 +57,7 @@ export async function prerender(shell: string, paths: string[]): Promise<Drawn[]
         name,
         trail: links("main .crumbs a"),
         items: links("main .topic-page > .tiles a"),
-        regions: Array.from(document.querySelectorAll("#region button"), (b) => `${b.textContent} (${b.getAttribute("title")})`),
+        regions: Array.from(document.querySelectorAll("#region option"), (o) => o.textContent!),
       });
     } finally {
       await GlobalRegistrator.unregister();

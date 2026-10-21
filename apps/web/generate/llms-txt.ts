@@ -13,6 +13,7 @@ const REPO_URL = "https://github.com/chengmarc/uom-converter";
  * from the same pages as the sitemap, with the topics as the pages' breadcrumbs show them.
  */
 export function llmsTxt(converters: { page: Page; topic?: Topic }[], regions: string[]): string {
+  if (!regions.length) throw new Error("no regions read from the page's region menu");
   const topics = new Map<Topic, Page[]>();
   for (const { page, topic } of converters) {
     if (!topic || !TOPIC_PAGES[topic]) throw new Error(`${page.slug}: no topic in its breadcrumb`);
