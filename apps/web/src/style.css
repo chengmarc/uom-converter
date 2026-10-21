@@ -4,49 +4,15 @@
    shared with the Windows app (apps/windows/src/renderer/style.css), which keeps its own look.
    Corners: 3px on controls (inputs, buttons, chips), 4px on panels and images. */
 
-/* The brand colours, the same in every app: --brand (navy: the header, footer and photo bands)
-   and --accent. */
-@import "@uom/brand/colors.css";
+/* The colours, the same in every app: --brand (navy: the header, footer and photo bands), --accent,
+   the greys and the answers' colours. The pages are --surface (white), their panels --sunken. */
+@import "@uom/brand/tokens.css";
 
 :root {
-  --bg: #ffffff;
-  --surface: #ffffff;
-  --sunken: #f2f4f6;
-  --hover: rgb(19 41 75 / 0.06);
-  --text: #222831;
-  --muted: #5a6370;
-  --line: #d9dee4;
-  --line-strong: #b9c1cb;
-  --danger: #b3261e;
-  --good: #1a7f37;
-  --warn: #9a6700;
-  --bad: #b3261e;
-  --bad-soft: #fbe9e7;
-  --shadow: none;
   --font: Arial, "Helvetica Neue", Helvetica, sans-serif;
   /* The header scrolls away with the page: nothing to leave room for when scrolling to a heading. */
   --header: 0px;
   --ease: ease;
-  color-scheme: light;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #15181c;
-    --surface: #1d2126;
-    --sunken: #23282e;
-    --hover: rgb(255 255 255 / 0.06);
-    --text: #e6e9ed;
-    --muted: #a3acb8;
-    --line: #333a42;
-    --line-strong: #4a535e;
-    --danger: #f2877f;
-    --good: #6fd58b;
-    --warn: #e8c060;
-    --bad: #f2877f;
-    --bad-soft: #3a1c1a;
-    color-scheme: dark;
-  }
 }
 
 * { box-sizing: border-box; }
@@ -58,7 +24,7 @@ body {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  background: var(--bg);
+  background: var(--surface);
   color: var(--text);
   font: 15px/1.5 var(--font);
 }
@@ -70,7 +36,6 @@ body { overflow-x: clip; }
 h1, h2, h3 { font-weight: 700; letter-spacing: 0; }
 
 a { color: var(--accent); }
-a:hover { color: var(--accent-hover); }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 .wrap { width: 100%; max-width: 1240px; margin-inline: auto; padding-inline: 24px; }
@@ -99,7 +64,7 @@ a:hover { color: var(--accent-hover); }
 }
 .button:hover { border-color: var(--text); color: var(--text); }
 .button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
-.button.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); color: var(--accent-ink); }
+.button.primary:hover { color: var(--accent-ink); text-decoration: underline; }
 
 /* ---------- Header ---------- */
 
@@ -120,16 +85,15 @@ a:hover { color: var(--accent-hover); }
 .brand img { display: block; }
 .site-header .brand, .site-header .brand:hover { color: var(--brand-ink); }
 .header-tools { display: flex; align-items: center; gap: 1.25rem; font-size: 0.85rem; }
-.region { display: flex; align-items: center; gap: 0.45rem; color: var(--brand-muted); }
+.region { display: flex; align-items: center; gap: 0.45rem; color: var(--brand-ink); }
 .region select { height: 28px; padding: 0 0.3rem; border: 1px solid transparent; border-radius: 2px; background: #ffffff; color: #222831; font: inherit; }
 
-/* The categories, on a lighter bar; the one being shown filled in blue. */
-.category-nav { background: #1d3a66; border-bottom: 3px solid var(--accent); }
+/* The categories, on the same navy over a line of the blue; the one being shown filled in it. */
+.category-nav { background: var(--brand); border-bottom: 3px solid var(--accent); }
 .category-nav ul { display: flex; margin: 0 auto; list-style: none; overflow-x: auto; scrollbar-width: none; }
 .category-nav a { display: block; padding: 0.7rem 1rem; color: var(--brand-ink); font-size: 0.9rem; font-weight: 700; text-decoration: none; white-space: nowrap; }
 .category-nav a:hover { color: var(--brand-ink); text-decoration: underline; }
 .category-nav a[aria-current] { background: var(--accent); }
-@media (prefers-color-scheme: dark) { .category-nav { background: #142a4a; } }
 
 @media (max-width: 640px) {
   .header-row { padding-block: 0.5rem; }
@@ -145,7 +109,7 @@ a:hover { color: var(--accent-hover); }
 .category-strip a { position: relative; display: block; height: clamp(160px, 30vh, 300px); overflow: hidden; background: var(--brand); color: var(--brand-ink); text-decoration: none; }
 .category-strip li + li a { border-left: 2px solid #ffffff; }
 .category-strip img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.category-strip span { position: absolute; left: 0; right: 0; bottom: 0; padding: 0.5rem 0.75rem; background: rgb(19 41 75 / 0.85); font-weight: 700; font-size: 0.95rem; }
+.category-strip span { position: absolute; left: 0; right: 0; bottom: 0; padding: 0.5rem 0.75rem; background: rgb(var(--brand-rgb) / 0.85); font-weight: 700; font-size: 0.95rem; }
 .category-strip a:hover span { background: var(--accent); text-decoration: underline; }
 @media (max-width: 640px) {
   .category-strip ul { grid-template-columns: repeat(5, 9rem); overflow-x: auto; }
@@ -172,7 +136,7 @@ a:hover { color: var(--accent-hover); }
 .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: 1.1rem 2rem; margin: 0; padding: 0; list-style: none; }
 .tile { display: grid; align-content: start; gap: 0.2rem; height: 100%; color: var(--text); text-decoration: none; }
 .tile-title { color: var(--accent); font-weight: 700; }
-.tile:hover .tile-title { color: var(--accent-hover); text-decoration: underline; }
+.tile:hover .tile-title { text-decoration: underline; }
 .tile-text { color: var(--muted); font-size: 0.9rem; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
 /* The Windows app, in a line, in a grey box. */
@@ -231,19 +195,18 @@ a:hover { color: var(--accent-hover); }
 .side-group a:hover { text-decoration: underline; }
 /* A group's heading links to its topic's page, but looks like the heading it is. */
 .side-group .topic-title a { padding: 0; border: 0; font-size: inherit; color: inherit; }
-.side-group a[aria-current] { border-left-color: var(--accent); background: var(--accent-soft); color: var(--text); font-weight: 700; }
+.side-group a[aria-current] { border-left-color: var(--accent); background: var(--sunken); color: var(--text); font-weight: 700; }
 
 /* The band across the top of a topic's pages (categoryBand in main.ts): the topic's photo, full
    width and hard-edged, under the brand colour, with the breadcrumb and title in white. */
 .category-band { position: relative; isolation: isolate; background: var(--brand); color: var(--brand-ink); }
 .category-photo { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; }
-.category-band::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgb(19 41 75 / 0.93) 0%, rgb(19 41 75 / 0.85) 50%, rgb(19 41 75 / 0.6) 100%); }
+.category-band::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgb(var(--brand-rgb) / 0.93) 0%, rgb(var(--brand-rgb) / 0.85) 50%, rgb(var(--brand-rgb) / 0.6) 100%); }
 .category-inner { padding-block: 1.5rem 1.75rem; }
 .category-band .crumbs { margin-bottom: 0.6rem; }
-.category-band .crumbs-label { color: var(--brand-muted); }
-.category-band .crumbs a { color: var(--brand-muted); }
-.category-band .crumbs a:hover { color: var(--brand-ink); }
-.category-band .crumbs li + li::before { color: var(--brand-muted); }
+.category-band .crumbs-label { color: var(--brand-ink); }
+.category-band .crumbs a { color: var(--brand-ink); }
+.category-band .crumbs li + li::before { color: var(--brand-ink); }
 .category-title { margin: 0; font-size: 1.6rem; font-weight: 700; line-height: 1.2; }
 .category-title a, .category-title a:hover { color: var(--brand-ink); text-decoration: none; }
 .category-title a:hover { text-decoration: underline; }
@@ -312,7 +275,7 @@ a:hover { color: var(--accent-hover); }
   transition: border-color 0.15s var(--ease);
 }
 .example:hover { border-color: var(--accent); color: var(--accent); }
-.example[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.example[aria-pressed="true"] { background: var(--sunken); border-color: var(--accent); color: var(--accent); font-weight: 600; }
 
 .flow { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; gap: 1.25rem; }
 .arrow { display: none; }
@@ -343,7 +306,7 @@ legend.label { margin-bottom: 0.4rem; }
   transition: border-color 0.15s var(--ease);
 }
 .text-input:hover { border-color: var(--muted); }
-.text-input:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.text-input:focus-within { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
 .affix { color: var(--muted); font-size: 0.95rem; white-space: nowrap; }
 .text-input input {
   flex: 1;
@@ -383,7 +346,7 @@ input[aria-invalid="true"] { color: var(--danger); }
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.segmented input:checked + span { background: var(--surface); color: var(--text); font-weight: 600; box-shadow: 0 1px 2px rgb(60 52 30 / 0.14); }
+.segmented input:checked + span { background: var(--surface); color: var(--text); font-weight: 600; box-shadow: var(--lifted); }
 .segmented input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 1px; }
 
 .more { display: grid; gap: 1rem; padding-top: 0.9rem; border-top: 1px solid var(--line); }
@@ -472,7 +435,7 @@ table.wide { max-width: none; }
 th, td { padding: 0.45rem 0.75rem; border-bottom: 1px solid var(--line); text-align: left; }
 th { font-size: 0.85rem; font-weight: 600; color: var(--muted); }
 tr.cat td { padding-top: 1rem; font-size: 0.85rem; font-weight: 700; color: var(--text); }
-tr.hit td { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+tr.hit td { background: var(--sunken); color: var(--accent); font-weight: 600; }
 
 /* Diagrams (packages/ui/src/visuals.ts) */
 .visual { margin: 0; padding: 0.9rem; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; }
@@ -492,13 +455,13 @@ tr.hit td { background: var(--accent-soft); color: var(--accent); font-weight: 6
 .viz-pointer.is-exact { stroke: var(--accent); }
 .viz-pointer.is-near { stroke: var(--warn); stroke-dasharray: 3 2; }
 .viz-wire { stroke-width: 1.5; }
-.viz-wire.is-input { fill: #c77b3a; stroke: #8a4f1f; }
-.viz-wire.is-match { fill: var(--accent-soft); stroke: var(--accent); }
+.viz-wire.is-input { fill: var(--copper); stroke: var(--copper-edge); }
+.viz-wire.is-match { fill: var(--sunken); stroke: var(--accent); }
 .viz-wire.is-other { fill: var(--sunken); stroke: var(--muted); stroke-dasharray: 3 2; }
 .viz-pack { fill: var(--sunken); stroke: var(--muted); stroke-width: 1.5; }
 .viz-pack-used { fill: var(--accent); opacity: 0.85; }
 .viz-hub { fill: var(--surface); stroke: var(--muted); }
-.viz-temp { fill: var(--accent-soft); stroke: var(--line); }
+.viz-temp { fill: var(--sunken); stroke: var(--line); }
 .viz-dot { fill: var(--accent); stroke: var(--surface); stroke-width: 2; }
 
 /* ---------- Footer ---------- */
@@ -506,16 +469,16 @@ tr.hit td { background: var(--accent-soft); color: var(--accent); font-weight: 6
 .site-footer { background: var(--brand); color: var(--brand-ink); }
 .footer-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr); gap: 2.5rem; padding-block: 2.5rem; }
 .site-footer .brand, .site-footer .brand:hover { color: var(--brand-ink); }
-.footer-brand p { margin: 0.75rem 0 0; max-width: 36ch; color: var(--brand-muted); font-size: 0.9rem; }
+.footer-brand p { margin: 0.75rem 0 0; max-width: 36ch; color: var(--brand-ink); font-size: 0.9rem; }
 .site-footer h2 { margin: 0 0 0.75rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
 .site-footer ul { display: grid; gap: 0.4rem; margin: 0; padding: 0; list-style: none; }
-.site-footer nav a { color: var(--brand-muted); font-size: 0.9rem; text-decoration: none; }
+.site-footer nav a { color: var(--brand-ink); font-size: 0.9rem; text-decoration: none; }
 .site-footer nav a:hover { color: var(--brand-ink); text-decoration: underline; }
 /* The bottom line: copyright and the privacy policy, on a darker strip. */
-.footer-legal { background: rgb(0 0 0 / 0.25); font-size: 0.8rem; color: var(--brand-muted); }
+.footer-legal { background: rgb(0 0 0 / 0.25); font-size: 0.8rem; color: var(--brand-ink); }
 .footer-legal .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem 1.5rem; padding-block: 0.9rem; }
-.footer-legal a { color: var(--brand-muted); }
-.footer-legal a:hover { color: var(--brand-ink); }
+.footer-legal a { color: var(--brand-ink); }
+.footer-legal a:hover { text-decoration: none; }
 @media (max-width: 767px) {
   .footer-grid { grid-template-columns: 1fr 1fr; }
   .footer-brand { grid-column: 1 / -1; }
@@ -553,14 +516,14 @@ tr.hit td { background: var(--accent-soft); color: var(--accent); font-weight: 6
 /* 1. The page: a fixed-width column on grey. Everything full-width before stops at its edges. */
 body { background: var(--page); }
 .site-header, main, .site-footer { width: 100%; max-width: 1100px; margin-inline: auto; }
-main { background: var(--bg); border-inline: 1px solid var(--page-edge); }
+main { background: var(--surface); border-inline: 1px solid var(--page-edge); }
 
-/* 2. Small links over the header, between pipes. */
-.utility-bar { background: #0b1a31; font: 11px/1.5 var(--small); }
+/* 2. Small links over the header, between pipes, on a darker strip of the navy. */
+.utility-bar { background: linear-gradient(rgb(0 0 0 / 0.3), rgb(0 0 0 / 0.3)), var(--brand); font: 11px/1.5 var(--small); }
 .utility-bar ul { display: flex; justify-content: flex-end; flex-wrap: wrap; margin: 0 auto; padding-block: 4px; list-style: none; }
-.utility-bar li + li::before { content: "|"; margin: 0 0.6em; color: var(--brand-muted); }
-.utility-bar a { color: var(--brand-muted); }
-.utility-bar a:hover { color: var(--brand-ink); }
+.utility-bar li + li::before { content: "|"; margin: 0 0.6em; color: var(--brand-ink); }
+.utility-bar a { color: var(--brand-ink); }
+.utility-bar a:hover { text-decoration: none; }
 
 /* 3. The footer's line of links between pipes, the copyright under it; "Back to top" after long pages. */
 .footer-legal { font: 11px/1.6 var(--small); }
@@ -570,12 +533,13 @@ main { background: var(--bg); border-inline: 1px solid var(--page-edge); }
 .footer-legal p { margin: 0.35rem 0 0; }
 .to-top { margin: 2rem 0 0; text-align: right; font: 11px var(--small); }
 
-/* 4. Gradients on the bars, and a divider between the menu's entries. */
-.site-header { background: linear-gradient(180deg, #24467a 0%, var(--brand) 100%); }
-.category-nav { background: linear-gradient(180deg, #2d5088 0%, #1a3561 100%); }
+/* 4. Gradients on the bars, and a divider between the menu's entries: a sheen of white or a shade of
+   black over the navy and the blue, so they're still the two blues, lit from above. */
+.site-header { background: linear-gradient(180deg, rgb(255 255 255 / 0.1) 0%, rgb(255 255 255 / 0) 100%), var(--brand); }
+.category-nav { background: linear-gradient(180deg, rgb(255 255 255 / 0.14) 0%, rgb(255 255 255 / 0.03) 100%), var(--brand); }
 .category-nav li + li { border-left: 1px solid rgb(0 0 0 / 0.3); box-shadow: inset 1px 0 0 rgb(255 255 255 / 0.12); }
-.category-nav a[aria-current] { background: linear-gradient(180deg, #2b7bd6 0%, var(--accent) 100%); }
-.site-footer { background: linear-gradient(180deg, var(--brand) 0%, #0f2240 100%); }
+.category-nav a[aria-current] { background: linear-gradient(180deg, rgb(255 255 255 / 0.2) 0%, rgb(255 255 255 / 0) 100%), var(--accent); }
+.site-footer { background: linear-gradient(180deg, rgb(0 0 0 / 0) 0%, rgb(0 0 0 / 0.2) 100%), var(--brand); }
 
 /* 5. Panel headings in a grey gradient. */
 .topic > .topic-title, .worked-item h3, .side-group .topic-title { background: linear-gradient(180deg, var(--bar-top) 0%, var(--bar-bottom) 100%); }
@@ -583,15 +547,14 @@ main { background: var(--bg); border-inline: 1px solid var(--page-edge); }
 /* 6. Glossy buttons; fields with a shadow inside. */
 .example, .button { background: linear-gradient(180deg, var(--gloss-top) 0%, var(--gloss-bottom) 100%); box-shadow: 0 1px 0 rgb(0 0 0 / 0.06); }
 .example:hover { background: linear-gradient(180deg, var(--gloss-top) 0%, var(--bar-bottom) 100%); }
-.example[aria-pressed="true"] { background: linear-gradient(180deg, #d9e6f6 0%, #c3d6ef 100%); box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.15); }
-@media (prefers-color-scheme: dark) { .example[aria-pressed="true"] { background: var(--accent-soft); } }
+.example[aria-pressed="true"] { background: linear-gradient(180deg, var(--line) 0%, var(--sunken) 100%); box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.15); }
 .segmented input:checked + span { background: linear-gradient(180deg, var(--gloss-top) 0%, var(--gloss-bottom) 100%); }
 .text-input, .side-role select, .region select { box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.14); }
 
 /* 7. "Convert from" as a form box, its title sitting on the border. */
 .flow { margin-top: 0.7rem; }
 .from { position: relative; padding-top: 1.75rem; border-color: var(--line-strong); }
-.from .box-title { position: absolute; top: -0.7em; left: 0.9rem; padding: 0 0.4rem; background: var(--bg); color: var(--text); font-size: 0.85rem; line-height: 1.4; }
+.from .box-title { position: absolute; top: -0.7em; left: 0.9rem; padding: 0 0.4rem; background: var(--surface); color: var(--text); font-size: 0.85rem; line-height: 1.4; }
 
 /* 8. Verdana for the small print. */
 .crumbs, .site-footer nav a, .side-role, .region { font-family: var(--small); }
@@ -600,7 +563,7 @@ main { background: var(--bg); border-inline: 1px solid var(--page-edge); }
 /* 9. Links underlined, and purple once visited. */
 .tile .tile-title, .side-group > a, .answers a, .crumbs a, .site-footer nav a, .app-box a { text-decoration: underline; }
 .tile:visited .tile-title, .side-group > a:visited, .answers a:visited, .crumbs a:visited, .app-box a:visited { color: var(--visited); }
-.category-band .crumbs a:visited { color: var(--brand-muted); }
+.category-band .crumbs a:visited { color: var(--brand-ink); }
 .side-group > a[aria-current] { color: var(--text); text-decoration: none; }
 
 /* 10. "»" before menu and footer links. */

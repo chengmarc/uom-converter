@@ -1,0 +1,89 @@
+/* The apps' colours, the same in all of them (the website, the Windows app, the Android app), each
+   of which @imports this, light and dark: navy for the brand, a blue that sits with it for links and
+   what's chosen, cool greys for pages, panels and lines, and the colours of a good, borderline or
+   bad answer. Each app lays them out its own way (the website's white pages, the apps' off-white
+   screens with white cards on them) but defines no colours of its own, save a few of the website's
+   period greys.
+   Two blues, and only two: every blue in the apps is --brand or --accent, never a lighter, darker or
+   mixed one. What's chosen shows as the blue on a grey (--sunken or --surface), not on a pale blue;
+   hovering underlines or outlines rather than changing the blue; text on the navy is white. The one
+   exception is a photo, which may sit under a see-through navy (--brand-rgb) so white text reads
+   on it. The app icon keeps its own vivid azure-to-indigo and gold, to stand out where people find
+   the app; the apps themselves don't use them.
+   Some are copied where CSS can't reach, and a test checks each copy: the Windows app's frame
+   (--sunken, --text; apps/windows/src/main/theme.test.ts) and the Android splash and web view
+   (--bg; apps/android/src/theme.test.ts). */
+
+:root {
+  /* The two blues, and what's written on them. */
+  --brand: #13294b;
+  /* The navy's channels, for the see-through navy over a photo: rgb(var(--brand-rgb) / 0.5). */
+  --brand-rgb: 19 41 75;
+  --brand-ink: #ffffff;
+  --accent: #0b5cad;
+  --accent-ink: #ffffff;
+
+  /* Pages and panels: --bg under everything, --surface for cards, boxes and fields on it,
+     --sunken for what sits lower (panel headings, tracks, the Windows app's frame). */
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --sunken: #edf0f3;
+  --hover: rgb(0 0 0 / 0.05);
+  --pressed: rgb(0 0 0 / 0.08);
+  --text: #222831;
+  --muted: #5a6370;
+  --line: #d9dee4;
+  --line-strong: #b9c1cb;
+
+  /* Answers and errors */
+  --danger: #b3261e;
+  --good: #1a7f37;
+  --warn: #9a6700;
+  --bad: #b3261e;
+  --bad-soft: #fbe9e7;
+
+  /* The diagrams' copper, for the wire being sized. */
+  --copper: #c77b3a;
+  --copper-edge: #8a4f1f;
+
+  /* Depth, where an app uses it: boxes stand off the page (--raised), cards in them a little less
+     (--lifted). */
+  --lifted: 0 1px 2px rgb(0 0 0 / 0.06), 0 2px 6px -2px rgb(0 0 0 / 0.1);
+  --lifted-hover: 0 1px 2px rgb(0 0 0 / 0.08), 0 6px 14px -4px rgb(0 0 0 / 0.16);
+  --raised: 0 1px 3px rgb(0 0 0 / 0.06), 0 10px 28px -8px rgb(0 0 0 / 0.14);
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brand: #0e1d33;
+    --brand-rgb: 14 29 51;
+    --accent: #6fa8e8;
+    /* The light blue takes the navy on it, not white. */
+    --accent-ink: var(--brand);
+
+    --bg: #15181c;
+    --surface: #1d2126;
+    --sunken: #23282e;
+    --hover: rgb(255 255 255 / 0.06);
+    --pressed: rgb(255 255 255 / 0.1);
+    --text: #e6e9ed;
+    --muted: #a3acb8;
+    --line: #333a42;
+    --line-strong: #4a535e;
+
+    --danger: #f2877f;
+    --good: #6fd58b;
+    --warn: #e8c060;
+    --bad: #f2877f;
+    --bad-soft: #3a1c1a;
+
+    /* On a dark page a shadow needs more weight to show. */
+    --lifted: 0 1px 2px rgb(0 0 0 / 0.4), 0 2px 6px -2px rgb(0 0 0 / 0.4);
+    --lifted-hover: 0 1px 2px rgb(0 0 0 / 0.45), 0 6px 14px -4px rgb(0 0 0 / 0.55);
+    --raised: 0 1px 3px rgb(0 0 0 / 0.45), 0 12px 32px -8px rgb(0 0 0 / 0.6);
+
+    color-scheme: dark;
+  }
+}

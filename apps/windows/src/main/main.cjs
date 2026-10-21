@@ -14,12 +14,12 @@ const DIST = path.join(__dirname, "..", "..", "dist");
 const DEV_URL = app.isPackaged ? undefined : process.env.UOM_DEV_URL;
 
 /**
- * The page's frame colours (--chrome and --text in style.css, light and dark), for the title bar
- * buttons Windows draws and for the window behind the page. theme.test.ts checks they match.
+ * The page's frame colours (--sunken and --text in @uom/brand/tokens.css, light and dark), for the
+ * title bar buttons Windows draws and for the window behind the page. theme.test.ts checks they match.
  */
 const FRAME = {
-  light: { chrome: "#ecebe6", text: "#1c1b19" },
-  dark: { chrome: "#1b1a18", text: "#edebe6" },
+  light: { chrome: "#edf0f3", text: "#222831" },
+  dark: { chrome: "#23282e", text: "#e6e9ed" },
 };
 const frame = () => (nativeTheme.shouldUseDarkColors ? FRAME.dark : FRAME.light);
 const TITLE_BAR_HEIGHT = 40;

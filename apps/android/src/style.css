@@ -2,50 +2,21 @@
    screens: an app bar, converter cards two across, touch-sized controls (48px), and padding for
    the status and navigation bars, since the app draws edge to edge.
    Corners: pills for the search field and the sheet's button, 12px for chips, cards, fields and
-   surfaces, 28px for the settings sheet's top edge. */
+   surfaces, 28px for the settings sheet's top edge.
+   Shadows (--lifted, --raised, as in the Windows app): a converter's two boxes and the home header
+   stand off the screen, the cards, topic bands, answer and diagrams a little less; pressing one
+   lays it flat. */
 
-/* The brand colours, the same in every app: --brand (navy: the home header, and the tint over the
-   topic photos) and --accent. */
-@import "@uom/brand/colors.css";
+/* The colours, the same in every app: --accent, the greys and the answers' colours. As in the
+   Windows app, there's no navy: the home header is the frame's grey (--sunken), the screens --bg,
+   cards and fields --surface, and the blue marks what's chosen. */
+@import "@uom/brand/tokens.css";
 
 :root {
-  --bg: #f7f6f3;
-  --surface: #ffffff;
-  --sunken: #efeee9;
-  --pressed: rgb(28 27 25 / 0.08);
-  --text: #1c1b19;
-  --muted: #5c5a53;
-  --line: #e2e0d9;
-  --line-strong: #cfccc3;
-  --danger: #b3261e;
-  --good: #1a7f37;
-  --warn: #9a6700;
-  --bad: #b3261e;
-  --bad-soft: #fbe9e7;
   --font: "Inter Variable", system-ui, Roboto, sans-serif;
   /* Capacitor sets --safe-area-inset-* where the web view lacks env(); either way, the bars' height. */
   --top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
   --bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
-  color-scheme: light;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #131312;
-    --surface: #1c1b19;
-    --sunken: #242320;
-    --pressed: rgb(255 255 255 / 0.08);
-    --text: #edebe6;
-    --muted: #aca89e;
-    --line: #2f2d29;
-    --line-strong: #45423c;
-    --danger: #f2877f;
-    --good: #6fd58b;
-    --warn: #e8c060;
-    --bad: #f2877f;
-    --bad-soft: #3a1c1a;
-    color-scheme: dark;
-  }
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -98,21 +69,19 @@ a { color: var(--accent); }
 /* ---------- Home ---------- */
 
 /* The home screen's header (its app bar, search and roles), held at the top while the cards
-   scroll up under its rounded lower edge: the brand's navy, white on it. The photos are the
-   topics' own, as in the Windows app. The status bar's icons turn light over it (statusBar in
-   main.ts). */
+   scroll up under its rounded lower edge: the grey of the Windows app's frame, with its search
+   box and role tabs. */
 .home-head {
   position: sticky;
   top: 0;
   z-index: 10;
   padding-bottom: 4px;
   border-radius: 0 0 20px 20px;
-  background: var(--brand);
+  background: var(--sunken);
+  box-shadow: var(--raised);
 }
 /* Its app bar is part of the block: not held on its own, nor a background of its own. */
-#home .appbar { position: static; background: none; color: #ffffff; }
-#home .icon-button { color: #ffffff; }
-#home .icon-button:active { background: rgb(255 255 255 / 0.14); }
+#home .appbar { position: static; background: none; }
 
 .home-body { padding-bottom: calc(24px + var(--bottom)); }
 
@@ -121,38 +90,47 @@ a { color: var(--accent); }
   width: 100%;
   height: 52px;
   padding: 0 20px;
-  border: 0;
+  border: 1px solid var(--line);
   border-radius: 26px;
-  background: rgb(255 255 255 / 0.18);
-  color: #ffffff;
+  background: var(--surface);
+  color: var(--text);
   font: inherit;
   font-size: 1rem;
 }
-.search input::placeholder { color: rgb(255 255 255 / 0.85); }
-.search input:focus { outline: 2px solid #ffffff; outline-offset: 0; background: rgb(255 255 255 / 0.24); }
-/* The field's clear button: white, as the text. */
-.search input::-webkit-search-cancel-button { filter: brightness(0) invert(1); }
+.search input::placeholder { color: var(--muted); }
+.search input:focus { outline: 0; border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
 
 .roles { display: flex; gap: 8px; padding: 0 16px 12px; overflow-x: auto; scrollbar-width: none; }
 .roles::-webkit-scrollbar { display: none; }
 .chip {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 6px;
   flex: none;
   height: 36px;
   padding: 0 14px;
-  border: 1px solid rgb(255 255 255 / 0.45);
+  border: 1px solid transparent;
   border-radius: 12px;
   background: none;
-  color: #ffffff;
+  color: var(--text);
   font: inherit;
   font-size: 0.9rem;
 }
-.chip .icon { width: 18px; height: 18px; color: rgb(255 255 255 / 0.85); }
-/* The chosen role: white, the navy on it. */
-.chip[aria-pressed="true"] { background: #ffffff; border-color: #ffffff; color: var(--brand); font-weight: 600; }
-.chip[aria-pressed="true"] .icon { color: var(--brand); }
+.chip:active { background: var(--pressed); }
+.chip .icon { width: 18px; height: 18px; color: var(--accent); }
+/* The chosen role, as the Windows app's role tabs: raised on the page's white, the blue under it. */
+.chip[aria-pressed="true"] { background: var(--surface); border-color: var(--line); font-weight: 600; box-shadow: var(--lifted); }
+.chip[aria-pressed="true"]::after {
+  content: "";
+  position: absolute;
+  left: 30%;
+  right: 30%;
+  bottom: -1px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+}
 
 .group { margin-top: 12px; }
 .group-title {
@@ -166,9 +144,9 @@ a { color: var(--accent); }
   color: var(--accent);
 }
 
-/* A topic's band (topicBand in main.ts): its photo under a light tint of the brand's navy, a
-   little deeper behind the name on the left, and a soft shadow under the white name, so it reads
-   over any photo and the photo still shows. Heading a topic's cards. */
+/* A topic's band (topicBand in main.ts): its photo under a light shade, a little deeper behind the
+   name on the left, and a soft shadow under the white name, so it reads over any photo and the
+   photo still shows. Heading a topic's cards. */
 .topic-band {
   position: relative;
   isolation: isolate;
@@ -180,7 +158,8 @@ a { color: var(--accent); }
   margin: 4px 16px 10px;
   padding: 0 18px;
   border-radius: 12px;
-  background: rgb(var(--brand-rgb));
+  box-shadow: var(--lifted);
+  background: var(--sunken);
   font-size: 1.05rem;
   color: #ffffff;
   font-weight: 650;
@@ -192,7 +171,7 @@ a { color: var(--accent); }
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(90deg, rgb(var(--brand-rgb) / 0.45) 0%, rgb(var(--brand-rgb) / 0.3) 45%, rgb(var(--brand-rgb) / 0.1) 100%);
+  background: linear-gradient(90deg, rgb(0 0 0 / 0.45) 0%, rgb(0 0 0 / 0.3) 45%, rgb(0 0 0 / 0.1) 100%);
 }
 /* The icon is a stroke, which text-shadow skips. */
 .topic-band .icon { width: 22px; height: 22px; filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.55)); }
@@ -210,10 +189,11 @@ a { color: var(--accent); }
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 12px;
+  box-shadow: var(--lifted);
   color: var(--text);
   text-decoration: none;
 }
-.card:active { background: var(--sunken); }
+.card:active { background: var(--sunken); box-shadow: none; }
 .card-photo { flex: none; width: 36px; height: 36px; margin-left: -4px; border-radius: 8px; object-fit: cover; background: var(--sunken); }
 .card-title {
   flex: 1;
@@ -267,14 +247,14 @@ a { color: var(--accent); }
   font-size: 0.9rem;
   white-space: nowrap;
 }
-.example[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.example[aria-pressed="true"] { background: var(--sunken); border-color: var(--accent); color: var(--accent); font-weight: 600; }
 
 .flow { display: grid; gap: 16px; }
 .arrow { display: none; }
 .box { display: grid; gap: 16px; min-width: 0; padding: 16px; border-radius: 12px; }
-.from { background: var(--surface); border: 1px solid var(--line); }
+.from { background: var(--surface); border: 1px solid var(--line); box-shadow: var(--raised); }
 .from .box-title { display: none; }
-.to { background: var(--sunken); }
+.to { background: var(--sunken); border: 1px solid var(--line); box-shadow: var(--raised); }
 .box-title { margin: 0; font-size: 0.95rem; font-weight: 600; }
 
 fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
@@ -332,7 +312,7 @@ input[aria-invalid="true"] { color: var(--danger); }
   font-size: 0.9rem;
   line-height: 1.2;
 }
-.segmented input:checked + span { background: var(--surface); color: var(--text); font-weight: 600; box-shadow: 0 1px 2px rgb(60 52 30 / 0.16); }
+.segmented input:checked + span { background: var(--surface); color: var(--text); font-weight: 600; box-shadow: var(--lifted); }
 .segmented input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 1px; }
 
 .more { display: grid; gap: 16px; padding-top: 12px; border-top: 1px solid var(--line); }
@@ -356,11 +336,12 @@ input[aria-invalid="true"] { color: var(--danger); }
   background: var(--surface);
   border: 0;
   border-radius: 12px;
+  box-shadow: var(--lifted);
   color: var(--text);
   font: inherit;
   text-align: left;
 }
-.answer:active { background: var(--pressed); }
+.answer:active { background: var(--pressed); box-shadow: none; }
 .answer-label { font-size: 0.9rem; color: var(--muted); }
 .answer-value { font-size: 2rem; font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .answer-detail { font-size: 0.9rem; font-weight: 600; }
@@ -414,10 +395,10 @@ table { margin-top: 8px; width: 100%; border-collapse: collapse; font-variant-nu
 th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: left; }
 th { font-size: 0.85rem; font-weight: 600; color: var(--muted); }
 tr.cat td { padding-top: 14px; font-size: 0.85rem; font-weight: 650; }
-tr.hit td { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+tr.hit td { background: var(--sunken); color: var(--accent); font-weight: 600; }
 
 /* Diagrams (packages/ui/src/visuals.ts) */
-.visual { margin: 0; padding: 12px; background: var(--surface); border-radius: 12px; }
+.visual { margin: 0; padding: 12px; background: var(--surface); border-radius: 12px; box-shadow: var(--lifted); }
 .viz { display: block; width: 100%; height: auto; max-height: 11rem; overflow: visible; }
 .viz-text { font: 13px var(--font); fill: var(--muted); }
 .viz-text.strong { font-weight: 700; fill: var(--text); }
@@ -434,13 +415,13 @@ tr.hit td { background: var(--accent-soft); color: var(--accent); font-weight: 6
 .viz-pointer.is-exact { stroke: var(--accent); }
 .viz-pointer.is-near { stroke: var(--warn); stroke-dasharray: 3 2; }
 .viz-wire { stroke-width: 1.5; }
-.viz-wire.is-input { fill: #c77b3a; stroke: #8a4f1f; }
-.viz-wire.is-match { fill: var(--accent-soft); stroke: var(--accent); }
+.viz-wire.is-input { fill: var(--copper); stroke: var(--copper-edge); }
+.viz-wire.is-match { fill: var(--sunken); stroke: var(--accent); }
 .viz-wire.is-other { fill: var(--sunken); stroke: var(--muted); stroke-dasharray: 3 2; }
 .viz-pack { fill: var(--sunken); stroke: var(--muted); stroke-width: 1.5; }
 .viz-pack-used { fill: var(--accent); opacity: 0.85; }
 .viz-hub { fill: var(--surface); stroke: var(--muted); }
-.viz-temp { fill: var(--accent-soft); stroke: var(--line); }
+.viz-temp { fill: var(--sunken); stroke: var(--line); }
 .viz-dot { fill: var(--accent); stroke: var(--surface); stroke-width: 2; }
 
 /* ---------- Settings sheet ---------- */

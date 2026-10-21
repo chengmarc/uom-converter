@@ -54,7 +54,7 @@ const photo = photoLibrary(
   }),
 );
 
-/** A band with the topic's photo under a tint of the brand's navy, and its icon and name on it. */
+/** A band with the topic's photo under a light shade, and its icon and name on it. */
 function topicBand(topic: Topic) {
   const band = el("h2", "topic-band");
   const img = photo(`${TOPIC_SLOTS[topic]}-banner`, "100vw", "", "topic-band-photo");
@@ -197,11 +197,11 @@ function showBackdrop(topic: Topic) {
 
 let homeScroll = 0;
 
-// The status bar's clock and icons, over the page since it draws edge to edge: light on the home
-// screen's navy header and in the dark theme, dark on a light converter screen.
+// The status bar's clock and icons, over the page since it draws edge to edge: light in the dark
+// theme, dark in the light one.
 const darkTheme = matchMedia("(prefers-color-scheme: dark)");
 function statusBar() {
-  const light = !home.hidden || darkTheme.matches;
+  const light = darkTheme.matches;
   // Style.Dark is for a dark background: light icons. Outside the app (vite's dev server in a
   // browser) there's no status bar.
   StatusBar.setStyle({ style: light ? Style.Dark : Style.Light }).catch(() => {});

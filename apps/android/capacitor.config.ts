@@ -11,7 +11,7 @@ const config: CapacitorConfig = {
   webDir: "dist",
   android: {
     path: "native",
-    backgroundColor: "#f7f6f3",
+    backgroundColor: "#f6f7f9",
   },
   ...(devUrl && { server: { url: devUrl, cleartext: true } }),
 };
