@@ -30,6 +30,14 @@ for (const [scheme, value] of [["https", process.env.HTTPS_PROXY ?? process.env.
   proxy.push(`-D${scheme}.proxyHost=${u.hostname}`, `-D${scheme}.proxyPort=${u.port || (u.protocol === "https:" ? 443 : 80)}`);
 }
 if (tasks.some((t) => t.startsWith("install"))) ensureDevice();
+// A release build without the upload key comes out unsigned, and Play refuses it (native/app/build.gradle).
+if (tasks.some((t) => t.endsWith("Release"))) {
+  const { UOM_UPLOAD_KEYSTORE: keystore, UOM_UPLOAD_PASSWORD: password } = process.env;
+  if (!keystore || !fs.existsSync(keystore) || !password) {
+    console.error("A release build needs the upload key: set UOM_UPLOAD_KEYSTORE to its .jks file and UOM_UPLOAD_PASSWORD (apps/android/README.md).");
+    process.exit(1);
+  }
+}
 
 const env = { ...process.env, JAVA_HOME: java, ANDROID_HOME: sdk, GRADLE_OPTS: [process.env.GRADLE_OPTS, ...proxy].filter(Boolean).join(" ") };
 const gradlew = path.join(PROJECT, win ? "gradlew.bat" : "gradlew");

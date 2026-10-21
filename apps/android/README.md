@@ -22,7 +22,7 @@ npm run android:dev       # live preview on an emulator (started if need be) or 
 npm run android:run       # build, install and open on the running emulator or phone
 npm run android:emulator  # open the emulator with the app installed (or apps/android/emulator.cmd)
 npm run android:apk       # debug .apk, in apps/android/native/app/build/outputs/apk/debug/
-npm run android:aab       # release .aab, for Google Play
+npm run android:aab       # release .aab for Google Play, signed with the upload key (below)
 npm run android:sync      # build the page and copy it into the native project
 ```
 
@@ -30,8 +30,29 @@ npm run android:sync      # build the page and copy it into the native project
 page back when stopped (Ctrl+C or closing the console); until then, the app on the phone keeps
 loading from this computer.
 
-The release `.aab` isn't signed: `native/app/build.gradle` has no signing config yet. Google Play
-needs it signed with an upload key before it takes it.
+### Build a release for Google Play
+
+Play takes only bundles signed with the app's upload key; Play App Signing then signs what it
+ships with the app's own key, which Google keeps. The upload key lives outside the repo, in a
+keystore made once with Android Studio's `keytool`:
+
+```powershell
+& "C:\Program Files\Android\Android Studio\jbr\bin\keytool.exe" -genkeypair -v `
+  -keystore "$env:USERPROFILE\.keys\uom-converter-upload.jks" -alias upload `
+  -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=chengmarc"
+```
+
+Back up the keystore and its password: a lost upload key takes Play support days to reset. To
+build, point the build at it, and bump the version first (every upload needs a higher
+versionCode):
+
+```powershell
+$env:UOM_UPLOAD_KEYSTORE = "$env:USERPROFILE\.keys\uom-converter-upload.jks"
+$env:UOM_UPLOAD_PASSWORD = "<its password>"
+npm run android:aab   # apps/android/native/app/build/outputs/bundle/release/app-release.aab
+```
+
+Without them the build stops (`scripts/gradle.cjs`) rather than make a bundle Play would refuse.
 
 ### Behind a proxy
 
