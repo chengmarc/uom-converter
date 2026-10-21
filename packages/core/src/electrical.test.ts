@@ -11,10 +11,13 @@ describe("load", () => {
 });
 
 describe("line and neutral voltage", () => {
-  it("converts and finds the system", () => {
+  it("converts between line-to-line and line-to-neutral", () => {
     expect(lineToNeutral(208)).toBeCloseTo(120.09, 2);
     expect(lineToNeutral(600)).toBeCloseTo(346.4, 1);
     expect(lineToLine(277)).toBeCloseTo(479.8, 1);
+  });
+
+  it("finds the wye system a voltage belongs to", () => {
     expect(wyeSystem(208)).toEqual([120, 208]);
     expect(wyeSystem(346.4)).toEqual([347, 600]);
     expect(wyeSystem(240)).toBeUndefined();
@@ -36,10 +39,16 @@ describe("power factor correction", () => {
 });
 
 describe("motors", () => {
-  it("works out synchronous speed, slip and poles", () => {
+  it("works out synchronous speed from frequency and poles", () => {
     expect(syncSpeedRpm(60, 4)).toBe(1800);
     expect(syncSpeedRpm(50, 4)).toBe(1500);
+  });
+
+  it("works out slip from synchronous and rated speed", () => {
     expect(motorSlip(1800, 1750)).toBeCloseTo(0.0278, 4);
+  });
+
+  it("finds the poles from a nameplate speed", () => {
     expect(polesForRpm(60, 1750)).toBe(4);
     expect(polesForRpm(60, 3550)).toBe(2);
     expect(polesForRpm(50, 1450)).toBe(4);
@@ -57,16 +66,27 @@ describe("transformer fault current", () => {
 });
 
 describe("Ohm's law", () => {
-  it("solves from any two", () => {
-    const full = { volts: 120, amps: 10, ohms: 12, watts: 1200 };
-    const keys = Object.keys(full) as (keyof typeof full)[];
-    for (const a of keys) {
-      for (const b of keys) {
-        if (a >= b) continue;
-        const r = ohmsLaw({ [a]: full[a], [b]: full[b] }) as typeof full;
-        for (const k of keys) expect(r[k], `${a}+${b} -> ${k}`).toBeCloseTo(full[k]);
-      }
-    }
+  // One circuit, 120 V × 10 A through 12 Ω = 1200 W: any two of its values give back all four.
+  const circuit = { volts: 120, amps: 10, ohms: 12, watts: 1200 };
+  const pairs = [
+    ["volts", "amps"],
+    ["volts", "ohms"],
+    ["volts", "watts"],
+    ["amps", "ohms"],
+    ["amps", "watts"],
+    ["ohms", "watts"],
+  ] as const;
+
+  it.each(pairs)("solves from %s and %s", (a, b) => {
+    expect(ohmsLaw({ [a]: circuit[a], [b]: circuit[b] })).toMatchObject({
+      volts: expect.closeTo(120),
+      amps: expect.closeTo(10),
+      ohms: expect.closeTo(12),
+      watts: expect.closeTo(1200),
+    });
+  });
+
+  it("needs exactly two values", () => {
     expect(ohmsLaw({ volts: 120 })).toHaveProperty("error");
     expect(ohmsLaw({ volts: 120, amps: 1, ohms: 5 })).toHaveProperty("error");
   });

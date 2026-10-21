@@ -55,10 +55,13 @@ describe("parseGtin", () => {
     expect(r.errors[0]).toMatch(/scientific notation/);
   });
 
-  it("expands UPC-E by default and supports GTIN-8 mode", () => {
+  it("reads 8 digits as UPC-E by default, and gives its UPC-A", () => {
     const r = parseGtin("04252614");
     expect(r.kind).toBe("UPC-E");
     expect(r.upcA).toBe("042100005264");
+  });
+
+  it("reads 8 digits as GTIN-8 when asked", () => {
     expect(parseGtin("04252614", { eightDigit: "gtin-8" }).kind).toBe("GTIN-8");
   });
 

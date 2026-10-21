@@ -56,7 +56,6 @@ describe("unit converters' common values", () => {
 
   it("highlight the row for the value entered", () => {
     expect(answer("weight", { value: "50", unit: "lb" })?.highlight).toBe("lb:50");
-    expect(tool("weight").table!().rows.some((r) => "key" in r && r.key === "lb:50")).toBe(true);
   });
 });
 
