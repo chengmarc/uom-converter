@@ -51,9 +51,9 @@ Inside an app, `src/` is its source, `scripts/` its helpers (icon renderers, the
 Live preview, reloading on every save:
 
 ```
-npm run dev           # the website, at http://localhost:5173/
-npm run dev:windows   # the Windows app, in its own window
-npm run dev:android   # the Android app, on an emulator (started if need be) or USB phone
+npm run web:dev       # the website, at http://localhost:5173/
+npm run windows:dev   # the Windows app, in its own window
+npm run android:dev   # the Android app, on an emulator (started if need be) or USB phone
 ```
 
 Each package and app has its own `package.json` listing what it uses; the apps import the
@@ -67,13 +67,13 @@ Every converter at its own address (`/voltage-drop-calculator`, `/awg-to-mm2`…
 can land on it, and a page per topic listing its converters (`/electrical`, `/units`…). Each
 page's title and description are in `apps/web/src/pages.ts`; `apps/web/build/` writes
 the pages with their content drawn in, a sitemap, `llms.txt`, and an offline copy for phones.
-`npm run check:web` checks the built pages as search engines read them.
+`npm run web:check` checks the built pages as search engines read them.
 
 ```
-npm run dev           # live-reloading at http://localhost:5173/
-npm run build:web     # apps/web/dist/
-npm run preview:web   # serve apps/web/dist/ at http://localhost:4173/
-npm run deploy:web    # build and deploy to Cloudflare (needs `npx wrangler login` once)
+npm run web:dev       # live-reloading at http://localhost:5173/
+npm run web:build     # apps/web/dist/
+npm run web:preview   # serve apps/web/dist/ at http://localhost:4173/
+npm run web:deploy    # build and deploy to Cloudflare (needs `npx wrangler login` once)
 ```
 
 It is served at <https://uom-converter.com/> by Cloudflare Workers as static files
@@ -89,8 +89,8 @@ policy. electron-builder's settings are in `apps/windows/packaging/electron-buil
 land in `apps/windows/release/`.
 
 ```
-npm run app        # build the page and open it in the desktop shell
-npm run dist:win   # UOM-Converter-setup.exe
+npm run windows:start  # build the page and open it in the desktop shell
+npm run windows:dist   # UOM-Converter-setup.exe
 ```
 
 ## Microsoft Store (.appx)
@@ -99,8 +99,8 @@ The Store build is an MSIX package. Partner Center signs it on submission, so it
 certificate of its own.
 
 ```
-npm run store:assets   # re-render the app icon and apps/windows/store/ from the icon and the built page
-npm run dist:store     # UOM-Converter-<version>.appx
+npm run windows:assets   # re-render the app icon and apps/windows/store/ from the icon and the built page
+npm run windows:appx     # UOM-Converter-<version>.appx
 ```
 
 ## Android app

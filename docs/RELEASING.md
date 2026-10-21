@@ -26,14 +26,14 @@ the repo root.
 5. **Refresh the images** if the app's look, the icon or the screenshots' converters changed:
 
    ```
-   npm run store:assets
+   npm run windows:assets
    ```
 
 6. **Build:**
 
    ```
-   npm run dist:win     # UOM-Converter-setup.exe
-   npm run dist:store   # UOM-Converter-<version>.appx
+   npm run windows:dist   # UOM-Converter-setup.exe
+   npm run windows:appx   # UOM-Converter-<version>.appx
    ```
 
 7. **Try it out.** Install with the setup exe, ideally on a machine that hasn't run the app before:
@@ -73,7 +73,7 @@ published there.
 1. **One time:** copy the three values under Partner Center → the app → Product identity into
    `appx` in [packaging/electron-builder.config.cjs](../apps/windows/packaging/electron-builder.config.cjs): `identityName`, `publisher` (`CN=…`) and `publisherDisplayName`.
    Until then they hold placeholders, and the Store rejects a package whose identity doesn't match.
-2. **Build** with `npm run dist:store`.
+2. **Build** with `npm run windows:appx`.
 3. **Upload** `apps/windows/release/UOM-Converter-<version>.appx` in a new Partner Center
    submission. Every other field (listing text, images in their numbered order, privacy policy,
    `runFullTrust` justification, certification notes) is in
@@ -96,7 +96,7 @@ Everything else electron-builder leaves there (`win-unpacked/`, `.blockmap` file
 
 ### Where the images come from
 
-`npm run store:assets` runs [store/render.cjs](../apps/windows/store/render.cjs), which renders from
+`npm run windows:assets` runs [store/render.cjs](../apps/windows/store/render.cjs), which renders from
 `packages/brand/app-icon.svg` and the built page (paths below are in `apps/windows/`):
 
 | Output | Used for |

@@ -2,7 +2,7 @@
 
 Everything to paste into Partner Center → UOM Converter, in the submission's order: Properties, Store listings
 (English (United States)), Submission options. Pricing and availability, Age ratings and Packages are filled in Partner
-Center by hand. Images are in [listing/](listing/), rendered by `npm run store:assets` (from `apps/windows/`).
+Center by hand. Images are in [listing/](listing/), rendered by `npm run windows:assets`.
 
 ## Properties
 

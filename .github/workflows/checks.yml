@@ -26,5 +26,5 @@ jobs:
           ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
       - run: npm test
       - run: npm run typecheck
-      - run: npm run build:web
-      - run: npm run check:web
+      - run: npm run web:build
+      - run: npm run web:check

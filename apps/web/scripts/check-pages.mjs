@@ -1,6 +1,6 @@
 // Checks the built website (apps/web/dist/) the way a search engine or link preview reads it:
 // every page's title, description, canonical address, share tags, structured data and heading,
-// the sitemap and llms.txt, and the links between pages. `npm run check:web`, after `npm run build:web`.
+// the sitemap and llms.txt, and the links between pages. `npm run web:check`, after `npm run web:build`.
 // Exits non-zero, listing every problem, if anything is off.
 
 import { existsSync, readdirSync, readFileSync } from "node:fs";
@@ -25,7 +25,7 @@ const meta = (html, attr, key) => {
 const all = (html, re) => [...html.matchAll(re)].map((m) => m[1]);
 
 if (!existsSync(DIST)) {
-  console.error(`No ${DIST}: run npm run build:web first.`);
+  console.error(`No ${DIST}: run npm run web:build first.`);
   process.exit(1);
 }
 

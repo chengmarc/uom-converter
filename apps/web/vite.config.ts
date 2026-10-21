@@ -1,4 +1,4 @@
-// The website build: `npm run build:web` writes apps/web/dist/, served by Cloudflare Workers
+// The website build: `npm run web:build` writes apps/web/dist/, served by Cloudflare Workers
 // (wrangler.jsonc). It is the page in src/, plus what sitePages() below writes, each from its
 // module in build/:
 //   <slug>.html         one page per converter (src/pages.ts), each with its own title,
@@ -17,7 +17,7 @@
 //   _headers, _redirects                      cloudflare.ts: caching rules, and /<slug>.html and
 //                                             /index.html → the canonical address, permanently
 // app-icon.svg is @uom/brand's (its vite.ts), as in every app. scripts/check-pages.mjs
-// (`npm run check:web`) checks the result as search engines read it. The address it is served
+// (`npm run web:check`) checks the result as search engines read it. The address it is served
 // from is SITE_URL (build/site.ts); its path becomes Vite's base.
 
 import { createHash } from "node:crypto";

@@ -9,7 +9,7 @@ const path = require("node:path");
 const { pathToFileURL } = require("node:url");
 
 const DIST = path.join(__dirname, "..", "..", "dist");
-// `npm run dev:windows` (scripts/dev.mjs) points the app at Vite's dev server instead, for live
+// `npm run windows:dev` (scripts/dev.mjs) points the app at Vite's dev server instead, for live
 // reload. A packaged app ignores it, so it always shows its own build.
 const DEV_URL = app.isPackaged ? undefined : process.env.UOM_DEV_URL;
 
