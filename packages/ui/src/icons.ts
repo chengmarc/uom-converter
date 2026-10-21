@@ -24,9 +24,14 @@ const TOPICS: Record<Topic, string> = {
   "Product data": "M4 5v14 M7 5v14 M11 5v14 M14 5v14 M18 5v14 M20 5v14",
 };
 
+/** An audience's or topic's icon. */
 export function icon(name: string): SVGSVGElement | undefined {
   const d = AUDIENCES[name as AudienceId] ?? TOPICS[name as Topic];
-  if (!d) return undefined;
+  return d ? lineIcon(d) : undefined;
+}
+
+/** A 24×24 line icon from its path, for an app's own controls drawn the same way. */
+export function lineIcon(d: string): SVGSVGElement {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("viewBox", "0 0 24 24");
   svg.setAttribute("aria-hidden", "true");

@@ -16,7 +16,7 @@ import { REGIONS } from "@uom/converters/regions";
 import { ALL_AUDIENCES } from "@uom/ui/audiences";
 import { chooseAudience, chooseRegion, chosenAudience, chosenRegion } from "@uom/ui/choices";
 import { el, renderConverter, setClipboard } from "@uom/ui/converter";
-import { icon } from "@uom/ui/icons";
+import { icon, lineIcon } from "@uom/ui/icons";
 import { photoLibrary, TOPIC_SLOTS } from "@uom/ui/photos";
 import { search } from "@uom/ui/search";
 import { store, stored } from "@uom/ui/storage";
@@ -26,21 +26,11 @@ declare const __APP_VERSION__: string;
 // The web view's own clipboard needs permissions an app page doesn't get; the plugin doesn't.
 setClipboard((text) => Clipboard.write({ string: text }));
 
-// Controls only this app draws: 24×24 strokes, like packages/ui/src/icons.ts.
+// Controls only this app draws, as line icons like the topics' and audiences'.
 const GLYPHS = {
   back: "M19 12H5 M11 6l-6 6 6 6",
   settings: "M4 7h10 M18 7h2 M4 17h4 M12 17h8 M16 5v4 M10 15v4",
 };
-function glyph(name: keyof typeof GLYPHS) {
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("viewBox", "0 0 24 24");
-  svg.setAttribute("aria-hidden", "true");
-  svg.setAttribute("class", "icon");
-  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  path.setAttribute("d", GLYPHS[name]);
-  svg.append(path);
-  return svg;
-}
 
 // The topic photos (@uom/ui/photos), all decorative (the text beside each names the topic): the
 // square, small beside a card's name and at a phone's width behind a converter's screen, so at
@@ -222,7 +212,7 @@ function show() {
 }
 
 window.addEventListener("hashchange", show);
-$("#back").append(glyph("back"));
+$("#back").append(lineIcon(GLYPHS.back));
 $("#back").addEventListener("click", () => {
   // Opened from the list: go back to it. Opened directly: replace with the list.
   if (history.state?.fromList) history.back();
@@ -269,7 +259,7 @@ function setRegion(r: Region) {
 }
 
 // The sheet is a history entry too, so Back closes it rather than leaving the screen under it.
-$("#open-settings").append(glyph("settings"));
+$("#open-settings").append(lineIcon(GLYPHS.settings));
 $("#open-settings").addEventListener("click", () => {
   history.pushState({ sheet: true }, "", location.hash || "#");
   settings.showModal();
