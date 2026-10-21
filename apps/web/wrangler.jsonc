@@ -1,6 +1,6 @@
 // The website on Cloudflare Workers: static files only (apps/web/dist/, from `npm run web:build`),
 // no Worker code. `npm run web:deploy` builds and deploys it; so does Cloudflare's Git integration
-// (Workers Builds) on every push to main. Response headers are in dist/_headers, written by build/cloudflare.ts.
+// (Workers Builds) on every push to main. Response headers are in dist/_headers, written by generate/cloudflare.ts.
 {
   "$schema": "../../node_modules/wrangler/config-schema.json",
   "name": "uom-converter",

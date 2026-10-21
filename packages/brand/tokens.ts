@@ -1,5 +1,5 @@
 // tokens.css's colours, read as text, for the places CSS can't reach: the website's theme-color and
-// web manifest (apps/web/build/head.ts and offline.ts), and the tests that check the hand-made copies in the
+// web manifest (apps/web/generate/head.ts and offline.ts), and the tests that check the hand-made copies in the
 // Windows app's frame and the Android splash.
 
 import { readFileSync } from "node:fs";
