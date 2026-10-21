@@ -1,19 +1,25 @@
-// The Android app: a home screen listing the converters (search, and a filter by role), and a
-// screen per converter at #<id>. Opening a converter adds a history entry, so the system Back
-// gesture returns to the list; Back on the list leaves the app. Region lives in a settings sheet.
+/// <reference types="vite/client" />
+// The Android app: a home screen of converter cards, two across (the ones opened last, then by
+// topic; search, and a filter by role), and a screen per converter at #<id>. Opening a converter
+// adds a history entry, so the system Back gesture returns to the list; Back on the list leaves
+// the app. Region lives in a settings sheet.
 
 // Bundled with the app: the page may only load its own files (see the CSP in index.html).
 import "@fontsource-variable/inter/opsz.css";
 import { App } from "@capacitor/app";
 import { Clipboard } from "@capacitor/clipboard";
+import { StatusBar, Style } from "@capacitor/status-bar";
 import type { Region } from "@uom/core/region";
 import { TOOLS } from "@uom/converters";
 import { setNumberStyle } from "@uom/converters/format";
 import { dyn, type Converter, type Topic, type Values } from "@uom/converters/model";
 import { guessRegion, regionInfo, REGIONS } from "@uom/converters/regions";
-import { AUDIENCES, type Audience } from "@uom/ui/audiences";
+import { ALL_AUDIENCES, EVERYTHING } from "@uom/ui/audiences";
 import { el, renderConverter, setClipboard } from "@uom/ui/converter";
 import { icon } from "@uom/ui/icons";
+import { photoLibrary, TOPIC_SLOTS } from "@uom/ui/photos";
+import { search } from "@uom/ui/search";
+import { store, stored } from "@uom/ui/storage";
 
 declare const __APP_VERSION__: string;
 
@@ -24,7 +30,6 @@ setClipboard((text) => Clipboard.write({ string: text }));
 const GLYPHS = {
   back: "M19 12H5 M11 6l-6 6 6 6",
   settings: "M4 7h10 M18 7h2 M4 17h4 M12 17h8 M16 5v4 M10 15v4",
-  chevron: "M9 6l6 6-6 6",
 };
 function glyph(name: keyof typeof GLYPHS) {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -37,14 +42,29 @@ function glyph(name: keyof typeof GLYPHS) {
   return svg;
 }
 
+// The topic photos (@uom/ui/photos), at the one width each that a phone needs: the square small
+// beside a card's name, and the 6:1 banner under the tint of a topic's band, where its 800px look
+// as sharp as any. All decorative: the text beside each names the topic.
+const photo = photoLibrary(
+  import.meta.glob<string>(["../../../packages/brand/photos/*-thumb-240.webp", "../../../packages/brand/photos/*-banner-800.webp"], {
+    eager: true,
+    query: "?url",
+    import: "default",
+  }),
+);
+
+/** A band with the topic's photo under a tint of the logo's indigo, and its icon and name on it. */
+function topicBand(topic: Topic, tag: "h2" | "p", cls: string) {
+  const band = el(tag, `topic-band ${cls}`);
+  const img = photo(`${TOPIC_SLOTS[topic]}-banner`, "100vw", "", "topic-band-photo");
+  if (img) band.append(img);
+  const i = icon(topic);
+  if (i) band.append(i);
+  band.append(topic);
+  return band;
+}
+
 const byId = new Map(TOOLS.map((t) => [t.id, t]));
-const EVERYTHING: Audience = {
-  id: "all",
-  label: "Everything",
-  description: "Every converter, grouped by topic.",
-  tools: TOOLS.map((t) => t.id),
-};
-const ALL_AUDIENCES = [EVERYTHING, ...AUDIENCES];
 /** Topics in the order of their first converter. */
 const TOPICS = [...new Set(TOOLS.map((t) => t.topic))];
 
@@ -58,55 +78,50 @@ const roles = $("#roles");
 const q = $<HTMLInputElement>("#q");
 const settings = $<HTMLDialogElement>("#settings");
 
-function stored(key: string): string | undefined {
-  try {
-    return localStorage.getItem(key) ?? undefined;
-  } catch {
-    return undefined;
-  }
-}
-function store(key: string, value: string) {
-  try {
-    localStorage.setItem(key, value);
-  } catch {
-    // Storage blocked: the choice still applies until the app closes.
-  }
-}
-
 let audience = ALL_AUDIENCES.find((a) => a.id === stored("uom.audience")) ?? EVERYTHING;
+
+/** The converters opened last, newest first: the home screen's Recent cards. */
+const RECENT_MAX = 4;
+let recent: string[] = (() => {
+  try {
+    const ids: unknown = JSON.parse(stored("uom.recent") ?? "[]");
+    return Array.isArray(ids) ? ids.filter((id) => byId.has(id)).slice(0, RECENT_MAX) : [];
+  } catch {
+    return [];
+  }
+})();
+function addRecent(id: string) {
+  recent = [id, ...recent.filter((r) => r !== id)].slice(0, RECENT_MAX);
+  store("uom.recent", JSON.stringify(recent));
+}
 let region: Region = REGIONS.find((r) => r.id === stored("uom.region"))?.id ?? guessRegion();
 
 /** Descriptions only read the region. */
 const blurb = (t: Converter) => dyn(t.blurb, { region } as Values);
 
-// ---------- Home: the list ----------
+// ---------- Home: the cards ----------
 
-/** Converters matching the search: name matches before description matches, each in the audience's order. */
-function search(query: string): Converter[] {
-  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
-  const has = (text: string) => words.every((w) => text.toLowerCase().includes(w));
-  const byName = (t: Converter) => has(`${t.title} ${t.topic} ${t.id}`);
-  const rank = (t: Converter) =>
-    (byName(t) ? 0 : 2 * TOOLS.length) + (audience.tools.includes(t.id) ? audience.tools.indexOf(t.id) : TOOLS.length + TOOLS.indexOf(t));
-  return TOOLS.filter((t) => byName(t) || has(blurb(t))).sort((a, b) => rank(a) - rank(b));
-}
-
-function row(t: Converter) {
-  const a = el("a", "row-link");
+/**
+ * A converter's card: its name, and its topic's photo where the cards around it are of mixed
+ * topics. The description is only read out (it shows on the converter's screen): cut to fit, it
+ * said little.
+ */
+function card(t: Converter, withTopic: boolean) {
+  const a = el("a", "card");
   a.href = `#${t.id}`;
-  const text = el("span", "row-text");
-  text.append(el("span", "row-title", t.title), el("span", "row-sub", blurb(t)));
-  a.append(text, glyph("chevron"));
+  const img = withTopic ? photo(`${TOPIC_SLOTS[t.topic]}-thumb`, "36px", "", "card-photo") : undefined;
+  if (img) a.append(img);
+  a.append(el("span", "card-title", t.title), el("span", "sr", `. ${blurb(t)}`));
   return a;
 }
 
+/** A heading and its cards: a topic's band, or else a plain heading and the topic on each card. */
 function group(title: string, tools: Converter[], topic?: Topic) {
   const s = el("section", "group");
-  const h = el("h2", "group-title");
-  const i = topic ? icon(topic) : undefined;
-  if (i) h.append(i);
-  h.append(title);
-  s.append(h, ...tools.map(row));
+  const h = topic ? topicBand(topic, "h2", "group-band") : el("h2", "group-title", title);
+  const cards = el("div", "cards");
+  cards.append(...tools.map((t) => card(t, !topic)));
+  s.append(h, cards);
   return s;
 }
 
@@ -134,12 +149,13 @@ function drawRoles() {
 function drawList() {
   const query = q.value.trim();
   if (query) {
-    const found = search(query);
+    const found = search(query, audience, region);
     list.replaceChildren(found.length ? group("Matches", found) : el("p", "list-empty", "No converter matches."));
     return;
   }
   const visible = audience.tools.map((id) => byId.get(id)!);
   list.replaceChildren(
+    ...(recent.length ? [group("Recent", recent.map((id) => byId.get(id)!))] : []),
     ...TOPICS.filter((topic) => visible.some((t) => t.topic === topic)).map((topic) =>
       group(topic, visible.filter((t) => t.topic === topic), topic),
     ),
@@ -150,7 +166,7 @@ q.addEventListener("input", drawList);
 q.addEventListener("keydown", (e) => {
   // Search key on the keyboard: open the best match.
   if (e.key === "Enter") {
-    const first = list.querySelector<HTMLAnchorElement>("a.row-link");
+    const first = list.querySelector<HTMLAnchorElement>("a.card");
     if (first) {
       e.preventDefault();
       q.blur();
@@ -164,11 +180,28 @@ q.addEventListener("keydown", (e) => {
 // Built once per region, so a converter keeps what was typed while you look at others.
 let panels = new Map<string, HTMLElement>();
 function panel(id: string) {
-  if (!panels.has(id)) panels.set(id, renderConverter(byId.get(id)!, region, "h1"));
+  if (!panels.has(id)) {
+    const conv = byId.get(id)!;
+    const p = renderConverter(conv, region, "h1");
+    // Its topic's band across the top, as the website's converter pages have.
+    p.prepend(topicBand(conv.topic, "p", "screen-band"));
+    panels.set(id, p);
+  }
   return panels.get(id)!;
 }
 
 let homeScroll = 0;
+
+// The status bar's clock and icons, over the page since it draws edge to edge: light on the home
+// screen's blue header and in the dark theme, dark on a light converter screen.
+const darkTheme = matchMedia("(prefers-color-scheme: dark)");
+function statusBar() {
+  const light = !home.hidden || darkTheme.matches;
+  // Style.Dark is for a dark background: light icons. Outside the app (vite's dev server in a
+  // browser) there's no status bar.
+  StatusBar.setStyle({ style: light ? Style.Dark : Style.Light }).catch(() => {});
+}
+darkTheme.addEventListener("change", statusBar);
 
 function show() {
   const id = location.hash.slice(1);
@@ -176,12 +209,15 @@ function show() {
   if (conv && !home.hidden) homeScroll = window.scrollY;
   home.hidden = !!conv;
   screen.hidden = !conv;
+  statusBar();
   if (conv) {
     screenTitle.textContent = conv.title;
     content.replaceChildren(panel(id));
     window.scrollTo(0, 0);
+    addRecent(id);
   } else {
-    // Back on the list where you left it, search and all.
+    // Back on the list where you left it, search and all, with Recent brought up to date.
+    drawList();
     window.scrollTo(0, homeScroll);
   }
 }
@@ -199,7 +235,7 @@ function open(id: string) {
   show();
 }
 list.addEventListener("click", (e) => {
-  const a = (e.target as Element).closest<HTMLAnchorElement>("a.row-link");
+  const a = (e.target as Element).closest<HTMLAnchorElement>("a.card");
   if (!a) return;
   e.preventDefault();
   open(a.hash.slice(1));

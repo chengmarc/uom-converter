@@ -1,7 +1,7 @@
 /* The Android app. Same colours and type as the website and the Windows app, laid out as phone
-   screens: an app bar, full-width lists, touch-sized controls (48px), and padding for the status
-   and navigation bars, since the app draws edge to edge.
-   Corners: pills for the search field and the sheet's button, 12px for chips, fields and
+   screens: an app bar, converter cards two across, touch-sized controls (48px), and padding for
+   the status and navigation bars, since the app draws edge to edge.
+   Corners: pills for the search field and the sheet's button, 12px for chips, cards, fields and
    surfaces, 28px for the settings sheet's top edge. */
 
 :root {
@@ -13,9 +13,17 @@
   --muted: #5c5a53;
   --line: #e2e0d9;
   --line-strong: #cfccc3;
-  --accent: #1f5fbf;
+  /* The logo's azure, deep enough for text on the light background. */
+  --accent: #1f66e0;
   --accent-ink: #ffffff;
   --accent-soft: #e8effa;
+  /* The logo's tile, azure to indigo (packages/brand/public/app-icon.svg; its sky-blue corner is
+     left out, too light under white text): the home screen's header. Channels, as --tint. */
+  --brand-from: 47 124 246;
+  --brand-to: 75 59 224;
+  /* The logo's deep indigo (its tile's shadow), tinting the topic photos under their white names:
+     channels, for rgb(var(--tint) / alpha). */
+  --tint: 27 22 112;
   --danger: #b3261e;
   --good: #1a7f37;
   --warn: #9a6700;
@@ -41,6 +49,9 @@
     --accent: #7eaaf0;
     --accent-ink: #0f1a2e;
     --accent-soft: #1d2a3d;
+    /* The logo's colours, deeper, so the header doesn't glare in the dark. */
+    --brand-from: 31 85 196;
+    --brand-to: 58 45 176;
     --danger: #f2877f;
     --good: #6fd58b;
     --warn: #e8c060;
@@ -99,7 +110,33 @@ a { color: var(--accent); }
 
 /* ---------- Home ---------- */
 
+/* The home screen's header (its app bar, search and roles): a shop floor of copper coils (the
+   app-header photo, packages/brand/scripts/photos.mjs) under the logo's gradient, white on it,
+   with a rounded lower edge the cards scroll up under. The status bar's icons turn light over it
+   (statusBar in main.ts). It's two pieces, the app bar and the part under it, so the photo is
+   sized by the width in both and the lower one's is moved up by the app bar's height: one photo
+   across them. The gradient runs left to right, so it meets itself too. */
+#home .appbar, .home-tools {
+  background:
+    linear-gradient(90deg, rgb(var(--brand-from) / 0.8), rgb(var(--brand-to) / 0.68)),
+    url("../../../packages/brand/photos/app-header-1080.webp") 0 0 / 100% auto no-repeat,
+    rgb(var(--brand-to));
+}
+.home-tools { background-position: 0 0, 0 calc(-64px - var(--top)), 0 0; }
+#home .appbar { color: #ffffff; }
+#home .icon-button { color: #ffffff; }
+#home .icon-button:active { background: rgb(255 255 255 / 0.14); }
+
 .home-body { padding-bottom: calc(24px + var(--bottom)); }
+
+/* Search and roles, held under the app bar (64px plus the status bar) while the cards scroll. */
+.home-tools {
+  position: sticky;
+  top: calc(64px + var(--top));
+  z-index: 9;
+  padding-bottom: 4px;
+  border-radius: 0 0 20px 20px;
+}
 
 .search { display: block; padding: 4px 16px 12px; }
 .search input {
@@ -108,15 +145,17 @@ a { color: var(--accent); }
   padding: 0 20px;
   border: 0;
   border-radius: 26px;
-  background: var(--sunken);
-  color: var(--text);
+  background: rgb(255 255 255 / 0.18);
+  color: #ffffff;
   font: inherit;
   font-size: 1rem;
 }
-.search input::placeholder { color: var(--muted); }
-.search input:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+.search input::placeholder { color: rgb(255 255 255 / 0.85); }
+.search input:focus { outline: 2px solid #ffffff; outline-offset: 0; background: rgb(255 255 255 / 0.24); }
+/* The field's clear button: white, as the text. */
+.search input::-webkit-search-cancel-button { filter: brightness(0) invert(1); }
 
-.roles { display: flex; gap: 8px; padding: 0 16px 8px; overflow-x: auto; scrollbar-width: none; }
+.roles { display: flex; gap: 8px; padding: 0 16px 12px; overflow-x: auto; scrollbar-width: none; }
 .roles::-webkit-scrollbar { display: none; }
 .chip {
   display: inline-flex;
@@ -125,18 +164,19 @@ a { color: var(--accent); }
   flex: none;
   height: 36px;
   padding: 0 14px;
-  border: 1px solid var(--line-strong);
+  border: 1px solid rgb(255 255 255 / 0.45);
   border-radius: 12px;
-  background: var(--surface);
-  color: var(--text);
+  background: none;
+  color: #ffffff;
   font: inherit;
   font-size: 0.9rem;
 }
-.chip .icon { width: 18px; height: 18px; color: var(--muted); }
-.chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
-.chip[aria-pressed="true"] .icon { color: var(--accent); }
+.chip .icon { width: 18px; height: 18px; color: rgb(255 255 255 / 0.85); }
+/* The chosen role: white, the logo's indigo on it. */
+.chip[aria-pressed="true"] { background: #ffffff; border-color: #ffffff; color: rgb(var(--brand-to)); font-weight: 600; }
+.chip[aria-pressed="true"] .icon { color: rgb(var(--brand-to)); }
 
-.group { margin-top: 16px; }
+.group { margin-top: 12px; }
 .group-title {
   display: flex;
   align-items: center;
@@ -147,21 +187,68 @@ a { color: var(--accent); }
   font-weight: 650;
   color: var(--accent);
 }
-.group-title .icon { width: 20px; height: 20px; }
-.row-link {
+
+/* A topic's band (topicBand in main.ts): its photo under a light tint of the logo's indigo, a
+   little deeper behind the name on the left, and a soft shadow under the white name, so it reads
+   over any photo and the photo still shows. Heading a topic's cards, and atop its converters. */
+.topic-band {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: flex;
   align-items: center;
-  gap: 12px;
-  min-height: 64px;
-  padding: 10px 12px 10px 16px;
+  gap: 10px;
+  margin: 0;
+  background: rgb(var(--tint));
+  color: #ffffff;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 3px rgb(0 0 0 / 0.55), 0 0 12px rgb(0 0 0 / 0.35);
+}
+.topic-band::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(90deg, rgb(var(--tint) / 0.45) 0%, rgb(var(--tint) / 0.3) 45%, rgb(var(--tint) / 0.1) 100%);
+}
+/* The icon is a stroke, which text-shadow skips. */
+.topic-band .icon { filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.55)); }
+.topic-band-photo { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; }
+.topic-band .icon { width: 22px; height: 22px; }
+.group-band { min-height: 64px; margin: 4px 16px 10px; padding: 0 18px; border-radius: 12px; font-size: 1.05rem; }
+.screen-band { min-height: 56px; margin: -16px -16px 16px; padding: 0 16px; font-size: 0.95rem; }
+
+.cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 0 16px; }
+/* A name of up to three lines, centred (most fit on one; a row's cards share its height), after
+   the topic's photo where there is one. */
+.card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 60px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
   color: var(--text);
   text-decoration: none;
 }
-.row-link:active { background: var(--pressed); }
-.row-link .icon { width: 20px; height: 20px; color: var(--muted); }
-.row-text { display: grid; flex: 1; min-width: 0; }
-.row-title { font-weight: 600; }
-.row-sub { color: var(--muted); font-size: 0.875rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card:active { background: var(--sunken); }
+.card-photo { flex: none; width: 36px; height: 36px; margin-left: -4px; border-radius: 8px; object-fit: cover; background: var(--sunken); }
+.card-title {
+  flex: 1;
+  min-width: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: break-word;
+  text-wrap: balance;
+}
 .list-empty { padding: 24px 16px; color: var(--muted); }
 
 /* ---------- A converter ---------- */

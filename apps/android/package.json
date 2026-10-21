@@ -16,7 +16,8 @@
     "@capacitor/android": "^8.5.3",
     "@capacitor/app": "^8.1.2",
     "@capacitor/clipboard": "^8.0.1",
-    "@capacitor/core": "^8.5.3"
+    "@capacitor/core": "^8.5.3",
+    "@capacitor/status-bar": "^8.0.4"
   },
   "devDependencies": {
     "@capacitor/cli": "^8.5.3",

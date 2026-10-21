@@ -20,11 +20,14 @@
         <button id="open-settings" class="icon-button" type="button" aria-label="Settings" aria-haspopup="dialog"></button>
       </header>
       <div class="home-body">
-        <label class="search">
-          <span class="sr">Search converters</span>
-          <input id="q" type="search" placeholder="Search converters" autocomplete="off" spellcheck="false" enterkeyhint="search" />
-        </label>
-        <div id="roles" class="roles" role="group" aria-label="Show converters for"></div>
+        <!-- Stays under the app bar while the cards scroll. -->
+        <div class="home-tools">
+          <label class="search">
+            <span class="sr">Search converters</span>
+            <input id="q" type="search" placeholder="Search converters" autocomplete="off" spellcheck="false" enterkeyhint="search" />
+          </label>
+          <div id="roles" class="roles" role="group" aria-label="Show converters for"></div>
+        </div>
         <nav id="list" class="list" aria-label="Converters"></nav>
       </div>
     </section>
