@@ -6,7 +6,7 @@ import type { CapacitorConfig } from "@capacitor/cli";
 const devUrl = process.env.UOM_DEV_URL;
 
 const config: CapacitorConfig = {
-  appId: "com.uomconverter.app",
+  appId: "com.chengmarc.uomconverter",
   appName: "UOM Converter",
   webDir: "dist",
   android: {

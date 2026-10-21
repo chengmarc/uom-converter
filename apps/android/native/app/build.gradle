@@ -6,10 +6,10 @@ def appVersion = new groovy.json.JsonSlurper().parse(rootProject.file("../../../
 def (major, minor, patch) = appVersion.tokenize(".").collect { it.toInteger() }
 
 android {
-    namespace = "com.uomconverter.app"
+    namespace = "com.chengmarc.uomconverter"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.uomconverter.app"
+        applicationId "com.chengmarc.uomconverter"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode major * 10000 + minor * 100 + patch

@@ -1,4 +1,4 @@
-package com.uomconverter.app;
+package com.chengmarc.uomconverter;
 
 import com.getcapacitor.BridgeActivity;
 

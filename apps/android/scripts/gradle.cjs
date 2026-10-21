@@ -46,5 +46,5 @@ if (r.status !== 0) process.exit(r.status ?? 1);
 
 if (reverse) execFileSync(adb, ["reverse", `tcp:${reverse}`, `tcp:${reverse}`], { stdio: "inherit" });
 if (launch) {
-  execFileSync(adb, ["shell", "am", "start", "-n", "com.uomconverter.app/.MainActivity"], { stdio: "inherit" });
+  execFileSync(adb, ["shell", "am", "start", "-n", "com.chengmarc.uomconverter/.MainActivity"], { stdio: "inherit" });
 }
