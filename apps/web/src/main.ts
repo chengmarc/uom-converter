@@ -241,21 +241,51 @@ function windowsApp() {
 }
 
 /**
- * The Windows app in a grey box, with the wire-reel photo the Wire & conduit topic uses: on the
- * home page, and at the foot of every converter page's menu.
+ * The Windows app, as a card from a newer era than the page around it (.app-card in style.css):
+ * its icon, what it is, and a button to the Store with Microsoft's logo. On the home page, and at
+ * the foot of every converter page's menu, where it stacks.
  */
 function appBox(heading: "h2" | "h3") {
-  const box = el("div", "app-box");
-  const img = thumbnail("Wire & conduit", "app-thumb");
-  if (img) box.append(img);
-  const get = link(STORE_URL, "Get it from the Microsoft Store");
+  const card = el("div", "app-card");
+  const inner = el("div", "app-card-inner");
+
+  const icon = el("img", "app-card-icon");
+  icon.src = `${import.meta.env.BASE_URL}app-icon.svg`;
+  icon.alt = "";
+  icon.width = icon.height = 64;
+
+  const text = el("div", "app-card-text");
+  text.append(
+    el("p", "app-card-eyebrow", "Windows app · Free"),
+    el(heading, "app-card-title", "Every converter, in its own window"),
+    el("p", "app-card-lede", "The same converters as this site, working offline."),
+  );
+
+  const get = link(STORE_URL, "Get it from the Microsoft Store", "app-card-cta");
   get.rel = "noopener";
-  const p = el("p", undefined, "The same converters in their own window, working offline. Free. ");
-  p.append(get);
-  const text = el("div");
-  text.append(el(heading, undefined, "Windows app"), p);
-  box.append(text);
-  return box;
+  get.prepend(microsoftLogo());
+
+  inner.append(icon, text, get);
+  card.append(inner);
+  return card;
+}
+
+/** Microsoft's four squares, in their colours (as on the Store badge in docs/badges/). */
+function microsoftLogo() {
+  const ns = "http://www.w3.org/2000/svg";
+  const logo = document.createElementNS(ns, "svg");
+  logo.setAttribute("viewBox", "0 0 21 21");
+  logo.setAttribute("aria-hidden", "true");
+  for (const [x, y, fill] of [[0, 0, "#f25022"], [11, 0, "#7fba00"], [0, 11, "#00a4ef"], [11, 11, "#ffb900"]] as const) {
+    const square = document.createElementNS(ns, "rect");
+    square.setAttribute("x", String(x));
+    square.setAttribute("y", String(y));
+    square.setAttribute("width", "10");
+    square.setAttribute("height", "10");
+    square.setAttribute("fill", fill);
+    logo.append(square);
+  }
+  return logo;
 }
 
 // ---------- A converter's page ----------

@@ -13,6 +13,8 @@
   /* The header scrolls away with the page: nothing to leave room for when scrolling to a heading. */
   --header: 0px;
   --ease: ease;
+  /* The Windows app's card, from a newer era than the rest: Windows' own type. */
+  --modern: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -122,7 +124,7 @@ a { color: var(--accent); }
 
 .directory { padding-block: 2rem 1rem; }
 .directory-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 1rem; }
-.directory-head h2, .app-note h2 { margin: 0; font-size: 1.35rem; line-height: 1.2; }
+.directory-head h2 { margin: 0; font-size: 1.35rem; line-height: 1.2; }
 .directory-head .side-role { margin: 0; display: flex; align-items: center; gap: 0.5rem; }
 
 /* Each topic under a grey bar with its name, its converters in columns below. */
@@ -139,15 +141,62 @@ a { color: var(--accent); }
 .tile:hover .tile-title { text-decoration: underline; }
 .tile-text { color: var(--muted); font-size: 0.9rem; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
-/* The Windows app, in a line, in a grey box. */
-.app-note { margin-block: 1.5rem 3rem; }
-.app-box { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; background: var(--sunken); border: 1px solid var(--line); border-radius: 4px; }
-.app-box p { margin: 0.35rem 0 0; }
-.app-thumb { flex: none; width: 5rem; aspect-ratio: 1; object-fit: cover; border-radius: 2px; }
-/* At the foot of the menu: narrower, the picture above the text. */
-.side .app-box { display: grid; gap: 0.6rem; margin-top: 1.25rem; padding: 0.85rem; font-size: 0.9rem; }
-.side .app-box h2 { margin: 0; font-size: 0.95rem; }
-.side .app-thumb { width: 100%; aspect-ratio: 2 / 1; }
+/* The Windows app (appBox in main.ts): a card from a newer era than the page it sits on, as when
+   an old supplier's site adds its first app. Windows' own type, generous rounding and a soft
+   shadow, the app's icon as a tile, and a pill button with Microsoft's logo; the period rules
+   further down leave it alone. The icon and Microsoft's squares keep their own colours, as the
+   icon does everywhere. In a row when there's room (40rem), stacked in the menu. */
+.app-note { margin-block: 2rem 3rem; }
+.app-card { container: app-card / inline-size; font-family: var(--modern); }
+.app-card-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: start;
+  gap: 1rem;
+  padding: 1.25rem 1.25rem 1.4rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  box-shadow: var(--raised);
+}
+.app-card-icon { display: block; width: 3rem; height: 3rem; filter: drop-shadow(0 4px 10px rgb(0 0 0 / 0.18)); }
+.app-card-text { display: grid; gap: 0.6rem; }
+.app-card-eyebrow { margin: 0; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.02em; color: var(--accent); }
+.app-card-title { margin: 0; font-size: 1.2rem; font-weight: 650; line-height: 1.15; letter-spacing: -0.02em; color: var(--text); text-wrap: balance; }
+.app-card-lede { margin: 0; max-width: 42ch; color: var(--muted); font-size: 0.95rem; line-height: 1.5; }
+.app-card-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 48px;
+  padding: 0.55rem 1.3rem 0.55rem 1.05rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.25;
+  text-decoration: none;
+  box-shadow: var(--lifted);
+  transition: box-shadow 0.15s var(--ease), transform 0.15s var(--ease);
+}
+.app-card-cta:hover { color: var(--accent-ink); box-shadow: var(--lifted-hover); transform: translateY(-1px); }
+.app-card-cta:focus-visible { outline-offset: 3px; }
+.app-card-cta svg { flex: none; display: block; width: 18px; height: 18px; }
+
+@container app-card (min-width: 20rem) {
+  .app-card-title { font-size: 1.5rem; }
+}
+@container app-card (min-width: 40rem) {
+  .app-card-inner { grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 1.75rem; padding: 2.25rem 2.5rem; }
+  .app-card-icon { width: 4.5rem; height: 4.5rem; }
+  .app-card-text { gap: 0.75rem; }
+  .app-card-title { font-size: clamp(1.6rem, 3.2cqi, 2.1rem); }
+  .app-card-lede { font-size: 1.02rem; }
+}
+
+/* At the foot of the menu. */
+.side .app-card { margin-top: 1.25rem; }
 
 /* ---------- A converter's page ---------- */
 
@@ -561,8 +610,8 @@ main { background: var(--surface); border-inline: 1px solid var(--page-edge); }
 .crumbs { font-size: 11px; }
 
 /* 9. Links underlined, and purple once visited. */
-.tile .tile-title, .side-group > a, .answers a, .crumbs a, .site-footer nav a, .app-box a { text-decoration: underline; }
-.tile:visited .tile-title, .side-group > a:visited, .answers a:visited, .crumbs a:visited, .app-box a:visited { color: var(--visited); }
+.tile .tile-title, .side-group > a, .answers a, .crumbs a, .site-footer nav a { text-decoration: underline; }
+.tile:visited .tile-title, .side-group > a:visited, .answers a:visited, .crumbs a:visited { color: var(--visited); }
 .category-band .crumbs a:visited { color: var(--brand-ink); }
 .side-group > a[aria-current] { color: var(--text); text-decoration: none; }
 
