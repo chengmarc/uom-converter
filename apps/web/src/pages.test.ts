@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { TOOLS } from "@uom/converters";
+import { TOOLS, TOPICS } from "@uom/converters";
 import { idFromPath, PAGES, topicFromPath, TOPIC_PAGES } from "./pages";
 
 const ALL = [...Object.values(PAGES), ...Object.values(TOPIC_PAGES)];
@@ -10,7 +10,7 @@ describe("site pages", () => {
   });
 
   it("give every topic a page, and only topics", () => {
-    expect(Object.keys(TOPIC_PAGES).sort()).toEqual([...new Set(TOOLS.map((t) => t.topic))].sort());
+    expect(Object.keys(TOPIC_PAGES).sort()).toEqual([...TOPICS].sort());
   });
 
   it("have unique, address-safe slugs", () => {

@@ -114,3 +114,6 @@ export interface Converter {
 }
 
 export const dyn = <T>(d: Dyn<T>, v: Values) => (typeof d === "function" ? (d as (v: Values) => T)(v) : d);
+
+/** A converter's description, where nothing is typed yet: descriptions only read the region. */
+export const blurb = (conv: Converter, region: Region) => dyn(conv.blurb, { region } as Values);

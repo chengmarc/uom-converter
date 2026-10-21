@@ -4,18 +4,14 @@
 import "@fontsource-variable/inter/opsz.css";
 import type { Region } from "@uom/core/region";
 import { ALL_AUDIENCES, EVERYTHING, type Audience } from "@uom/ui/audiences";
-import { TOOLS } from "@uom/converters";
+import { byId, TOOLS } from "@uom/converters";
 import { icon } from "@uom/ui/icons";
-import { guessRegion, regionInfo, REGIONS } from "@uom/converters/regions";
-import { setNumberStyle } from "@uom/converters/format";
+import { REGIONS } from "@uom/converters/regions";
 import type { Converter, Topic } from "@uom/converters/model";
 import { el, renderConverter } from "@uom/ui/converter";
 import { photoLibrary, TOPIC_SLOTS } from "@uom/ui/photos";
 import { search } from "@uom/ui/search";
-import { store, stored } from "@uom/ui/storage";
-
-// audiences.test.ts checks every id an audience lists exists.
-const byId = new Map(TOOLS.map((t) => [t.id, t]));
+import { chooseAudience, chooseRegion, chosenAudience, chosenRegion } from "@uom/ui/choices";
 
 // ---------- Page ----------
 
@@ -32,11 +28,11 @@ const regionBar = document.querySelector<HTMLElement>("#region")!;
 const audienceDesc = document.querySelector<HTMLElement>("#audience-desc")!;
 
 const params = new URLSearchParams(location.search);
-let audience = ALL_AUDIENCES.find((a) => a.id === (params.get("for") ?? stored("uom.audience"))) ?? EVERYTHING;
+let audience = chosenAudience(params);
 // A converter's own page always opens on that converter, whatever the audience last chosen.
 const landing = routeId();
 if (landing && !audience.tools.includes(landing)) audience = EVERYTHING;
-let region: Region = REGIONS.find((r) => r.id === (params.get("region") ?? stored("uom.region")))?.id ?? guessRegion();
+let region: Region = chosenRegion(params);
 
 function chip(label: string, pressed: boolean, onClick: () => void, opts: { title?: string; icon?: string } = {}) {
   const b = Object.assign(document.createElement("button"), { type: "button" });
@@ -116,7 +112,6 @@ function markCurrent() {
 
 let panels = new Map<string, HTMLElement>();
 function buildPanels() {
-  setNumberStyle(regionInfo(region).number);
   panels = new Map(TOOLS.map((t) => [t.id, renderConverter(t, region)]));
   content.replaceChildren(...panels.values());
 }
@@ -162,7 +157,7 @@ function navigate(id: string) {
 
 function setAudience(a: Audience) {
   audience = a;
-  store("uom.audience", a.id);
+  chooseAudience(a);
   syncUrl();
   buildControls();
   buildNav();
@@ -171,7 +166,7 @@ function setAudience(a: Audience) {
 
 function setRegion(r: Region) {
   region = r;
-  store("uom.region", r);
+  chooseRegion(r);
   syncUrl();
   buildControls();
   buildPanels();

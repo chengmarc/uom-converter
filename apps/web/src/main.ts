@@ -4,14 +4,14 @@
 // Back and Forward work as usual. Each converter is drawn by packages/ui/src/converter.ts.
 
 import type { Region } from "@uom/core/region";
-import { TOOLS } from "@uom/converters";
-import { parseNumber, setNumberStyle } from "@uom/converters/format";
-import { dyn, type Converter, type Topic, type Values } from "@uom/converters/model";
-import { guessRegion, regionInfo, REGIONS } from "@uom/converters/regions";
+import { byId, TOOLS, TOPICS } from "@uom/converters";
+import { parseNumber } from "@uom/converters/format";
+import { blurb, dyn, type Converter, type Topic, type Values } from "@uom/converters/model";
+import { REGIONS } from "@uom/converters/regions";
 import { ALL_AUDIENCES, EVERYTHING, type Audience } from "@uom/ui/audiences";
+import { chooseAudience, chooseRegion, chosenAudience, chosenRegion } from "@uom/ui/choices";
 import { el, renderConverter } from "@uom/ui/converter";
 import { photoLibrary, TOPIC_SLOTS } from "@uom/ui/photos";
-import { store, stored } from "@uom/ui/storage";
 import { HOME, idFromPath, PAGES, topicFromPath, TOPIC_PAGES } from "./pages";
 import { registerOffline, STORE_URL } from "./site";
 
@@ -20,9 +20,6 @@ declare const __SITE_BASE__: string;
 const BASE = __SITE_BASE__;
 const NAME = "UOM Converter";
 
-const byId = new Map(TOOLS.map((t) => [t.id, t]));
-/** Topics in the order of their first converter. */
-const TOPICS = [...new Set(TOOLS.map((t) => t.topic))];
 const topicAnchor = (t: Topic) => t.toLowerCase().replace(/[^a-z]+/g, "-");
 const pathFor = (id: string) => BASE + PAGES[id].slug;
 const topicPath = (t: Topic) => BASE + TOPIC_PAGES[t].slug;
@@ -42,11 +39,8 @@ const photo = photoLibrary(
 );
 
 const params = new URLSearchParams(location.search);
-let audience = ALL_AUDIENCES.find((a) => a.id === (params.get("for") ?? stored("uom.audience"))) ?? EVERYTHING;
-let region: Region = REGIONS.find((r) => r.id === (params.get("region") ?? stored("uom.region")))?.id ?? guessRegion();
-
-/** Descriptions only read the region. */
-const blurb = (t: Converter) => dyn(t.blurb, { region } as Values);
+let audience = chosenAudience(params);
+let region: Region = chosenRegion(params);
 
 // ---------- Addresses ----------
 
@@ -112,7 +106,7 @@ function tile(t: Converter) {
     a.classList.add("has-thumb");
     a.append(thumb);
   }
-  a.append(el("span", "tile-title", t.title), el("span", "tile-text", blurb(t)));
+  a.append(el("span", "tile-title", t.title), el("span", "tile-text", blurb(t, region)));
   return a;
 }
 
@@ -534,15 +528,14 @@ function scrollToHash() {
 
 function setAudience(a: Audience) {
   audience = a;
-  store("uom.audience", a.id);
+  chooseAudience(a);
   syncUrl();
   refreshLists();
 }
 
 function setRegion(r: Region) {
   region = r;
-  store("uom.region", r);
-  setNumberStyle(regionInfo(r).number);
+  chooseRegion(r);
   panels = new Map();
   syncUrl();
   drawRegion();
@@ -621,7 +614,6 @@ const legacyTopic = TOPICS.find((t) => topicAnchor(t) === legacy);
 if (route().kind === "home" && byId.has(legacy)) history.replaceState(null, "", pathFor(legacy) + location.search);
 else if (route().kind === "home" && legacyTopic) history.replaceState(null, "", topicPath(legacyTopic) + location.search);
 
-setNumberStyle(regionInfo(region).number);
 drawRegion();
 syncUrl();
 render();

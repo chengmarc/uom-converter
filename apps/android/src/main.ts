@@ -10,11 +10,11 @@ import { App } from "@capacitor/app";
 import { Clipboard } from "@capacitor/clipboard";
 import { StatusBar, Style } from "@capacitor/status-bar";
 import type { Region } from "@uom/core/region";
-import { TOOLS } from "@uom/converters";
-import { setNumberStyle } from "@uom/converters/format";
-import { dyn, type Converter, type Topic, type Values } from "@uom/converters/model";
-import { guessRegion, regionInfo, REGIONS } from "@uom/converters/regions";
-import { ALL_AUDIENCES, EVERYTHING } from "@uom/ui/audiences";
+import { byId, TOPICS } from "@uom/converters";
+import { blurb, type Converter, type Topic } from "@uom/converters/model";
+import { REGIONS } from "@uom/converters/regions";
+import { ALL_AUDIENCES } from "@uom/ui/audiences";
+import { chooseAudience, chooseRegion, chosenAudience, chosenRegion } from "@uom/ui/choices";
 import { el, renderConverter, setClipboard } from "@uom/ui/converter";
 import { icon } from "@uom/ui/icons";
 import { photoLibrary, TOPIC_SLOTS } from "@uom/ui/photos";
@@ -65,10 +65,6 @@ function topicBand(topic: Topic) {
   return band;
 }
 
-const byId = new Map(TOOLS.map((t) => [t.id, t]));
-/** Topics in the order of their first converter. */
-const TOPICS = [...new Set(TOOLS.map((t) => t.topic))];
-
 const $ = <T extends HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
 const home = $("#home");
 const screen = $("#screen");
@@ -79,7 +75,7 @@ const roles = $("#roles");
 const q = $<HTMLInputElement>("#q");
 const settings = $<HTMLDialogElement>("#settings");
 
-let audience = ALL_AUDIENCES.find((a) => a.id === stored("uom.audience")) ?? EVERYTHING;
+let audience = chosenAudience();
 
 /** The converters opened last, newest first: the home screen's Recent cards. */
 const RECENT_MAX = 4;
@@ -95,10 +91,7 @@ function addRecent(id: string) {
   recent = [id, ...recent.filter((r) => r !== id)].slice(0, RECENT_MAX);
   store("uom.recent", JSON.stringify(recent));
 }
-let region: Region = REGIONS.find((r) => r.id === stored("uom.region"))?.id ?? guessRegion();
-
-/** Descriptions only read the region. */
-const blurb = (t: Converter) => dyn(t.blurb, { region } as Values);
+let region: Region = chosenRegion();
 
 // ---------- Home: the cards ----------
 
@@ -112,7 +105,7 @@ function card(t: Converter, withTopic: boolean) {
   a.href = `#${t.id}`;
   const img = withTopic ? photo(`${TOPIC_SLOTS[t.topic]}-thumb`, "36px", "", "card-photo") : undefined;
   if (img) a.append(img);
-  a.append(el("span", "card-title", t.title), el("span", "sr", `. ${blurb(t)}`));
+  a.append(el("span", "card-title", t.title), el("span", "sr", `. ${blurb(t, region)}`));
   return a;
 }
 
@@ -137,7 +130,7 @@ function drawRoles() {
       b.setAttribute("aria-pressed", String(a === audience));
       b.addEventListener("click", () => {
         audience = a;
-        store("uom.audience", a.id);
+        chooseAudience(a);
         drawRoles();
         drawList();
         b.scrollIntoView({ inline: "nearest", block: "nearest" });
@@ -269,8 +262,7 @@ function drawRegions() {
 
 function setRegion(r: Region) {
   region = r;
-  store("uom.region", r);
-  setNumberStyle(regionInfo(r).number);
+  chooseRegion(r);
   panels = new Map();
   drawList();
   show();
@@ -309,7 +301,6 @@ App.addListener("backButton", ({ canGoBack }) => {
 
 // ---------- Start ----------
 
-setNumberStyle(regionInfo(region).number);
 drawRoles();
 drawList();
 drawRegions();
