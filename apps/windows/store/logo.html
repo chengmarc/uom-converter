@@ -15,9 +15,9 @@
         text-align: center;
       }
       /* The grid fades out from the edges toward the icon. */
-      /* Darker behind the icon and name; the coil in the photo frames them. */
+      /* Darker behind the icon and name; the pylon and the sunset in the photo frame them. */
       body { --shade: radial-gradient(closest-side, rgba(10, 6, 4, 0.45), transparent); --focus: 62% 60%; --blur: 0.6vmin; }
-      /* The square box art shows more of the photo's width: keep to the coils on the right, clear of the worker. */
+      /* The square box art shows more of the photo's width: keep to its right, the lines against the sky. */
       /* The grid fades out from the edges toward the icon. */
       body::after { mask-image: radial-gradient(closest-side, transparent 30%, #000 100%); }
       @media (aspect-ratio: 1) { body { --focus: 100% 60%; } }
@@ -48,7 +48,7 @@
     </style>
   </head>
   <body>
-    <img src="../../../packages/brand/public/app-icon.svg" alt="" />
+    <img src="../../../packages/brand/app-icon.svg" alt="" />
     <h1>UOM Converter</h1>
     <p>For the <em>electrical</em> trade</p>
   </body>

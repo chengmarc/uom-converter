@@ -181,7 +181,7 @@ export interface TopicPage extends Page {
   intro: string;
   /**
    * What the topic's banner photo shows, for anyone who can't see it (its alt text). The photo is
-   * packages/brand/photos/<slot>-banner-*.webp, made by its scripts/photos.mjs: change this with the photo.
+   * packages/brand/photos/<slot>-banner-*.webp, made by its photos.mjs: change this with the photo.
    */
   photo: string;
 }
@@ -190,7 +190,7 @@ export interface TopicPage extends Page {
 export const TOPIC_PAGES: Record<Topic, TopicPage> = {
   Pricing: {
     slug: "pricing",
-    photo: "Aisles of tall pallet racking stocked with boxed electrical supplies in a distributor's warehouse.",
+    photo: "Shelves and stands of packaged electrical supplies on a supplier's sales floor.",
     title: "Electrical Pricing: E/C/M, Multiplier and Margin Tools",
     description:
       "Calculators for electrical distribution pricing: E/C/M price units, wire price per foot or metre, list × multiplier, margin and markup, packs and reels.",
@@ -200,7 +200,7 @@ export const TOPIC_PAGES: Record<Topic, TopicPage> = {
   },
   "Wire & conduit": {
     slug: "wire-and-conduit",
-    photo: "Reels of building wire in many colours on warehouse racking.",
+    photo: "Large coils of bare copper wire on a factory floor.",
     title: "Wire Size and Conduit Converters: AWG, mm², Trade Size",
     description:
       "Convert AWG and kcmil wire sizes to mm² and back, and conduit trade sizes to metric designators with their knockout punch sizes.",
@@ -210,7 +210,7 @@ export const TOPIC_PAGES: Record<Topic, TopicPage> = {
   },
   Electrical: {
     slug: "electrical",
-    photo: "Open control panels with rows of terminal blocks, relays and coloured wiring.",
+    photo: "Gloved hands testing an open control panel with a clamp meter, beside rows of contactors and coloured wiring.",
     title: "Electrical Calculators: Voltage Drop, kVA, Ohm's Law",
     description:
       "Electrical calculators: kVA and amps, voltage drop, power factor, transformer fault current, motor slip, line-to-neutral voltage, Ohm's law, energy cost.",

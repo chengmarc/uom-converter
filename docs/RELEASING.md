@@ -97,7 +97,7 @@ Everything else electron-builder leaves there (`win-unpacked/`, `.blockmap` file
 ### Where the images come from
 
 `npm run store:assets` runs [store/render.cjs](../apps/windows/store/render.cjs), which renders from
-`packages/brand/public/app-icon.svg` and the built page (paths below are in `apps/windows/`):
+`packages/brand/app-icon.svg` and the built page (paths below are in `apps/windows/`):
 
 | Output | Used for |
 |---|---|

@@ -1,4 +1,4 @@
-/* The look shared by the Store's designed images (shots.html, logo.html): a photo of copper wire coils under a
+/* The look shared by the Store's designed images (shots.html, logo.html): a photo of a power line pylon at sunset under a
    faint measuring grid as the background, and the icon's gold bolt as the accent. Sizes are relative, so the same background fits the wide
    screenshots and the square and tall logos. */
 
@@ -22,14 +22,14 @@ body {
   background: #140d09;
 }
 
-/* The trade itself: coils of copper wire (base.jpg), blurred and darkened so text and the app stay readable.
-   Each page sets --shade, a darker layer over the photo where its own text sits, and --focus, the part of the
-   photo it shows. The inset hides the blur's soft edges. */
+/* The trade itself: a pylon and its lines against the evening sky (@uom/brand's store-backdrop), blurred and
+   darkened so text and the app stay readable. Each page sets --shade, a darker layer over the photo where its own
+   text sits, and --focus, the part of the photo it shows. The inset hides the blur's soft edges. */
 body::before {
   content: "";
   position: absolute;
   inset: -24px;
-  background: var(--shade, none), url(base.jpg) var(--focus, center) / cover no-repeat;
+  background: var(--shade, none), url(../../../packages/brand/photos/store-backdrop-2560.webp) var(--focus, center) / cover no-repeat;
   filter: blur(var(--blur, 4px)) brightness(0.8) saturate(1.05);
 }
 

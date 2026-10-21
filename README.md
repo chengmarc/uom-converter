@@ -1,6 +1,6 @@
 <div align="center">
 
-  <img src="packages/brand/public/app-icon.svg" width="180"><br>
+  <img src="packages/brand/app-icon.svg" width="180"><br>
 
   <a href="https://github.com/chengmarc/uom-converter/releases/latest/download/UOM-Converter-setup.exe"><img src="docs/badges/badge-download.svg" height="50"></a>
   <a href="https://apps.microsoft.com/detail/9PHZQBV736JC"><img src="docs/badges/badge-microsoft-store.svg" height="50"></a>

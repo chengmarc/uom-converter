@@ -1,13 +1,14 @@
 {
   "name": "@uom/brand",
-  "description": "What every app looks like: the app icon (public/, each app's Vite public folder: served as-is in dev, copied into every build) and the photos (photos/, made from originals/ by scripts/photos.mjs; @uom/ui/photos shows them).",
+  "description": "What every app looks like: the brand colours (colors.css, which each app's stylesheet @imports), the app icon (app-icon.svg; vite.ts puts it at /app-icon.svg in the apps built with Vite) and the photos (photos/, made from originals/ by photos.mjs; @uom/ui/photos shows them).",
   "private": true,
   "type": "module",
   "exports": {
-    "./app-icon.svg": "./public/app-icon.svg"
+    "./app-icon.svg": "./app-icon.svg",
+    "./colors.css": "./colors.css"
   },
   "scripts": {
-    "photos": "node scripts/photos.mjs"
+    "photos": "node photos.mjs"
   },
   "devDependencies": {
     "sharp": "0.35.5"

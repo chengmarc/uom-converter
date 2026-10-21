@@ -10,7 +10,7 @@
 //   <topic>.html        one page per topic (src/pages.ts TOPIC_PAGES), listing its converters
 //   sitemap.xml, robots.txt
 //   llms.txt            the site and every converter, for AI assistants (llmstxt.org)
-//   app-icon.svg        from @uom/brand's public folder, as in every app
+//   app-icon.svg        @uom/brand's (its vite.ts), as in every app
 //   manifest.webmanifest, sw.js, icons   install from the browser and use it offline
 //   og.png              the preview image when a link is shared
 //   _headers            caching rules for Cloudflare
@@ -25,6 +25,7 @@ import { pathToFileURL } from "node:url";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { defineConfig, type Plugin } from "vite";
 import type { Topic } from "@uom/converters/model";
+import { appIcon } from "../../packages/brand/vite";
 import { HOME, PAGES, TOPIC_PAGES, type Page, type TopicPage } from "./src/pages";
 
 const SITE_URL = (process.env.SITE_URL ?? "https://uom-converter.com/").replace(/\/?$/, "/");
@@ -382,9 +383,9 @@ function sitePages(): Plugin {
 
 export default defineConfig({
   root: resolve(__dirname, "src"),
-  publicDir: resolve(__dirname, "../../packages/brand/public"),
+  publicDir: false,
   base: BASE,
   define: { __SITE_BASE__: JSON.stringify(BASE) },
   build: { outDir: OUT, emptyOutDir: true },
-  plugins: [sitePages()],
+  plugins: [appIcon(), sitePages()],
 });

@@ -4,6 +4,10 @@
    shared with the Windows app (apps/windows/src/renderer/style.css), which keeps its own look.
    Corners: 3px on controls (inputs, buttons, chips), 4px on panels and images. */
 
+/* The brand colours, the same in every app: --brand (navy: the header, footer and photo bands)
+   and --accent. */
+@import "@uom/brand/colors.css";
+
 :root {
   --bg: #ffffff;
   --surface: #ffffff;
@@ -13,14 +17,6 @@
   --muted: #5a6370;
   --line: #d9dee4;
   --line-strong: #b9c1cb;
-  --accent: #0b5cad;
-  --accent-hover: #084a8c;
-  --accent-ink: #ffffff;
-  --accent-soft: #e6eef8;
-  /* The header, footer and photo bands. */
-  --brand: #13294b;
-  --brand-ink: #ffffff;
-  --brand-muted: #b8c4d6;
   --danger: #b3261e;
   --good: #1a7f37;
   --warn: #9a6700;
@@ -44,12 +40,6 @@
     --muted: #a3acb8;
     --line: #333a42;
     --line-strong: #4a535e;
-    --accent: #6fa8e8;
-    --accent-hover: #93bff0;
-    --accent-ink: #0d1726;
-    --accent-soft: #1b2a3c;
-    --brand: #0e1d33;
-    --brand-muted: #9aa8bc;
     --danger: #f2877f;
     --good: #6fd58b;
     --warn: #e8c060;
