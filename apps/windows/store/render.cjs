@@ -5,7 +5,7 @@
 //   @uom/brand's rendered/ the icon at 256 and the share image (the promo shot), which the website uses too
 // The icons come from @uom/brand's app-icon.svg; screenshots from the built page, captured into build/shots/ and
 // framed by shots.html.
-// Run with `npm run store:assets` (builds apps/windows/dist/ first).
+// Run with `npm run windows:assets` (builds apps/windows/dist/ first).
 
 const { app, BrowserWindow, nativeTheme, net, protocol } = require("electron");
 const fs = require("node:fs");
@@ -154,7 +154,7 @@ async function renderPage(page, file, width, height, scale, script = "") {
 app.on("window-all-closed", () => {});
 
 app.whenReady().then(async () => {
-  if (!fs.existsSync(path.join(DIST, "index.html"))) throw new Error("No apps/windows/dist/: run it with `npm run store:assets`, which builds the page first.");
+  if (!fs.existsSync(path.join(DIST, "index.html"))) throw new Error("No apps/windows/dist/: run it with `npm run windows:assets`, which builds the page first.");
   await renderIcon(path.join(WINDOWS, "src", "main", "icon.png"), 1024, 1024, 1);
   await renderTiles();
   await renderListing();
