@@ -8,7 +8,7 @@ import { NAME, STORE_URL } from "../src/site";
 import type { Drawn } from "./prerender";
 import { BASE, esc, SITE_URL } from "./site";
 
-/** The preview image when a link is shared: @uom/brand's, the Windows app's Store promo (apps/windows/listing/generator/render.cjs). */
+/** The preview image when a link is shared: @uom/brand's, the Windows app's Store promo (apps/windows/store-listing/generator/render.cjs). */
 export const OG_IMAGE = createRequire(import.meta.url).resolve("@uom/brand/share.png");
 const OG_ALT = "UOM Converter converting 12 AWG to 3.309 mm², with every converter listed beside it";
 

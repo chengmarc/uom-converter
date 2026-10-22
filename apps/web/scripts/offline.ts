@@ -30,7 +30,7 @@ export function manifest(): string {
 
 /** Offline copy: every page and asset cached on install, then served from cache and refreshed in the background. */
 export function serviceWorker(files: string[], version: string): string {
-  return `// Written by apps/web/generate/offline.ts.
+  return `// Written by apps/web/scripts/offline.ts.
 const CACHE = "uom-${version}";
 const FILES = ${JSON.stringify(files)};
 self.addEventListener("install", (e) => {

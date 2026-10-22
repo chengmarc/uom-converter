@@ -14,7 +14,7 @@ import { photoLibrary, TOPIC_SLOTS } from "@uom/ui/photos";
 import { HOME, idFromPath, PAGES, topicFromPath, TOPIC_PAGES } from "./pages";
 import { NAME, registerOffline, STORE_URL } from "./site";
 
-// The site's base path, from SITE_URL in generate/site.ts.
+// The site's base path, from SITE_URL in scripts/site.ts.
 declare const __SITE_BASE__: string;
 const BASE = __SITE_BASE__;
 
@@ -70,7 +70,7 @@ function go(path: string, hash = "") {
   render();
 }
 
-/** The page's own head, as a fresh load of this address has it (generate/head.ts writes those). */
+/** The page's own head, as a fresh load of this address has it (scripts/head.ts writes those). */
 function setHead(title: string, canonical?: string) {
   document.title = `${title} | ${NAME}`;
   const link = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');

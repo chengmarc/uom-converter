@@ -1,5 +1,5 @@
 // What only the website has: its name, a link to the Windows app, and offline use once installed
-// from the browser (sw.js, written by generate/offline.ts). The build reads the name and link too.
+// from the browser (sw.js, written by scripts/offline.ts). The build reads the name and link too.
 
 export const NAME = "UOM Converter";
 export const STORE_URL = "https://apps.microsoft.com/detail/9PHZQBV736JC";

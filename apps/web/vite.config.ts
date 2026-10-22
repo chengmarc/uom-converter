@@ -1,6 +1,6 @@
 // The website build: `npm run web:build` writes apps/web/dist/, served by Cloudflare Workers
 // (wrangler.jsonc). It is the page in src/, plus what sitePages() below writes, each from its
-// module in generate/:
+// module in scripts/:
 //   <slug>.html         one page per converter (src/pages.ts), each with its own title,
 //                       description and canonical address, so searches land on the converter.
 //                       Cloudflare serves it at /<slug> (no .html, no slash), which is the
@@ -18,7 +18,7 @@
 //                                             /index.html → the canonical address, permanently
 // app-icon.svg is @uom/brand's (its vite.ts), as in every app. scripts/check-pages.mjs
 // (`npm run web:check`) checks the result as search engines read it. The address it is served
-// from is SITE_URL (generate/site.ts); its path becomes Vite's base.
+// from is SITE_URL (scripts/site.ts); its path becomes Vite's base.
 
 import { createHash } from "node:crypto";
 import { createRequire } from "node:module";
@@ -28,13 +28,13 @@ import { defineConfig, type Plugin } from "vite";
 import type { Topic } from "@uom/converters/model";
 import { appIcon, photos } from "@uom/brand/vite";
 import { HOME, PAGES, TOPIC_PAGES, type Page, type TopicPage } from "./src/pages";
-import { headers, redirects } from "./generate/cloudflare";
-import { robots, sitemap } from "./generate/crawl";
-import { OG_IMAGE, withHead, type Kind } from "./generate/head";
-import { llmsTxt } from "./generate/llms-txt";
-import { manifest, serviceWorker } from "./generate/offline";
-import { BODY, prerender } from "./generate/prerender";
-import { BASE, OUT } from "./generate/site";
+import { headers, redirects } from "./scripts/cloudflare";
+import { robots, sitemap } from "./scripts/crawl";
+import { OG_IMAGE, withHead, type Kind } from "./scripts/head";
+import { llmsTxt } from "./scripts/llms-txt";
+import { manifest, serviceWorker } from "./scripts/offline";
+import { BODY, prerender } from "./scripts/prerender";
+import { BASE, OUT } from "./scripts/site";
 
 function sitePages(): Plugin {
   let assets: string[] = [];

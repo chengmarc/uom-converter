@@ -39,13 +39,13 @@ for every link, e.g. `SITE_URL=https://example.com/uom-converter/ npm run web:bu
 ### Change the icon or the share image
 
 They're `@uom/brand`'s `icon-256.png` and `share.png`, drawn by the Windows app's
-`apps/windows/listing/generator/render.cjs` (`npm run windows:assets`), and published as `icon-256.png` and
+`apps/windows/store-listing/generator/render.cjs` (`npm run windows:assets`), and published as `icon-256.png` and
 `og.png`.
 
 ## Explanation
 
 **One page, drawn twice.** `src/main.ts` draws every page in the browser and moves between them
-without reloading. The build runs that same script in happy-dom (`generate/prerender.ts`) to
+without reloading. The build runs that same script in happy-dom (`scripts/prerender.ts`) to
 write each page's HTML with its content already in it, so search engines and people without
 scripts get the converter, its worked examples and its links; in the browser the script then
 draws the page again, live.
@@ -62,7 +62,7 @@ pictures to be cached as they're shown.
 
 ## Reference
 
-What the build writes, and which `generate/` module writes it: the header of
+What the build writes, and which `scripts/` module writes it: the header of
 [vite.config.ts](vite.config.ts).
 
 | Path | What it is |
@@ -70,6 +70,6 @@ What the build writes, and which `generate/` module writes it: the header of
 | `src/main.ts`, `src/style.css`, `src/index.html` | The page: header, home, converter and topic pages |
 | `src/pages.ts` | Every page's address, title and description |
 | `src/site.ts` | The site's name, the Store link, and turning on the offline copy |
-| `generate/` | Build-time output: prerendered pages, heads, sitemap, `llms.txt`, offline files, Cloudflare rules |
+| `scripts/*.ts` | What the build writes beyond the page, imported by `vite.config.ts`: prerendered pages, heads, sitemap, `llms.txt`, offline files, Cloudflare rules |
 | `scripts/check-pages.mjs` | `npm run web:check` |
 | `wrangler.jsonc` | How Cloudflare serves `dist/`: static files, no Worker code |
