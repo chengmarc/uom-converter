@@ -1,4 +1,4 @@
-// The page inside the Windows app (src/renderer/), built with relative paths into apps/windows/dist/,
+// The page inside the Windows app (src/renderer/), built with relative paths into apps/windows/build/web/,
 // where src/main/main.cjs serves it from app://. Converters link by #<id>.
 
 import { resolve } from "node:path";
@@ -9,7 +9,7 @@ export default defineConfig({
   root: resolve(__dirname, "src", "renderer"),
   publicDir: false,
   base: "./",
-  build: { outDir: resolve(__dirname, "dist"), emptyOutDir: true },
+  build: { outDir: resolve(__dirname, "build", "web"), emptyOutDir: true },
   // The app icon, at /app-icon.svg, and the photos.
   plugins: [appIcon(), photos()],
 });

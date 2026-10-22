@@ -21,8 +21,8 @@ Commands run from the repo root:
 npm run android:dev       # live preview on an emulator (started if need be) or a USB phone
 npm run android:run       # build, install and open on the running emulator or phone
 npm run android:emulator  # open the emulator with the app installed (or apps/android/emulator.cmd)
-npm run android:apk       # debug .apk, in apps/android/native/app/build/outputs/apk/debug/
-npm run android:aab       # release .aab for Google Play, signed with the upload key (below)
+npm run android:apk       # debug .apk, apps/android/dist/UOM-Converter-debug.apk
+npm run android:aab       # release .aab for Google Play, signed with the upload key (below), into apps/android/dist/
 npm run android:sync      # build the page and copy it into the native project
 ```
 
@@ -49,7 +49,7 @@ versionCode):
 ```powershell
 $env:UOM_UPLOAD_KEYSTORE = "$env:USERPROFILE\.keys\uom-converter-upload.jks"
 $env:UOM_UPLOAD_PASSWORD = "<its password>"
-npm run android:aab   # apps/android/native/app/build/outputs/bundle/release/app-release.aab
+npm run android:aab   # apps/android/dist/UOM-Converter-<version>.aab
 ```
 
 Without them the build stops (`scripts/gradle.cjs`) rather than make a bundle Play would refuse.
@@ -72,7 +72,7 @@ npm run android:icons
 ```
 
 Redraws the launcher icons (`native/app/src/main/res/mipmap-*/`) and the Play icon
-(`store/icon-512.png`) from `@uom/brand`'s `app-icon.svg` (`scripts/render-icons.cjs`).
+(`listing/icon-512.png`) from `@uom/brand`'s `app-icon.svg` (`scripts/render-icons.cjs`).
 
 ### Refresh the Play listing images
 
@@ -80,13 +80,13 @@ Redraws the launcher icons (`native/app/src/main/res/mipmap-*/`) and the Play ic
 npm run android:store
 ```
 
-Builds the page and runs `store/render.cjs`, which draws the feature graphic
-(`store/feature-graphic.png`, from `store/feature.html`) and the phone screenshots
-for phones, 7-inch and 10-inch tablets (`store/screenshots/<device>/`, 1080 × 1920): each a caption
-over the real app at that device's size, as listed in `SHOTS` in `store/shots.html` with the
+Builds the page and runs `listing/generator/render.cjs`, which draws the feature graphic
+(`listing/feature-graphic.png`, from `listing/generator/feature.html`) and the phone screenshots
+for phones, 7-inch and 10-inch tablets (`listing/<device>/`, 1080 × 1920): each a caption
+over the real app at that device's size, as listed in `SHOTS` in `listing/generator/shots.html` with the
 region, role and screen it opens on. `scroll` scrolls a converter so its answer shows above the
 crop, the same on every device or set per device. Look them over before committing. Every other Play Console field
-is in [store/LISTING.md](store/LISTING.md), ready to paste.
+is in [listing/LISTING.md](listing/LISTING.md), ready to paste.
 
 ## Explanation
 
@@ -94,7 +94,7 @@ is in [store/LISTING.md](store/LISTING.md), ready to paste.
 website, but each converter is still drawn by `@uom/ui`'s `converter.ts`; this app only styles it
 (`src/style.css`) and copies with a native clipboard plugin.
 
-**Everything bundled.** The page is built into `dist/` and copied into the native project, which
+**Everything bundled.** The page is built into `build/web/` and copied into the native project, which
 serves it from `https://localhost`. Its content security policy (`src/index.html`) lets it load
 only its own files.
 
@@ -116,8 +116,10 @@ from it in `native/app/build.gradle` (1.2.3 is 10203).
 | `scripts/gradle.cjs` | Runs Gradle with them: the `run`, `apk` and `aab` scripts |
 | `scripts/dev.mjs`, `scripts/emulator.cjs` | `npm run android:dev`, `npm run android:emulator` |
 | `scripts/render-icons.cjs` | `npm run android:icons` |
-| `store/icon-512.png` | The Play listing icon (rendered) |
-| `store/render.cjs` | `npm run android:store`: the feature graphic and phone screenshots |
-| `store/feature.html`, `store/shots.html` | Their designs, in `@uom/brand`'s `store.css` look |
-| `store/feature-graphic.png`, `store/screenshots/<device>/` | The images to upload (rendered) |
-| `store/LISTING.md` | Every Play Console field, ready to paste |
+| `listing/icon-512.png` | The Play listing icon (rendered) |
+| `listing/generator/render.cjs` | `npm run android:store`: the feature graphic and phone screenshots |
+| `listing/generator/feature.html`, `listing/generator/shots.html` | Their designs, in `@uom/brand`'s `store.css` look |
+| `listing/feature-graphic.png`, `listing/<device>/` | The images to upload (rendered) |
+| `listing/LISTING.md` | Every Play Console field, ready to paste |
+| `dist/` | What ships: the `.aab` and the debug `.apk`, copied out of Gradle's build folder (not in git) |
+| `build/` | Intermediates, safe to delete: the built page (`web/`), store screenshot captures (not in git) |

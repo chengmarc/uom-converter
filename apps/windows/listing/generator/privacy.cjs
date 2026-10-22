@@ -1,13 +1,13 @@
 // The privacy policy as plain text, for Partner Center's privacy policy box (LISTING.md), made from
 // the repo's PRIVACY.md so the two can't drift: one line per paragraph or bullet, no Markdown.
-// Writes store/PRIVACY.md; run after changing PRIVACY.md (store/privacy.test.ts checks it was):
-//   node apps/windows/store/privacy.cjs
+// Writes listing/PRIVACY.md; run after changing PRIVACY.md (listing/generator/privacy.test.ts checks it was):
+//   node apps/windows/listing/generator/privacy.cjs
 
 const fs = require("node:fs");
 const path = require("node:path");
 
-const SOURCE = path.join(__dirname, "..", "..", "..", "PRIVACY.md");
-const OUT = path.join(__dirname, "PRIVACY.md");
+const SOURCE = path.join(__dirname, "..", "..", "..", "..", "PRIVACY.md");
+const OUT = path.join(__dirname, "..", "PRIVACY.md");
 
 const inline = (s) =>
   s

@@ -2,7 +2,10 @@
 // --config packaging/electron-builder.config.cjs, so the paths below are relative to apps/windows/.
 // The version is the repo's (one for every app, in the root package.json); the packaged app's
 // package.json also gets the repo's name, so it reads the same as before the apps had their own.
+// Everything electron-builder makes lands in build/electron-builder/; only the installer and the
+// .appx are copied out to dist/, so dist/ holds just what ships.
 
+const fs = require("node:fs");
 const path = require("node:path");
 
 const { version } = require("../../../package.json");
@@ -12,10 +15,16 @@ const electron = path.dirname(require.resolve("electron/package.json"));
 module.exports = {
   appId: "com.uomconverter.app",
   extraMetadata: { name: "uom-converter", version },
-  files: ["dist/**", "src/main/**", "!**/*.test.ts", "package.json"],
+  files: ["build/web/**", "src/main/**", "!**/*.test.ts", "package.json"],
   directories: {
-    output: "release",
+    output: "build/electron-builder",
     buildResources: "packaging",
+  },
+  afterAllArtifactBuild: ({ artifactPaths }) => {
+    const dist = path.join(__dirname, "..", "dist");
+    fs.mkdirSync(dist, { recursive: true });
+    for (const file of artifactPaths.filter((f) => /\.(exe|appx)$/.test(f))) fs.copyFileSync(file, path.join(dist, path.basename(file)));
+    return [];
   },
   electronVersion: require(path.join(electron, "package.json")).version,
   electronDist: path.join(electron, "dist"),

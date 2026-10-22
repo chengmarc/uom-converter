@@ -7,7 +7,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="../../../packages/brand/store.css" />
+    <link rel="stylesheet" href="../../../../packages/brand/store.css" />
     <style>
       html, body { width: 360px; height: 640px; }
       /* Darker across the top, under the headline; the pylon and the sunset show around the phone. */
@@ -63,7 +63,7 @@
     </style>
   </head>
   <body>
-    <div class="brand"><img src="../../../packages/brand/app-icon.svg" alt="" /><span>UOM Converter</span></div>
+    <div class="brand"><img src="../../../../packages/brand/app-icon.svg" alt="" /><span>UOM Converter</span></div>
     <h1 id="title"></h1>
     <p class="text" id="text"></p>
     <div class="phone"><div class="screen" id="screen"></div></div>
@@ -128,7 +128,7 @@
         document.getElementById("title").innerHTML = shot.title;
         document.getElementById("text").textContent = shot.text;
         document.getElementById("screen").innerHTML =
-          `<img src="../build/shots/${device}/${name}.png" alt="" />` + `<div class="status"><span>12:30</span><i><b></b><b></b></i></div>`;
+          `<img src="../../build/shots/${device}/${name}.png" alt="" />` + `<div class="status"><span>12:30</span><i><b></b><b></b></i></div>`;
       }
     </script>
   </body>

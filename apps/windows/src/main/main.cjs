@@ -1,4 +1,4 @@
-// Electron shell for the UOM converter. The page is the static build in apps/windows/dist/
+// Electron shell for the UOM converter. The page is the static build in apps/windows/build/web/
 // (see ../../vite.config.ts), served from a private app:// scheme so it gets a real origin: browser storage and
 // clipboard behave exactly as on the web, and nothing can load from outside the app.
 
@@ -8,7 +8,7 @@ const os = require("node:os");
 const path = require("node:path");
 const { pathToFileURL } = require("node:url");
 
-const DIST = path.join(__dirname, "..", "..", "dist");
+const PAGE = path.join(__dirname, "..", "..", "build", "web");
 // `npm run windows:dev` (scripts/dev.mjs) points the app at Vite's dev server instead, for live
 // reload. A packaged app ignores it, so it always shows its own build.
 const DEV_URL = app.isPackaged ? undefined : process.env.UOM_DEV_URL;
@@ -64,9 +64,9 @@ protocol.registerSchemesAsPrivileged([
 function serveApp() {
   protocol.handle("app", (request) => {
     const { pathname } = new URL(request.url);
-    const file = path.normalize(path.join(DIST, decodeURIComponent(pathname === "/" ? "/index.html" : pathname)));
+    const file = path.normalize(path.join(PAGE, decodeURIComponent(pathname === "/" ? "/index.html" : pathname)));
     // Refuse anything that resolves outside the build folder.
-    if (file !== DIST && !file.startsWith(DIST + path.sep)) return new Response("Not found", { status: 404 });
+    if (file !== PAGE && !file.startsWith(PAGE + path.sep)) return new Response("Not found", { status: 404 });
     return net.fetch(pathToFileURL(file).toString());
   });
 }

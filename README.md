@@ -6,15 +6,15 @@
   <a href="https://apps.microsoft.com/detail/9PHZQBV736JC"><img src="docs/badges/badge-microsoft-store.svg" height="50"></a>
   <h1>UOM Converter - Unit Converter for Electrical Industry</h1>
 
-  <img src="apps/windows/store/listing/screenshot-1-promo.png">
+  <img src="apps/windows/listing/desktop/screenshot-1-promo.png">
 
 </div>
 
 ## Screenshots
 
-<img src="apps/windows/store/listing/screenshot-2-voltage-drop.png">
-<img src="apps/windows/store/listing/screenshot-3-price-units.png">
-<img src="apps/windows/store/listing/screenshot-5-reels.png">
+<img src="apps/windows/listing/desktop/screenshot-2-voltage-drop.png">
+<img src="apps/windows/listing/desktop/screenshot-3-price-units.png">
+<img src="apps/windows/listing/desktop/screenshot-5-reels.png">
 
 ## Quick start
 
@@ -47,7 +47,16 @@ apps/
 ```
 
 Inside an app, `src/` is its source, `scripts/` its helpers (icon renderers, the Gradle runner),
-`store/` its listing, and its tools' configs sit at its root. Builds land in `dist/`.
+`listing/` its store listing, and its tools' configs sit at its root. Two folders, never in git,
+mean the same in every app:
+
+| Folder | Holds |
+|---|---|
+| `dist/` | What ships, and nothing else: the website as deployed, the Windows installer and `.appx`, the Android `.aab` |
+| `build/` | Intermediates, always safe to delete: the built page inside the Windows and Android apps (`build/web/`), electron-builder's full output, store screenshot captures |
+
+The Android app's `native/` (the Android Studio project) also has `build/` folders: Gradle's
+own, which `npm run android:aab` copies the `.aab` out of.
 
 Live preview, reloading on every save:
 

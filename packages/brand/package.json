@@ -1,6 +1,6 @@
 {
   "name": "@uom/brand",
-  "description": "What every app looks like: the colours (tokens.css, which each app's stylesheet @imports; tokens.ts reads them where CSS can't reach), the app icon (app-icon.svg, and as rendered/icon-256.png), the share image (rendered/share.png: both drawn by the Windows app's store/render.cjs, which has the renderer) and the photos (photos/, made from originals/ by photos.mjs; @uom/ui/photos shows them), which vite.ts's plugins hand to the apps; and store.css, the look of the app stores' designed images.",
+  "description": "What every app looks like: the colours (tokens.css, which each app's stylesheet @imports; tokens.ts reads them where CSS can't reach), the app icon (app-icon.svg, and as rendered/icon-256.png), the share image (rendered/share.png: both drawn by the Windows app's listing/generator/render.cjs, which has the renderer) and the photos (photos/, made from originals/ by photos.mjs; @uom/ui/photos shows them), which vite.ts's plugins hand to the apps; and store.css, the look of the app stores' designed images.",
   "private": true,
   "type": "module",
   "exports": {

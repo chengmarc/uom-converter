@@ -6,7 +6,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="../../../packages/brand/store.css" />
+    <link rel="stylesheet" href="../../../../packages/brand/store.css" />
     <style>
       html, body { width: 1366px; height: 768px; }
       /* The grid fades out behind the app. */
@@ -72,7 +72,7 @@
   </head>
   <body>
     <div class="top">
-      <div class="brand"><img src="../../../packages/brand/app-icon.svg" alt="" /><span>UOM Converter<small>For the electrical trade</small></span></div>
+      <div class="brand"><img src="../../../../packages/brand/app-icon.svg" alt="" /><span>UOM Converter<small>For the electrical trade</small></span></div>
       <div class="facts" id="facts"></div>
     </div>
     <h1 id="title"></h1>
@@ -135,7 +135,7 @@
         document.getElementById("title").innerHTML = shot.title;
         document.getElementById("text").textContent = shot.text;
         document.getElementById("window").innerHTML =
-          `<img src="../build/shots/${name}.png" alt="" />` +
+          `<img src="../../build/shots/${name}.png" alt="" />` +
           `<div class="caption-buttons ${shot.theme}"><i>&#xE921;</i><i>&#xE922;</i><i>&#xE8BB;</i></div>`;
       }
     </script>

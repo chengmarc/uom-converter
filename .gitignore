@@ -1,6 +1,5 @@
 node_modules
 dist
-release
 .wrangler
 packages/brand/originals/
 build

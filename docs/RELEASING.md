@@ -2,7 +2,7 @@
 
 How the source tree becomes the two release files: an installer for GitHub Releases, and an
 `.appx` for the Microsoft Store. electron-builder builds both from
-[packaging/electron-builder.config.cjs](../apps/windows/packaging/electron-builder.config.cjs), into `apps/windows/release/`. Commands run from
+[packaging/electron-builder.config.cjs](../apps/windows/packaging/electron-builder.config.cjs), into `apps/windows/dist/`. Commands run from
 the repo root.
 
 ← Back to the [README](../README.md).
@@ -53,11 +53,11 @@ the repo root.
    ```
 
 9. **Publish** the installer to GitHub, with the version's CHANGELOG section as the
-   description. [packaging/release-notes.cjs](../apps/windows/packaging/release-notes.cjs) copies it to `apps/windows/release/RELEASE_NOTES.md`:
+   description. [packaging/release-notes.cjs](../apps/windows/packaging/release-notes.cjs) copies it to `apps/windows/dist/RELEASE_NOTES.md`:
 
    ```
    node apps/windows/packaging/release-notes.cjs <version>
-   gh release create v<version> apps/windows/release/UOM-Converter-setup.exe --title "UOM Converter <version>" --notes-file apps/windows/release/RELEASE_NOTES.md
+   gh release create v<version> apps/windows/dist/UOM-Converter-setup.exe --title "UOM Converter <version>" --notes-file apps/windows/dist/RELEASE_NOTES.md
    ```
 
    The README's download badge points at `releases/latest/download/UOM-Converter-setup.exe`, so it
@@ -75,16 +75,16 @@ published there.
    `appx` in [packaging/electron-builder.config.cjs](../apps/windows/packaging/electron-builder.config.cjs): `identityName`, `publisher` (`CN=…`) and `publisherDisplayName`.
    Until then they hold placeholders, and the Store rejects a package whose identity doesn't match.
 2. **Build** with `npm run windows:appx`.
-3. **Upload** `apps/windows/release/UOM-Converter-<version>.appx` in a new Partner Center
+3. **Upload** `apps/windows/dist/UOM-Converter-<version>.appx` in a new Partner Center
    submission. Every other field (listing text, images in their numbered order, privacy policy,
    `runFullTrust` justification, certification notes) is in
-   [apps/windows/store/LISTING.md](../apps/windows/store/LISTING.md), ready to paste.
+   [apps/windows/listing/LISTING.md](../apps/windows/listing/LISTING.md), ready to paste.
 
 ## Reference
 
 ### Release files
 
-In `apps/windows/release/`:
+In `apps/windows/dist/`:
 
 | File | Published to |
 |---|---|
@@ -92,17 +92,18 @@ In `apps/windows/release/`:
 | `UOM-Converter-<version>.appx` | Microsoft Store (Partner Center) only |
 | `RELEASE_NOTES.md` | The GitHub release's description (from `packaging/release-notes.cjs`) |
 
-Everything else electron-builder leaves there (`win-unpacked/`, `.blockmap` files,
-`builder-debug.yml`) is intermediate and isn't published.
+Only these are copied there. Everything else electron-builder makes (`win-unpacked/`, `.blockmap`
+files, `builder-debug.yml`) stays in `apps/windows/build/electron-builder/`, with the other
+intermediates, and isn't published.
 
 ### Where the images come from
 
-`npm run windows:assets` runs [store/render.cjs](../apps/windows/store/render.cjs), which renders from
+`npm run windows:assets` runs [listing/generator/render.cjs](../apps/windows/listing/generator/render.cjs), which renders from
 `packages/brand/app-icon.svg` and the built page (paths below are in `apps/windows/`):
 
 | Output | Used for |
 |---|---|
 | `src/main/icon.png` | The window, taskbar and installer icon |
 | `packaging/appx/` | Start, tile and taskbar icons inside the `.appx` |
-| `store/listing/` | Partner Center: store logo, box and poster art (designed in `store/logo.html`) and screenshots (captions in `store/shots.html`, around captures of the app in `build/shots/`) |
+| `listing/`, `listing/desktop/` | Partner Center: store logo, box and poster art (designed in `listing/generator/logo.html`), and in `desktop/` the screenshots (captions in `listing/generator/shots.html`, around captures of the app in `build/shots/`) |
 | `packages/brand/rendered/` (at the repo root) | The website: `icon-256.png` (its install icon) and `share.png` (the preview when a link is shared, published as `og.png`), copies of the 256 px tile icon and the promo screenshot |

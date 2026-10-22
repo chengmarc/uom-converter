@@ -44,6 +44,20 @@ const gradlew = path.join(PROJECT, win ? "gradlew.bat" : "gradlew");
 const r = spawnSync(win ? `"${gradlew}"` : gradlew, [...proxy, ...tasks], { cwd: PROJECT, env, stdio: "inherit", shell: win });
 if (r.status !== 0) process.exit(r.status ?? 1);
 
+// What ships, copied out of Gradle's build folder into dist/ under names that say what they are.
+const { version } = require("../../../package.json");
+const OUTPUTS = {
+  bundleRelease: ["bundle/release/app-release.aab", `UOM-Converter-${version}.aab`],
+  assembleDebug: ["apk/debug/app-debug.apk", "UOM-Converter-debug.apk"],
+};
+for (const [task, [from, to]] of Object.entries(OUTPUTS)) {
+  if (!tasks.includes(task)) continue;
+  const dist = path.join(__dirname, "..", "dist");
+  fs.mkdirSync(dist, { recursive: true });
+  fs.copyFileSync(path.join(PROJECT, "app", "build", "outputs", from), path.join(dist, to));
+  console.log(path.relative(process.cwd(), path.join(dist, to)));
+}
+
 if (reverse) execFileSync(adb, ["reverse", `tcp:${reverse}`, `tcp:${reverse}`], { stdio: "inherit" });
 if (launch) {
   execFileSync(adb, ["shell", "am", "start", "-n", "com.chengmarc.uomconverter/.MainActivity"], { stdio: "inherit" });

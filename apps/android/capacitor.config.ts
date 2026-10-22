@@ -8,7 +8,7 @@ const devUrl = process.env.UOM_DEV_URL;
 const config: CapacitorConfig = {
   appId: "com.chengmarc.uomconverter",
   appName: "UOM Converter",
-  webDir: "dist",
+  webDir: "build/web",
   android: {
     path: "native",
     backgroundColor: "#f6f7f9",

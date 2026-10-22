@@ -15,8 +15,8 @@ Commands run from the repo root:
 ```
 npm run windows:dev     # live preview: Vite's dev server in the app's window
 npm run windows:start   # build the page and open it in the app
-npm run windows:dist    # the installer, apps/windows/release/UOM-Converter-setup.exe
-npm run windows:appx    # the Store package, apps/windows/release/UOM-Converter-<version>.appx
+npm run windows:dist    # the installer, apps/windows/dist/UOM-Converter-setup.exe
+npm run windows:appx    # the Store package, apps/windows/dist/UOM-Converter-<version>.appx
 ```
 
 `windows:dev` reloads on every save to the page; a change to `src/main/` needs the window closed
@@ -33,7 +33,7 @@ try it out, tag, then GitHub Releases and Partner Center.
 npm run windows:assets
 ```
 
-Builds the page and runs `store/render.cjs`, which redraws every image made from
+Builds the page and runs `listing/generator/render.cjs`, which redraws every image made from
 `@uom/brand`'s `app-icon.svg` and the built page: the window and tile icons, the Store listing
 images, and the website's icon and share image in `packages/brand/rendered/`. Look over the
 screenshots before committing them. The release guide's
@@ -41,15 +41,15 @@ screenshots before committing them. The release guide's
 
 ### Change a Store screenshot
 
-Each shot is an entry in `SHOTS` in `store/shots.html`: its caption, and the role, region and
+Each shot is an entry in `SHOTS` in `listing/generator/shots.html`: its caption, and the role, region and
 converter it opens on (`query`). `scroll` scrolls the converter so its answer stays inside the
 frame. Then refresh the images (above).
 
 ### Change the privacy policy
 
-Edit the repo's [PRIVACY.md](../../PRIVACY.md), then run `node apps/windows/store/privacy.cjs`
-to write `store/PRIVACY.md`, the plain-text copy pasted into Partner Center.
-`store/privacy.test.ts` fails until the two match.
+Edit the repo's [PRIVACY.md](../../PRIVACY.md), then run `node apps/windows/listing/generator/privacy.cjs`
+to write `listing/PRIVACY.md`, the plain-text copy pasted into Partner Center.
+`listing/generator/privacy.test.ts` fails until the two match.
 
 ## Explanation
 
@@ -80,8 +80,9 @@ in `window-state.json`, both in the app's data folder (see [PRIVACY.md](../../PR
 | `packaging/electron-builder.config.cjs` | Installer and `.appx` settings, including the Store identity |
 | `packaging/appx/` | The `.appx` tile icons (rendered) |
 | `packaging/release-notes.cjs` | A version's changelog section, for the GitHub release |
-| `store/render.cjs` | `npm run windows:assets`: every rendered image |
-| `store/shots.html`, `store/logo.html` | The designed screenshots, box art and poster art |
-| `store/LISTING.md` | Everything Partner Center asks for, ready to paste |
-| `store/privacy.cjs`, `store/PRIVACY.md` | The privacy policy as plain text for Partner Center |
-| `release/` | Build output (not in git) |
+| `listing/generator/render.cjs` | `npm run windows:assets`: every rendered image |
+| `listing/generator/shots.html`, `listing/generator/logo.html` | The designed screenshots, box art and poster art |
+| `listing/LISTING.md` | Everything Partner Center asks for, ready to paste |
+| `listing/generator/privacy.cjs`, `listing/PRIVACY.md` | The privacy policy as plain text for Partner Center |
+| `dist/` | What ships: the installer, the `.appx` and the release notes (not in git) |
+| `build/` | Intermediates, safe to delete: the built page (`web/`), electron-builder's full output, store screenshot captures (not in git) |

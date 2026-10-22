@@ -1,20 +1,20 @@
 // Renders Google Play's listing images from the app's own sources, so they never drift from it:
-//   store/feature-graphic.png     1024 × 500, from feature.html
-//   store/screenshots/<device>/   phone, 7-inch and 10-inch tablet screenshots, 1080 × 1920, in upload order:
+//   listing/feature-graphic.png   1024 × 500, from feature.html
+//   listing/<device>/             phone, 7-inch and 10-inch tablet screenshots, 1080 × 1920, in upload order:
 //                                 shots.html (which lists them and their captions) around captures of the built
 //                                 page at each device's size, taken into build/shots/<device>/
-// The icon is render-icons.cjs's (store/icon-512.png). Run with `npm run android:store`, which builds
-// apps/android/dist/ first.
+// The icon is render-icons.cjs's (listing/icon-512.png). Run with `npm run android:store`, which builds
+// apps/android/build/web/ first.
 
 const { app, BrowserWindow, nativeTheme, net, protocol } = require("electron");
 const fs = require("node:fs");
 const path = require("node:path");
 const { pathToFileURL } = require("node:url");
 
-const ANDROID = path.join(__dirname, "..");
-const DIST = path.join(ANDROID, "dist");
-const STORE = __dirname;
+const ANDROID = path.join(__dirname, "..", "..");
+const LISTING = path.join(ANDROID, "listing");
 const BUILD = path.join(ANDROID, "build");
+const PAGE = path.join(BUILD, "web");
 
 /**
  * Each device Play asks screenshots for, by its screen in CSS pixels: a common phone (393 × 852 at 3×, the
@@ -58,7 +58,7 @@ async function capture(win, file, expected) {
 async function renderPage(page, file, width, height, scale, query = {}) {
   const [html, hash] = page.split("#");
   const win = offscreen(width, height, scale);
-  await win.loadFile(path.join(STORE, html), { hash, query });
+  await win.loadFile(path.join(__dirname, html), { hash, query });
   await win.webContents.executeJavaScript("document.fonts.ready.then(() => true)");
   await capture(win, file, { width: width * scale, height: height * scale });
   win.destroy();
@@ -96,29 +96,28 @@ async function captureApp(name, device, { region, audience, recent = [], hash, s
 app.on("window-all-closed", () => {});
 
 app.whenReady().then(async () => {
-  if (!fs.existsSync(path.join(DIST, "index.html"))) throw new Error("No apps/android/dist/: run it with `npm run android:store`, which builds the page first.");
+  if (!fs.existsSync(path.join(PAGE, "index.html"))) throw new Error("No apps/android/build/web/: run it with `npm run android:store`, which builds the page first.");
   protocol.handle("app", (request) => {
     const { pathname } = new URL(request.url);
-    const file = path.normalize(path.join(DIST, decodeURIComponent(pathname === "/" ? "/index.html" : pathname)));
-    if (file !== DIST && !file.startsWith(DIST + path.sep)) return new Response("Not found", { status: 404 });
+    const file = path.normalize(path.join(PAGE, decodeURIComponent(pathname === "/" ? "/index.html" : pathname)));
+    if (file !== PAGE && !file.startsWith(PAGE + path.sep)) return new Response("Not found", { status: 404 });
     return net.fetch(pathToFileURL(file).toString());
   });
   nativeTheme.themeSource = "light";
 
-  await renderPage("feature.html", path.join(STORE, "feature-graphic.png"), 1024, 500, 1);
+  await renderPage("feature.html", path.join(LISTING, "feature-graphic.png"), 1024, 500, 1);
 
   const lister = offscreen(SHOT.width, SHOT.height);
-  await lister.loadFile(path.join(STORE, "shots.html"));
+  await lister.loadFile(path.join(__dirname, "shots.html"));
   const shots = Object.entries(await lister.webContents.executeJavaScript("SHOTS"));
   lister.destroy();
 
-  const out = path.join(STORE, "screenshots");
-  fs.rmSync(out, { recursive: true, force: true });
   fs.rmSync(path.join(BUILD, "shots"), { recursive: true, force: true });
   for (const [device, screen] of Object.entries(DEVICES)) {
+    fs.rmSync(path.join(LISTING, device), { recursive: true, force: true });
     for (const [i, [name, shot]] of shots.entries()) {
       await captureApp(name, device, shot);
-      const file = path.join(out, device, `screenshot-${i + 1}-${name}.png`);
+      const file = path.join(LISTING, device, `screenshot-${i + 1}-${name}.png`);
       await renderPage(`shots.html#${name}`, file, SHOT.width, SHOT.height, SHOT.scale, { device, width: String(screen.width) });
     }
   }

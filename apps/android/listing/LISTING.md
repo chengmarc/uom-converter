@@ -77,12 +77,12 @@ package is `com.chengmarc.uomconverter`; the bundle is built and signed as
   UOM Converter is open source under the Apache 2.0 license. The same converters are on the web at uom-converter.com and in the Microsoft Store for Windows.
   ```
 
-- **App icon:** [store/icon-512.png](icon-512.png), 512 × 512, from `npm run android:icons`.
-- **Feature graphic:** `store/feature-graphic.png`, 1024 × 500.
+- **App icon:** [listing/icon-512.png](icon-512.png), 512 × 512, from `npm run android:icons`.
+- **Feature graphic:** `listing/feature-graphic.png`, 1024 × 500.
 - **Phone screenshots** (2 to 8, 9:16; at least 4 at 1080 px or more on each side to be eligible
-  for promotion): `store/screenshots/phone/`, in their numbered order.
-- **7-inch tablet screenshots** (required for an app that runs on tablets): `store/screenshots/tablet-7/`.
-- **10-inch tablet screenshots:** `store/screenshots/tablet-10/`.
+  for promotion): `listing/phone/`, in their numbered order.
+- **7-inch tablet screenshots** (required for an app that runs on tablets): `listing/tablet-7/`.
+- **10-inch tablet screenshots:** `listing/tablet-10/`.
 - **Video:** none.
 
 ## App content

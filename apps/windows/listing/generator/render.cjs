@@ -1,21 +1,21 @@
 // Renders every image derived from the app's own sources, so they never drift from it:
 //   src/main/icon.png      the desktop window, taskbar and installer icon
 //   packaging/appx/        tile and taskbar icons packed into the MSIX (electron-builder's buildResources)
-//   store/listing/         images uploaded to Partner Center: store logos and screenshots
+//   listing/               images uploaded to Partner Center: store logos, and screenshots in desktop/
 //   @uom/brand's rendered/ the icon at 256 and the share image (the promo shot), which the website uses too
 // The icons come from @uom/brand's app-icon.svg; screenshots from the built page, captured into build/shots/ and
 // framed by shots.html.
-// Run with `npm run windows:assets` (builds apps/windows/dist/ first).
+// Run with `npm run windows:assets` (builds apps/windows/build/web/ first).
 
 const { app, BrowserWindow, nativeTheme, net, protocol } = require("electron");
 const fs = require("node:fs");
 const path = require("node:path");
 const { pathToFileURL } = require("node:url");
 
-const WINDOWS = path.join(__dirname, "..");
-const DIST = path.join(WINDOWS, "dist");
-const STORE = path.join(WINDOWS, "store");
+const WINDOWS = path.join(__dirname, "..", "..");
+const LISTING = path.join(WINDOWS, "listing");
 const BUILD = path.join(WINDOWS, "build");
+const PAGE = path.join(BUILD, "web");
 const ICON = fs.readFileSync(require.resolve("@uom/brand/app-icon.svg"), "utf8");
 const ICON_256 = require.resolve("@uom/brand/icon-256.png");
 const SHARE = require.resolve("@uom/brand/share.png");
@@ -94,24 +94,24 @@ async function renderTiles() {
 }
 
 async function renderListing() {
-  const dir = path.join(STORE, "listing");
-  fs.rmSync(dir, { recursive: true, force: true });
   // Partner Center's store logos: the 1:1 app tile icon, then box art and poster art from
   // logo.html, at the larger of the two sizes Partner Center accepts for each.
-  await renderIcon(path.join(dir, "store-logo-300.png"), 300, 300, 1);
-  await renderPage("logo.html", path.join(dir, "box-art-2160.png"), 540, 540, 4);
-  await renderPage("logo.html", path.join(dir, "poster-art-1440x2160.png"), 360, 540, 4);
+  await renderIcon(path.join(LISTING, "store-logo-300.png"), 300, 300, 1);
+  await renderPage("logo.html", path.join(LISTING, "box-art-2160.png"), 540, 540, 4);
+  await renderPage("logo.html", path.join(LISTING, "poster-art-1440x2160.png"), 360, 540, 4);
+  const dir = path.join(LISTING, "desktop");
+  fs.rmSync(dir, { recursive: true, force: true });
 
   protocol.handle("app", (request) => {
     const { pathname } = new URL(request.url);
-    const file = path.normalize(path.join(DIST, decodeURIComponent(pathname === "/" ? "/index.html" : pathname)));
-    if (file !== DIST && !file.startsWith(DIST + path.sep)) return new Response("Not found", { status: 404 });
+    const file = path.normalize(path.join(PAGE, decodeURIComponent(pathname === "/" ? "/index.html" : pathname)));
+    if (file !== PAGE && !file.startsWith(PAGE + path.sep)) return new Response("Not found", { status: 404 });
     return net.fetch(pathToFileURL(file).toString());
   });
 
   // The shots, in upload order, as shots.html lists them; their captions stay in that page.
   const lister = offscreen(SHOT_SIZE.width, SHOT_SIZE.height);
-  await lister.loadFile(path.join(STORE, "shots.html"));
+  await lister.loadFile(path.join(__dirname, "shots.html"));
   const shots = Object.entries(await lister.webContents.executeJavaScript("SHOTS"));
   lister.destroy();
 
@@ -144,7 +144,7 @@ async function renderListing() {
 async function renderPage(page, file, width, height, scale, script = "") {
   const [html, hash] = page.split("#");
   const win = offscreen(width, height, scale);
-  await win.loadFile(path.join(STORE, html), { hash });
+  await win.loadFile(path.join(__dirname, html), { hash });
   await win.webContents.executeJavaScript(`${script}; document.fonts.ready.then(() => true)`);
   await capture(win, file, { width: width * scale, height: height * scale });
   win.destroy();
@@ -154,7 +154,7 @@ async function renderPage(page, file, width, height, scale, script = "") {
 app.on("window-all-closed", () => {});
 
 app.whenReady().then(async () => {
-  if (!fs.existsSync(path.join(DIST, "index.html"))) throw new Error("No apps/windows/dist/: run it with `npm run windows:assets`, which builds the page first.");
+  if (!fs.existsSync(path.join(PAGE, "index.html"))) throw new Error("No apps/windows/build/web/: run it with `npm run windows:assets`, which builds the page first.");
   await renderIcon(path.join(WINDOWS, "src", "main", "icon.png"), 1024, 1024, 1);
   await renderTiles();
   await renderListing();

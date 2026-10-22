@@ -8,7 +8,7 @@ Center by hand. Images are in [listing/](listing/), rendered by `npm run windows
 
 - **Category:** Utilities & tools. **Subcategory:** none.
 - **Privacy policy:** paste [PRIVACY.md](PRIVACY.md) as it is: it's the repo's [PRIVACY.md](../../../PRIVACY.md) as plain
-  text for Partner Center's box, written by [privacy.cjs](privacy.cjs) (run it after changing that one).
+  text for Partner Center's box, written by [generator/privacy.cjs](generator/privacy.cjs) (run it after changing that one).
 - **Website:** `https://uom-converter.com/`
 - **Support contact info:** `https://github.com/chengmarc/uom-converter/issues`
 - **System requirements:** leave every row unchecked; the app runs on any PC that runs Windows 10 (1809) or later.
@@ -88,12 +88,12 @@ Read and change every line: it's open source under Apache 2.0
 
 Upload in this order (the first is shown first); each names one need, met in the real app:
 
-1. `listing/screenshot-1-promo.png`: every number on the job, converted (12 AWG to mm²)
-2. `listing/screenshot-2-voltage-drop.png`: will that wire carry the run? (voltage drop and the smallest wire)
-3. `listing/screenshot-3-price-units.png`: price per C or M, to price each
-4. `listing/screenshot-4-kva-amps.png`: kVA to amps (Engineer, Europe)
-5. `listing/screenshot-5-reels.png`: how many reels for this job (Counter staff, Canada)
-6. `listing/screenshot-6-uom-codes.png`: units in a supplier file to UN/ECE codes (PIM / data, Europe)
+1. `listing/desktop/screenshot-1-promo.png`: every number on the job, converted (12 AWG to mm²)
+2. `listing/desktop/screenshot-2-voltage-drop.png`: will that wire carry the run? (voltage drop and the smallest wire)
+3. `listing/desktop/screenshot-3-price-units.png`: price per C or M, to price each
+4. `listing/desktop/screenshot-4-kva-amps.png`: kVA to amps (Engineer, Europe)
+5. `listing/desktop/screenshot-5-reels.png`: how many reels for this job (Counter staff, Canada)
+6. `listing/desktop/screenshot-6-uom-codes.png`: units in a supplier file to UN/ECE codes (PIM / data, Europe)
 
 ### Store logos
 

@@ -39,7 +39,7 @@ for every link, e.g. `SITE_URL=https://example.com/uom-converter/ npm run web:bu
 ### Change the icon or the share image
 
 They're `@uom/brand`'s `icon-256.png` and `share.png`, drawn by the Windows app's
-`apps/windows/store/render.cjs` (`npm run windows:assets`), and published as `icon-256.png` and
+`apps/windows/listing/generator/render.cjs` (`npm run windows:assets`), and published as `icon-256.png` and
 `og.png`.
 
 ## Explanation
