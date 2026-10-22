@@ -6,15 +6,15 @@
   <a href="https://apps.microsoft.com/detail/9PHZQBV736JC"><img src="docs/badges/badge-microsoft-store.svg" height="50"></a>
   <h1>UOM Converter - Unit Converter for Electrical Industry</h1>
 
-  <img src="apps/windows/listing/desktop/screenshot-1-promo.png">
+  <img src="apps/windows/store-listing/desktop/screenshot-1-promo.png">
 
 </div>
 
 ## Screenshots
 
-<img src="apps/windows/listing/desktop/screenshot-2-voltage-drop.png">
-<img src="apps/windows/listing/desktop/screenshot-3-price-units.png">
-<img src="apps/windows/listing/desktop/screenshot-5-reels.png">
+<img src="apps/windows/store-listing/desktop/screenshot-2-voltage-drop.png">
+<img src="apps/windows/store-listing/desktop/screenshot-3-price-units.png">
+<img src="apps/windows/store-listing/desktop/screenshot-5-reels.png">
 
 ## Quick start
 
@@ -47,7 +47,7 @@ apps/
 ```
 
 Inside an app, `src/` is its source, `scripts/` its helpers (icon renderers, the Gradle runner),
-`listing/` its store listing, and its tools' configs sit at its root. Two folders, never in git,
+`store-listing/` its listing in the app store, and its tools' configs sit at its root. Two folders, never in git,
 mean the same in every app:
 
 | Folder | Holds |

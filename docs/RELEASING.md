@@ -78,7 +78,7 @@ published there.
 3. **Upload** `apps/windows/dist/UOM-Converter-<version>.appx` in a new Partner Center
    submission. Every other field (listing text, images in their numbered order, privacy policy,
    `runFullTrust` justification, certification notes) is in
-   [apps/windows/listing/LISTING.md](../apps/windows/listing/LISTING.md), ready to paste.
+   [apps/windows/store-listing/LISTING.md](../apps/windows/store-listing/LISTING.md), ready to paste.
 
 ## Reference
 
@@ -98,12 +98,12 @@ intermediates, and isn't published.
 
 ### Where the images come from
 
-`npm run windows:assets` runs [listing/generator/render.cjs](../apps/windows/listing/generator/render.cjs), which renders from
+`npm run windows:assets` runs [store-listing/generator/render.cjs](../apps/windows/store-listing/generator/render.cjs), which renders from
 `packages/brand/app-icon.svg` and the built page (paths below are in `apps/windows/`):
 
 | Output | Used for |
 |---|---|
 | `src/main/icon.png` | The window, taskbar and installer icon |
 | `packaging/appx/` | Start, tile and taskbar icons inside the `.appx` |
-| `listing/`, `listing/desktop/` | Partner Center: store logo, box and poster art (designed in `listing/generator/logo.html`), and in `desktop/` the screenshots (captions in `listing/generator/shots.html`, around captures of the app in `build/shots/`) |
+| `store-listing/`, `store-listing/desktop/` | Partner Center: store logo, box and poster art (designed in `store-listing/generator/logo.html`), and in `desktop/` the screenshots (captions in `store-listing/generator/shots.html`, around captures of the app in `build/shots/`) |
 | `packages/brand/rendered/` (at the repo root) | The website: `icon-256.png` (its install icon) and `share.png` (the preview when a link is shared, published as `og.png`), copies of the 256 px tile icon and the promo screenshot |

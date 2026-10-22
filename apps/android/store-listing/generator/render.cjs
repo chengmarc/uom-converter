@@ -1,9 +1,9 @@
 // Renders Google Play's listing images from the app's own sources, so they never drift from it:
-//   listing/feature-graphic.png   1024 × 500, from feature.html
-//   listing/<device>/             phone, 7-inch and 10-inch tablet screenshots, 1080 × 1920, in upload order:
-//                                 shots.html (which lists them and their captions) around captures of the built
-//                                 page at each device's size, taken into build/shots/<device>/
-// The icon is render-icons.cjs's (listing/icon-512.png). Run with `npm run android:store`, which builds
+//   store-listing/feature-graphic.png  1024 × 500, from feature.html
+//   store-listing/<device>/            phone, 7-inch and 10-inch tablet screenshots, 1080 × 1920, in upload order:
+//                                      shots.html (which lists them and their captions) around captures of the built
+//                                      page at each device's size, taken into build/shots/<device>/
+// The icon is render-icons.cjs's (store-listing/icon-512.png). Run with `npm run android:store`, which builds
 // apps/android/build/web/ first.
 
 const { app, BrowserWindow, nativeTheme, net, protocol } = require("electron");
@@ -12,7 +12,7 @@ const path = require("node:path");
 const { pathToFileURL } = require("node:url");
 
 const ANDROID = path.join(__dirname, "..", "..");
-const LISTING = path.join(ANDROID, "listing");
+const LISTING = path.join(ANDROID, "store-listing");
 const BUILD = path.join(ANDROID, "build");
 const PAGE = path.join(BUILD, "web");
 

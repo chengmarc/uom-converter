@@ -2,7 +2,7 @@
 
 Everything to paste into Partner Center → UOM Converter, in the submission's order: Properties, Store listings
 (English (United States)), Submission options. Pricing and availability, Age ratings and Packages are filled in Partner
-Center by hand. Images are in [listing/](listing/), rendered by `npm run windows:assets`.
+Center by hand. Images are in [store-listing/](store-listing/), rendered by `npm run windows:assets`.
 
 ## Properties
 
@@ -88,20 +88,20 @@ Read and change every line: it's open source under Apache 2.0
 
 Upload in this order (the first is shown first); each names one need, met in the real app:
 
-1. `listing/desktop/screenshot-1-promo.png`: every number on the job, converted (12 AWG to mm²)
-2. `listing/desktop/screenshot-2-voltage-drop.png`: will that wire carry the run? (voltage drop and the smallest wire)
-3. `listing/desktop/screenshot-3-price-units.png`: price per C or M, to price each
-4. `listing/desktop/screenshot-4-kva-amps.png`: kVA to amps (Engineer, Europe)
-5. `listing/desktop/screenshot-5-reels.png`: how many reels for this job (Counter staff, Canada)
-6. `listing/desktop/screenshot-6-uom-codes.png`: units in a supplier file to UN/ECE codes (PIM / data, Europe)
+1. `store-listing/desktop/screenshot-1-promo.png`: every number on the job, converted (12 AWG to mm²)
+2. `store-listing/desktop/screenshot-2-voltage-drop.png`: will that wire carry the run? (voltage drop and the smallest wire)
+3. `store-listing/desktop/screenshot-3-price-units.png`: price per C or M, to price each
+4. `store-listing/desktop/screenshot-4-kva-amps.png`: kVA to amps (Engineer, Europe)
+5. `store-listing/desktop/screenshot-5-reels.png`: how many reels for this job (Counter staff, Canada)
+6. `store-listing/desktop/screenshot-6-uom-codes.png`: units in a supplier file to UN/ECE codes (PIM / data, Europe)
 
 ### Store logos
 
 | Slot | File |
 |---|---|
-| 9:16 Poster art (1440 × 2160) | `listing/poster-art-1440x2160.png`: the main logo on Windows 10/11 |
-| 1:1 Box art (2160 × 2160) | `listing/box-art-2160.png` |
-| 1:1 App tile icon (300 × 300) | `listing/store-logo-300.png` |
+| 9:16 Poster art (1440 × 2160) | `store-listing/poster-art-1440x2160.png`: the main logo on Windows 10/11 |
+| 1:1 Box art (2160 × 2160) | `store-listing/box-art-2160.png` |
+| 1:1 App tile icon (300 × 300) | `store-listing/store-logo-300.png` |
 | 150 × 150, 71 × 71 | Leave empty; the Store takes them from the package. |
 
 ### Trailers, Xbox images

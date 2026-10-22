@@ -1,7 +1,7 @@
 // Renders every image derived from the app's own sources, so they never drift from it:
 //   src/main/icon.png      the desktop window, taskbar and installer icon
 //   packaging/appx/        tile and taskbar icons packed into the MSIX (electron-builder's buildResources)
-//   listing/               images uploaded to Partner Center: store logos, and screenshots in desktop/
+//   store-listing/         images uploaded to Partner Center: store logos, and screenshots in desktop/
 //   @uom/brand's rendered/ the icon at 256 and the share image (the promo shot), which the website uses too
 // The icons come from @uom/brand's app-icon.svg; screenshots from the built page, captured into build/shots/ and
 // framed by shots.html.
@@ -13,7 +13,7 @@ const path = require("node:path");
 const { pathToFileURL } = require("node:url");
 
 const WINDOWS = path.join(__dirname, "..", "..");
-const LISTING = path.join(WINDOWS, "listing");
+const LISTING = path.join(WINDOWS, "store-listing");
 const BUILD = path.join(WINDOWS, "build");
 const PAGE = path.join(BUILD, "web");
 const ICON = fs.readFileSync(require.resolve("@uom/brand/app-icon.svg"), "utf8");
