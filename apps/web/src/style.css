@@ -245,6 +245,16 @@ a { color: var(--accent); }
 .crumbs a { color: var(--accent); text-decoration: none; }
 .crumbs a:hover { text-decoration: underline; }
 
+/* The privacy policy (privacyView in main.ts): a column of plain text. */
+.privacy { padding-block: 1.75rem 3rem; }
+.privacy article { max-width: 75ch; }
+.privacy h1 { margin: 0; font-size: 2rem; line-height: 1.15; }
+.privacy h2 { margin: 2rem 0 0.5rem; font-size: 1.3rem; }
+.privacy p { margin: 0 0 0.75rem; }
+.privacy ul { margin: 0; padding-left: 1.25rem; }
+.privacy li { margin-bottom: 0.5rem; }
+.privacy-date { margin-top: 0.5rem; color: var(--muted); }
+
 /* A topic's page (topicView in main.ts): heading, introduction, its converters, an answer from each. */
 .topic-title a { color: inherit; text-decoration: none; }
 .topic-title a:hover { text-decoration: underline; }

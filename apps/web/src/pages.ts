@@ -247,6 +247,13 @@ export const HOME: Page = {
     "Free converters for the electrical trade: AWG to mm², voltage drop, conduit, kVA and amps, price per E/C/M, margins and UOM codes. US, Canada and Europe.",
 };
 
+/** The privacy policy, at /privacy. */
+export const PRIVACY: Page = {
+  slug: "privacy",
+  title: "Privacy Policy",
+  description: "UOM Converter's website collects no personal information: no analytics, cookies, ads or accounts. Every answer is worked out in your browser.",
+};
+
 /** The converter a site path opens, if any: "/voltage-drop-calculator" → "vdrop". */
 export function idFromPath(path: string, base: string): string | undefined {
   const slug = slugOf(path, base);

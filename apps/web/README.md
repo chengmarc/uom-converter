@@ -68,6 +68,7 @@ What the build writes, and which `scripts/` module writes it: the header of
 | Path | What it is |
 |---|---|
 | `src/main.ts`, `src/style.css`, `src/index.html` | The page: header, home, converter and topic pages |
+| `src/privacy.ts` | The website's privacy policy, drawn at `/privacy` |
 | `src/pages.ts` | Every page's address, title and description |
 | `src/site.ts` | The site's name, the Store link, and turning on the offline copy |
 | `scripts/*.ts` | What the build writes beyond the page, imported by `vite.config.ts`: prerendered pages, heads, sitemap, `llms.txt`, offline files, Cloudflare rules |

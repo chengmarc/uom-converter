@@ -104,14 +104,14 @@ for (const file of files) {
         fail(file, `structured data isn't JSON: ${e.message}`);
       }
       const of = (type) => graph.filter((n) => n["@type"] === type);
-      // A topic's page is a collection listing its converters; any other page is about one application.
+      // A topic's page is a collection listing its converters; the privacy policy is only a document; any other page is about one application.
       const collection = of("CollectionPage")[0];
       if ((collection ?? of("WebPage")[0])?.url !== url) fail(file, "no WebPage or CollectionPage at the page's address");
       if (collection) {
         const items = of("ItemList")[0]?.itemListElement ?? [];
         if (!items.length) fail(file, "a CollectionPage with no ItemList");
         for (const it of items) pointsAt.push([file, it.url, "list item"]);
-      } else if (of("WebApplication")[0]?.url !== url) fail(file, "no WebApplication at the page's address");
+      } else if (slug !== "privacy" && of("WebApplication")[0]?.url !== url) fail(file, "no WebApplication at the page's address");
       if (slug) {
         const trail = of("BreadcrumbList")[0]?.itemListElement ?? [];
         if (trail.at(-1)?.item !== url || trail[0]?.item !== SITE_URL) fail(file, "breadcrumb doesn't run from the home page to this one");

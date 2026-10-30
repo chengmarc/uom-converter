@@ -18,8 +18,8 @@ function pngSize(file: string): [number, number] {
   return [b.readUInt32BE(16), b.readUInt32BE(20)];
 }
 
-/** What a page is, for search engines: the home page, a converter, or a topic listing converters. */
-export type Kind = "home" | "converter" | "topic";
+/** What a page is, for search engines: the home page, a converter, a topic listing converters, or a document. */
+export type Kind = "home" | "converter" | "topic" | "document";
 
 /**
  * What search engines read as data, as one graph: the site (home page); the page; on a converter's
@@ -37,7 +37,7 @@ function structuredData(page: Page, kind: Kind, drawn: Drawn, leaf: string): obj
     description: page.description,
     inLanguage: "en",
     isPartOf: website,
-    mainEntity: { "@id": kind === "topic" ? `${url}#list` : `${url}#app` },
+    ...(kind === "document" ? {} : { mainEntity: { "@id": kind === "topic" ? `${url}#list` : `${url}#app` } }),
     primaryImageOfPage: { "@type": "ImageObject", url: `${SITE_URL}og.png` },
     ...(drawn.trail.length ? { breadcrumb: { "@id": `${url}#breadcrumb` } } : {}),
   };
@@ -51,7 +51,7 @@ function structuredData(page: Page, kind: Kind, drawn: Drawn, leaf: string): obj
       "@id": `${url}#list`,
       itemListElement: drawn.items.map((item, i) => ({ "@type": "ListItem", position: i + 1, name: item.name, url: item.url })),
     });
-  } else {
+  } else if (kind !== "document") {
     graph.push(app(page, url));
   }
   if (drawn.trail.length) {

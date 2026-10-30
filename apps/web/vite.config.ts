@@ -10,6 +10,7 @@
 //                       just an empty <main>.
 //   404.html            served for unknown addresses
 //   <topic>.html        one page per topic (src/pages.ts TOPIC_PAGES), listing its converters
+//   privacy.html        the privacy policy (src/privacy.ts)
 //   sitemap.xml, robots.txt                   crawl.ts
 //   llms.txt            the site and every converter, for AI assistants (llmstxt.org; llms-txt.ts)
 //   manifest.webmanifest, sw.js, icons        offline.ts: install from the browser and use it offline
@@ -27,7 +28,7 @@ import { join, resolve } from "node:path";
 import { defineConfig, type Plugin } from "vite";
 import type { Topic } from "@uom/converters/model";
 import { appIcon, photos } from "@uom/brand/vite";
-import { HOME, PAGES, TOPIC_PAGES, type Page, type TopicPage } from "./src/pages";
+import { HOME, PAGES, PRIVACY, TOPIC_PAGES, type Page, type TopicPage } from "./src/pages";
 import { headers, redirects } from "./scripts/cloudflare";
 import { robots, sitemap } from "./scripts/crawl";
 import { OG_IMAGE, withHead, type Kind } from "./scripts/head";
@@ -48,14 +49,15 @@ function sitePages(): Plugin {
       const shell = readFileSync(join(OUT, "index.html"), "utf8");
       const topics = Object.entries(TOPIC_PAGES) as [Topic, TopicPage][];
       const converters = Object.values(PAGES);
-      // Every page but the home page and 404, which are open to search: the topics, then the converters.
-      const pages = [...topics.map(([, page]) => page), ...converters];
+      // Every page but the home page and 404, which are open to search: the topics, the privacy policy, then the converters.
+      const pages = [...topics.map(([, page]) => page), PRIVACY, ...converters];
       const slugs = pages.map((p) => p.slug);
       const all: { page: Page; kind: Kind; leaf?: string; noindex?: boolean }[] = [
         { page: HOME, kind: "home" },
         { page: { ...HOME, slug: "404", title: "Page not found" }, kind: "home", noindex: true },
         // A topic page's own name in its breadcrumb trail is the topic, as converter pages show it.
         ...topics.map(([topic, page]) => ({ page, kind: "topic" as const, leaf: topic })),
+        { page: PRIVACY, kind: "document" },
         ...converters.map((page) => ({ page, kind: "converter" as const })),
       ];
       const drawn = await prerender(shell, all.map(({ page }) => BASE + page.slug));

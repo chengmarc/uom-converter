@@ -37,7 +37,7 @@ export function llmsTxt(converters: { page: Page; topic?: Topic }[], regions: st
       [
         item("Windows app", STORE_URL, "the same converters as a free Windows app from the Microsoft Store, working offline"),
         item("Source code", REPO_URL, "the website and apps, open source under the Apache 2.0 license"),
-        item("Privacy", `${REPO_URL}/blob/main/PRIVACY.md`, "what the website and apps do and don't collect"),
+        item("Privacy", `${SITE_URL}privacy`, "what the website does and doesn't collect"),
         item("Sitemap", `${SITE_URL}sitemap.xml`, "every page's address"),
       ].join("\n"),
   ].join("\n\n") + "\n";

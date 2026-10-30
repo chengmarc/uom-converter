@@ -11,7 +11,8 @@ import { ALL_AUDIENCES, EVERYTHING, type Audience } from "@uom/ui/audiences";
 import { chooseAudience, chooseRegion, chosenAudience, chosenRegion } from "@uom/ui/choices";
 import { el, renderConverter } from "@uom/ui/converter";
 import { photoLibrary, TOPIC_SLOTS } from "@uom/ui/photos";
-import { HOME, idFromPath, PAGES, topicFromPath, TOPIC_PAGES } from "./pages";
+import { HOME, idFromPath, PAGES, PRIVACY, topicFromPath, TOPIC_PAGES } from "./pages";
+import { PRIVACY_HTML } from "./privacy";
 import { NAME, registerOffline, STORE_URL } from "./site";
 
 // The site's base path, from SITE_URL in scripts/site.ts.
@@ -42,11 +43,14 @@ let region: Region = chosenRegion(params);
 
 // ---------- Addresses ----------
 
-type Route = { kind: "home" } | { kind: "converter"; id: string } | { kind: "topic"; topic: Topic } | { kind: "missing" };
+type Route = { kind: "home" } | { kind: "converter"; id: string } | { kind: "topic"; topic: Topic } | { kind: "privacy" } | { kind: "missing" };
+
+const privacyPath = BASE + PRIVACY.slug;
 
 function route(): Route {
   const path = location.pathname;
   if (path === BASE || path === `${BASE}index.html`) return { kind: "home" };
+  if (path === privacyPath) return { kind: "privacy" };
   const id = idFromPath(path, BASE);
   if (id && byId.has(id)) return { kind: "converter", id };
   const topic = topicFromPath(path, BASE);
@@ -54,7 +58,7 @@ function route(): Route {
 }
 
 /** An address one of the site's pages is drawn for, so following a link to it needs no reload. */
-const isPage = (path: string) => path === BASE || !!idFromPath(path, BASE) || !!topicFromPath(path, BASE);
+const isPage = (path: string) => path === BASE || path === privacyPath || !!idFromPath(path, BASE) || !!topicFromPath(path, BASE);
 
 /** The settings ride along in the address, so a shared link opens the same way. */
 function syncUrl() {
@@ -455,6 +459,14 @@ function topicView(topic: Topic): Node[] {
   return [band, layout];
 }
 
+function privacyView(): Node[] {
+  const page = el("div", "wrap privacy");
+  const policy = el("article");
+  policy.innerHTML = PRIVACY_HTML;
+  page.append(crumbs([link(BASE, "Converters")]), policy);
+  return [page];
+}
+
 // ---------- Drawing the page for the address ----------
 
 let drawnPath: string | undefined;
@@ -471,6 +483,9 @@ function render() {
   } else if (r.kind === "topic") {
     main.replaceChildren(...topicView(r.topic));
     setHead(TOPIC_PAGES[r.topic].title, topicPath(r.topic));
+  } else if (r.kind === "privacy") {
+    main.replaceChildren(...privacyView());
+    setHead(PRIVACY.title, privacyPath);
   } else if (r.kind === "home") {
     main.replaceChildren(...homeView(false));
     setHead(HOME.title, BASE);
@@ -561,6 +576,7 @@ window.addEventListener("popstate", render);
 // ---------- Start ----------
 
 document.querySelectorAll<HTMLAnchorElement>("a[data-home]").forEach((a) => (a.href = BASE));
+document.querySelectorAll<HTMLAnchorElement>("a[data-privacy]").forEach((a) => (a.href = privacyPath));
 document.querySelectorAll<HTMLAnchorElement>("#get-app, #footer-app").forEach((a) => (a.href = STORE_URL));
 document.querySelector("#footer-year")!.textContent = String(new Date().getFullYear());
 document.querySelector("#footer-topic-list")!.replaceChildren(
