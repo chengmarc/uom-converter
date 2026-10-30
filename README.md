@@ -38,6 +38,7 @@ packages/
                  formats and regions; diagrams and tables as data, so nothing here depends on a page
   ui/            @uom/ui: a converter drawn as HTML (form, result, diagrams), the roles and the
                  icons, for the apps built on a web page; each styles it its own way
+  i18n/          @uom/i18n: the Windows and Android apps' text in other languages: t() and the translations
   brand/         @uom/brand: the look every app shares: colours, the app icon (every app's icons are
                  made from it), the topic photos, and the rendered icon and share image
 apps/

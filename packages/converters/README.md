@@ -26,7 +26,9 @@ reads and shows numbers with. Every app draws converters its own way; nothing he
 5. **Run `npm test`.** `src/index.test.ts` works out every example in every region. If the
    converter makes a judgment of its own (a good/warn/bad status, a refusal), add a test for that
    rule there, named after it.
-6. **Note it** under `[Unreleased]` in [docs/CHANGELOG.md](../../docs/CHANGELOG.md).
+6. **Translate it.** `npm test` lists its new text until every language in
+   [@uom/i18n](../i18n/README.md) has it. Text with a number in it goes through `t()` where it's built.
+7. **Note it** under `[Unreleased]` in [docs/CHANGELOG.md](../../docs/CHANGELOG.md).
 
 The apps' sidebars, search, the website's sitemap and `llms.txt` all pick it up from `TOOLS`.
 
