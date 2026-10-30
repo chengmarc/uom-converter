@@ -47,9 +47,8 @@ frame. Then refresh the images (above).
 
 ### Change the privacy policy
 
-Edit the repo's [PRIVACY.md](../../PRIVACY.md), then run `node apps/windows/store-listing/generator/privacy.cjs`
-to write `store-listing/PRIVACY.md`, the plain-text copy pasted into Partner Center.
-`store-listing/generator/privacy.test.ts` fails until the two match.
+Edit [store-listing/PRIVACY.md](store-listing/PRIVACY.md), the plain text pasted into Partner Center.
+The website and the Android app keep their own.
 
 ## Explanation
 
@@ -69,7 +68,7 @@ and region. Each converter is drawn by
 Windows 11 22H2 and later the frame shows Acrylic through the page's transparent parts.
 
 **What it keeps.** The role, region and language in the page's storage, and the window's size and position
-in `window-state.json`, both in the app's data folder (see [PRIVACY.md](../../PRIVACY.md)).
+in `window-state.json`, both in the app's data folder (see [PRIVACY.md](store-listing/PRIVACY.md)).
 
 ## Reference
 
@@ -84,6 +83,6 @@ in `window-state.json`, both in the app's data folder (see [PRIVACY.md](../../PR
 | `store-listing/generator/render.cjs` | `npm run windows:assets`: every rendered image |
 | `store-listing/generator/shots.html`, `store-listing/generator/logo.html` | The designed screenshots, box art and poster art |
 | `store-listing/LISTING.md` | Everything Partner Center asks for, ready to paste |
-| `store-listing/generator/privacy.cjs`, `store-listing/PRIVACY.md` | The privacy policy as plain text for Partner Center |
+| `store-listing/PRIVACY.md` | The privacy policy as plain text for Partner Center |
 | `dist/` | What ships: the installer, the `.appx` and the release notes (not in git) |
 | `build/` | Intermediates, safe to delete: the built page (`web/`), electron-builder's full output, store screenshot captures (not in git) |

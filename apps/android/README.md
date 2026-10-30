@@ -121,5 +121,6 @@ from it in `native/app/build.gradle` (1.2.3 is 10203).
 | `store-listing/generator/feature.html`, `store-listing/generator/shots.html` | Their designs, in `@uom/brand`'s `store.css` look |
 | `store-listing/feature-graphic.png`, `store-listing/<device>/` | The images to upload (rendered) |
 | `store-listing/LISTING.md` | Every Play Console field, ready to paste |
+| `store-listing/PRIVACY.md` | The privacy policy, whose address goes in the Play Console |
 | `dist/` | What ships: the `.aab` and the debug `.apk`, copied out of Gradle's build folder (not in git) |
 | `build/` | Intermediates, safe to delete: the built page (`web/`), store screenshot captures (not in git) |

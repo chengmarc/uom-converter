@@ -87,7 +87,7 @@ package is `com.chengmarc.uomconverter`; the bundle is built and signed as
 
 ## App content
 
-- **Privacy policy:** `https://github.com/chengmarc/uom-converter/blob/main/PRIVACY.md`
+- **Privacy policy:** `https://github.com/chengmarc/uom-converter/blob/main/apps/android/store-listing/PRIVACY.md`
 - **App access:** all functionality is available without special access (no login).
 - **Ads:** no, the app contains no ads.
 - **Content rating** (IARC questionnaire): category "All other app types" or "Utility,
