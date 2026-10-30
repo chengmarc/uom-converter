@@ -62,8 +62,8 @@ one. Gradle gets `HTTPS_PROXY` as Java's own proxy settings (`scripts/gradle.cjs
 
 ### Black emulator window
 
-The emulators draw in software, since on some laptops with two GPUs, Chrome and the Play Store
-otherwise show only black. `UOM_GPU=host` uses the GPU again.
+The emulators draw with the GPU. If Chrome or the Play Store show only black, as they have on some
+laptops with two GPUs, `UOM_GPU=swiftshader_indirect` draws in software, which is much slower.
 
 ### Refresh the icons
 

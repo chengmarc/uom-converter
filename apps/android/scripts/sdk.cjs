@@ -84,10 +84,11 @@ function shareProxy(serial) {
 const PREFERRED_AVD = "Pixel_8";
 
 /**
- * How the emulator draws: in software, as with the GPU on this (Intel + NVIDIA) laptop apps such as
- * Chrome and the Play Store showed only black in its window. UOM_GPU=host draws with the GPU again.
+ * How the emulator draws: with the GPU, as in software it's too slow to use. If apps such as Chrome
+ * show only black in its window, as they once did on an Intel + NVIDIA laptop, UOM_GPU=swiftshader_indirect
+ * draws in software.
  */
-const GPU = process.env.UOM_GPU ?? "swiftshader_indirect";
+const GPU = process.env.UOM_GPU ?? "host";
 
 /**
  * Starts an emulator (UOM_AVD, else PREFERRED_AVD, else the first in the Device Manager), waits for
