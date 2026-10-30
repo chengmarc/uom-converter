@@ -13,15 +13,19 @@ import type { Region } from "@uom/core/region";
 import { byId, TOPICS } from "@uom/converters";
 import { blurb, type Converter, type Topic } from "@uom/converters/model";
 import { REGIONS } from "@uom/converters/regions";
+import { LANGUAGES, t, type Language } from "@uom/i18n";
 import { ALL_AUDIENCES } from "@uom/ui/audiences";
 import { chooseAudience, chooseRegion, chosenAudience, chosenRegion } from "@uom/ui/choices";
 import { el, renderConverter, setClipboard } from "@uom/ui/converter";
 import { icon, lineIcon } from "@uom/ui/icons";
+import { chooseLanguage, chosenLanguage } from "@uom/ui/language";
 import { photoLibrary, TOPIC_SLOTS } from "@uom/ui/photos";
 import { search } from "@uom/ui/search";
 import { store, stored } from "@uom/ui/storage";
 
 declare const __APP_VERSION__: string;
+
+let language = chosenLanguage();
 
 // The web view's own clipboard needs permissions an app page doesn't get; the plugin doesn't.
 setClipboard((text) => Clipboard.write({ string: text }));
@@ -51,7 +55,7 @@ function topicBand(topic: Topic) {
   if (img) band.append(img);
   const i = icon(topic);
   if (i) band.append(i);
-  band.append(topic);
+  band.append(t(topic));
   return band;
 }
 
@@ -90,12 +94,12 @@ let region: Region = chosenRegion();
  * topics. The description is only read out (it shows on the converter's screen): cut to fit, it
  * said little.
  */
-function card(t: Converter, withTopic: boolean) {
+function card(c: Converter, withTopic: boolean) {
   const a = el("a", "card");
-  a.href = `#${t.id}`;
-  const img = withTopic ? photo(`${TOPIC_SLOTS[t.topic]}-thumb`, "36px", "", "card-photo") : undefined;
+  a.href = `#${c.id}`;
+  const img = withTopic ? photo(`${TOPIC_SLOTS[c.topic]}-thumb`, "36px", "", "card-photo") : undefined;
   if (img) a.append(img);
-  a.append(el("span", "card-title", t.title), el("span", "sr", `. ${blurb(t, region)}`));
+  a.append(el("span", "card-title", t(c.title)), el("span", "sr", `. ${blurb(c, region)}`));
   return a;
 }
 
@@ -104,7 +108,7 @@ function group(title: string, tools: Converter[], topic?: Topic) {
   const s = el("section", "group");
   const h = topic ? topicBand(topic) : el("h2", "group-title", title);
   const cards = el("div", "cards");
-  cards.append(...tools.map((t) => card(t, !topic)));
+  cards.append(...tools.map((c) => card(c, !topic)));
   s.append(h, cards);
   return s;
 }
@@ -116,7 +120,7 @@ function drawRoles() {
       b.type = "button";
       const i = icon(a.id);
       if (i) b.append(i);
-      b.append(a.label);
+      b.append(t(a.label));
       b.setAttribute("aria-pressed", String(a === audience));
       b.addEventListener("click", () => {
         audience = a;
@@ -134,14 +138,14 @@ function drawList() {
   const query = q.value.trim();
   if (query) {
     const found = search(query, audience, region);
-    list.replaceChildren(found.length ? group("Matches", found) : el("p", "list-empty", "No converter matches."));
+    list.replaceChildren(found.length ? group(t("Matches"), found) : el("p", "list-empty", t("No converter matches.")));
     return;
   }
   const visible = audience.tools.map((id) => byId.get(id)!);
   list.replaceChildren(
-    ...(recent.length ? [group("Recent", recent.map((id) => byId.get(id)!))] : []),
-    ...TOPICS.filter((topic) => visible.some((t) => t.topic === topic)).map((topic) =>
-      group(topic, visible.filter((t) => t.topic === topic), topic),
+    ...(recent.length ? [group(t("Recent"), recent.map((id) => byId.get(id)!))] : []),
+    ...TOPICS.filter((topic) => visible.some((c) => c.topic === topic)).map((topic) =>
+      group(t(topic), visible.filter((c) => c.topic === topic), topic),
     ),
   );
 }
@@ -199,7 +203,7 @@ function show() {
   screen.hidden = !conv;
   statusBar();
   if (conv) {
-    screenTitle.textContent = conv.title;
+    screenTitle.textContent = t(conv.title);
     content.replaceChildren(panel(id));
     showBackdrop(conv.topic);
     window.scrollTo(0, 0);
@@ -243,11 +247,41 @@ function drawRegions() {
       input.checked = r.id === region;
       input.addEventListener("change", () => setRegion(r.id));
       const text = el("span", "choice-text");
-      text.append(el("span", undefined, r.label), el("small", undefined, `${r.code}, ${r.hz} Hz`));
+      text.append(el("span", undefined, t(r.label)), el("small", undefined, `${r.code}, ${r.hz} Hz`));
       lab.append(input, text);
       return lab;
     }),
   );
+}
+
+function drawLanguages() {
+  $("#languages").replaceChildren(
+    ...LANGUAGES.map((l) => {
+      const lab = el("label", "choice");
+      const input = el("input");
+      input.type = "radio";
+      input.name = "language";
+      input.value = l.id;
+      input.checked = l.id === language;
+      input.addEventListener("change", () => setLanguage(l.id));
+      const text = el("span", "choice-text");
+      text.append(el("span", undefined, l.name));
+      text.lang = l.tag;
+      lab.append(input, text);
+      return lab;
+    }),
+  );
+}
+
+function setLanguage(l: Language) {
+  language = l;
+  chooseLanguage(l);
+  panels = new Map();
+  drawRoles();
+  drawRegions();
+  drawVersion();
+  drawList();
+  show();
 }
 
 function setRegion(r: Region) {
@@ -280,7 +314,7 @@ settings.addEventListener("click", (e) => {
 window.addEventListener("popstate", () => {
   if (settings.open && !history.state?.sheet) settings.close();
 });
-$("#version").textContent = `Version ${__APP_VERSION__}`;
+const drawVersion = () => ($("#version").textContent = t("Version {version}", { version: __APP_VERSION__ }));
 
 // Android's Back: a step back through the page's history (the settings sheet, then the list), and
 // out of the app from the list. Without this, Back closes the app from any screen.
@@ -294,4 +328,6 @@ App.addListener("backButton", ({ canGoBack }) => {
 drawRoles();
 drawList();
 drawRegions();
+drawLanguages();
+drawVersion();
 show();

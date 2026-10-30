@@ -80,6 +80,7 @@ async function captureApp(name, device, { region, audience, recent = [], hash, s
   // The app keeps its choices in localStorage (@uom/ui/storage): set them, then open the screen afresh.
   await load("app://uom/index.html");
   await win.webContents.executeJavaScript(`localStorage.clear();
+    localStorage.setItem("uom.language", "en");
     localStorage.setItem("uom.region", ${JSON.stringify(region)});
     localStorage.setItem("uom.audience", ${JSON.stringify(audience)});
     localStorage.setItem("uom.recent", ${JSON.stringify(JSON.stringify(recent))});`);
