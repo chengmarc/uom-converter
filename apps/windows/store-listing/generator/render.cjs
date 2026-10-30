@@ -125,7 +125,8 @@ async function renderListing() {
   for (const [i, [name, { query, theme, scroll = 0 }]] of shots.entries()) {
     nativeTheme.themeSource = theme;
     const page = offscreen(width, height, scale);
-    await page.loadURL(`app://uom/index.html${query}`);
+    // In English whatever this machine's language: the app would otherwise follow it.
+    await page.loadURL(`app://uom/index.html${query.replace("?", "?lang=en&")}`);
     // As in the real window (main.cjs): the frame is translucent over Windows 11's Acrylic, which shots.html draws.
     await page.webContents.executeJavaScript(`document.documentElement.classList.add("desktop"); document.querySelector("#content").scrollTop = ${scroll}`);
     await capture(page, path.join(captures, `${name}.png`), { width: width * scale, height: height * scale });

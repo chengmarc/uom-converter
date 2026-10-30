@@ -2,7 +2,8 @@
 // (see ../../vite.config.ts), served from a private app:// scheme so it gets a real origin: browser storage and
 // clipboard behave exactly as on the web, and nothing can load from outside the app.
 
-const { app, BrowserWindow, Menu, nativeTheme, net, protocol, screen, shell } = require("electron");
+const { app, BrowserWindow, ipcMain, Menu, nativeTheme, net, protocol, screen, shell } = require("electron");
+const { appMenu, contextMenu } = require("./menus.cjs");
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
@@ -71,6 +72,9 @@ function serveApp() {
   });
 }
 
+// The page's language, for the native menus: it says when it opens and when it changes (preload.cjs).
+let language = "en";
+
 function createWindow() {
   const state = loadWindowState();
   // Never larger than the screen it opens on: after the taskbar, or at 125-150% scaling, many
@@ -96,6 +100,7 @@ function createWindow() {
     backgroundColor: ACRYLIC ? "#00000000" : frame().chrome,
     autoHideMenuBar: true,
     webPreferences: {
+      preload: path.join(__dirname, "preload.cjs"),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
@@ -114,23 +119,8 @@ function createWindow() {
   nativeTheme.on("updated", followTheme);
   win.on("closed", () => nativeTheme.off("updated", followTheme));
 
-  // Right-click: the usual edit menu in text boxes, Copy on selected text.
   win.webContents.on("context-menu", (_event, p) => {
-    const f = p.editFlags;
-    const items = p.isEditable
-      ? [
-          { role: "undo", enabled: f.canUndo },
-          { role: "redo", enabled: f.canRedo },
-          { type: "separator" },
-          { role: "cut", enabled: f.canCut },
-          { role: "copy", enabled: f.canCopy },
-          { role: "paste", enabled: f.canPaste },
-          { type: "separator" },
-          { role: "selectAll", enabled: f.canSelectAll },
-        ]
-      : p.selectionText.trim()
-        ? [{ role: "copy" }]
-        : [];
+    const items = contextMenu(language, p);
     if (items.length) Menu.buildFromTemplate(items).popup({ window: win });
   });
 
@@ -161,23 +151,12 @@ if (!app.requestSingleInstanceLock()) {
   });
 
   app.whenReady().then(() => {
-    // A plain Edit/View menu keeps copy, paste, zoom and reload shortcuts; it stays hidden until Alt.
-    Menu.setApplicationMenu(
-      Menu.buildFromTemplate([
-        { role: "editMenu" },
-        {
-          label: "View",
-          submenu: [
-            { role: "reload" },
-            { role: "resetZoom" },
-            { role: "zoomIn" },
-            { role: "zoomOut" },
-            { type: "separator" },
-            { role: "togglefullscreen" },
-          ],
-        },
-      ]),
-    );
+    const setLanguage = (l) => {
+      language = l;
+      Menu.setApplicationMenu(Menu.buildFromTemplate(appMenu(l)));
+    };
+    setLanguage(language);
+    ipcMain.on("language", (_event, l) => setLanguage(l));
     serveApp();
     createWindow();
   });

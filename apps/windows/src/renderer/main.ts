@@ -5,13 +5,15 @@ import "@fontsource-variable/inter/opsz.css";
 import type { Region } from "@uom/core/region";
 import { ALL_AUDIENCES, EVERYTHING, type Audience } from "@uom/ui/audiences";
 import { byId, TOOLS } from "@uom/converters";
-import { icon } from "@uom/ui/icons";
+import { icon, lineIcon } from "@uom/ui/icons";
 import { REGIONS } from "@uom/converters/regions";
 import type { Converter, Topic } from "@uom/converters/model";
+import { LANGUAGES, t, type Language } from "@uom/i18n";
 import { el, renderConverter } from "@uom/ui/converter";
 import { photoLibrary, TOPIC_SLOTS } from "@uom/ui/photos";
 import { search } from "@uom/ui/search";
 import { chooseAudience, chooseRegion, chosenAudience, chosenRegion } from "@uom/ui/choices";
+import { chooseLanguage, chosenLanguage } from "@uom/ui/language";
 
 // ---------- Page ----------
 
@@ -20,11 +22,18 @@ import { chooseAudience, chooseRegion, chosenAudience, chosenRegion } from "@uom
 const overlay = (navigator as Navigator & { windowControlsOverlay?: { visible: boolean } }).windowControlsOverlay;
 if (overlay?.visible) document.documentElement.classList.add("desktop");
 
+// The native menus are in the same language; a browser (npm run windows:dev without Electron) has none.
+const shell = (window as Window & { uomApp?: { setLanguage(language: Language): void } }).uomApp;
+let language = chosenLanguage(new URLSearchParams(location.search));
+shell?.setLanguage(language);
+
 const content = document.querySelector<HTMLElement>("#content")!;
 const sidebar = document.querySelector<HTMLElement>("#sidebar")!;
 const picker = document.querySelector<HTMLSelectElement>("#picker")!;
 const audienceBar = document.querySelector<HTMLElement>("#audience")!;
 const regionBar = document.querySelector<HTMLElement>("#region")!;
+const languageSelect = document.querySelector<HTMLSelectElement>("#language")!;
+const settings = document.querySelector<HTMLDialogElement>("#settings")!;
 const audienceDesc = document.querySelector<HTMLElement>("#audience-desc")!;
 
 const params = new URLSearchParams(location.search);
@@ -46,13 +55,15 @@ function chip(label: string, pressed: boolean, onClick: () => void, opts: { titl
 }
 
 function buildControls() {
-  audienceBar.replaceChildren(...ALL_AUDIENCES.map((a) => chip(a.label, a === audience, () => setAudience(a), { title: a.description, icon: a.id })));
-  audienceDesc.textContent = audience.description;
-  regionBar.replaceChildren(...REGIONS.map((r) => chip(r.label, r.id === region, () => setRegion(r.id), { title: `${r.code} · ${r.hz} Hz` })));
+  audienceBar.replaceChildren(...ALL_AUDIENCES.map((a) => chip(t(a.label), a === audience, () => setAudience(a), { title: t(a.description), icon: a.id })));
+  audienceDesc.textContent = t(audience.description);
+  const regionHint = t("Sets units, number formats, voltages and the wiring code converters refer to.");
+  regionBar.replaceChildren(...REGIONS.map((r) => chip(t(r.label), r.id === region, () => setRegion(r.id), { title: `${r.code} · ${r.hz} Hz\n${regionHint}` })));
+  languageSelect.replaceChildren(...LANGUAGES.map((l) => Object.assign(document.createElement("option"), { value: l.id, textContent: l.name, selected: l.id === language })));
 }
 
 function navLink(id: string, text: string) {
-  const a = Object.assign(document.createElement("a"), { href: `#${id}`, textContent: text });
+  const a = Object.assign(document.createElement("a"), { href: `#${id}`, textContent: t(text) });
   a.dataset.id = id;
   return a;
 }
@@ -65,7 +76,7 @@ function navGroup(title: string, tools: Converter[], topicIcon?: string) {
   const i = topicIcon ? icon(topicIcon) : undefined;
   if (i) h.append(i);
   h.append(title);
-  section.append(h, ...tools.map((t) => navLink(t.id, t.title)));
+  section.append(h, ...tools.map((c) => navLink(c.id, c.title)));
   return section;
 }
 
@@ -74,27 +85,27 @@ function buildNav() {
   const query = find.value.trim();
   if (query) {
     const found = search(query, audience, region);
-    const mine = found.filter((t) => audience.tools.includes(t.id));
-    const others = found.filter((t) => !audience.tools.includes(t.id));
+    const mine = found.filter((c) => audience.tools.includes(c.id));
+    const others = found.filter((c) => !audience.tools.includes(c.id));
     sidebar.replaceChildren();
-    if (mine.length) sidebar.append(navGroup(audience === EVERYTHING ? "Matches" : `For ${audience.label}`, mine));
-    if (others.length) sidebar.append(navGroup("In Everything", others));
-    if (!found.length) sidebar.append(el("p", "sidebar-hint", "No converter matches."));
+    if (mine.length) sidebar.append(navGroup(audience === EVERYTHING ? t("Matches") : t("For {audience}", { audience: t(audience.label) }), mine));
+    if (others.length) sidebar.append(navGroup(t("In Everything"), others));
+    if (!found.length) sidebar.append(el("p", "sidebar-hint", t("No converter matches.")));
   } else {
     const visible = audience.tools.map((id) => byId.get(id)!);
     // Groups in order of their first tool, tools in the audience's priority order.
-    const groups = [...new Set(visible.map((t) => t.topic))];
-    sidebar.replaceChildren(...groups.map((g) => navGroup(g, visible.filter((t) => t.topic === g), g)));
-    sidebar.append(el("p", "sidebar-hint", "Click any result to copy it."));
+    const groups = [...new Set(visible.map((c) => c.topic))];
+    sidebar.replaceChildren(...groups.map((g) => navGroup(t(g), visible.filter((c) => c.topic === g), g)));
+    sidebar.append(el("p", "sidebar-hint", t("Click any result to copy it.")));
   }
   markCurrent();
 
   // The narrow-window picker always lists the audience's converters.
   picker.replaceChildren();
   for (const g of [...new Set(audience.tools.map((id) => byId.get(id)!.topic))]) {
-    const og = Object.assign(document.createElement("optgroup"), { label: g });
+    const og = Object.assign(document.createElement("optgroup"), { label: t(g) });
     for (const id of audience.tools.filter((id) => byId.get(id)!.topic === g)) {
-      og.append(Object.assign(document.createElement("option"), { value: id, textContent: byId.get(id)!.title }));
+      og.append(Object.assign(document.createElement("option"), { value: id, textContent: t(byId.get(id)!.title) }));
     }
     picker.append(og);
   }
@@ -111,7 +122,7 @@ function markCurrent() {
 
 let panels = new Map<string, HTMLElement>();
 function buildPanels() {
-  panels = new Map(TOOLS.map((t) => [t.id, renderConverter(t, region)]));
+  panels = new Map(TOOLS.map((c) => [c.id, renderConverter(c, region)]));
   content.replaceChildren(...panels.values());
 }
 
@@ -168,6 +179,18 @@ function setRegion(r: Region) {
   chooseRegion(r);
   syncUrl();
   buildControls();
+  buildPanels();
+  show(false);
+  // The button just clicked was redrawn: stay on the region's, in the open dialog.
+  regionBar.querySelector<HTMLElement>('[aria-pressed="true"]')?.focus();
+}
+
+function setLanguage(l: Language) {
+  language = l;
+  chooseLanguage(l);
+  shell?.setLanguage(l);
+  buildControls();
+  buildNav();
   buildPanels();
   show(false);
 }
@@ -252,6 +275,19 @@ document.addEventListener("keydown", (e) => {
 });
 
 picker.addEventListener("change", () => navigate(picker.value));
+languageSelect.addEventListener("change", () => setLanguage(languageSelect.value as Language));
+
+// ---------- Settings ----------
+
+const openSettings = document.querySelector<HTMLElement>("#open-settings")!;
+openSettings.prepend(lineIcon("M4 7h10 M18 7h2 M4 17h4 M12 17h8 M16 5v4 M10 15v4"));
+openSettings.addEventListener("click", () => settings.showModal());
+document.querySelector("#close-settings")!.addEventListener("click", () => settings.close());
+// A click on the dimmed area outside the dialog closes it.
+settings.addEventListener("click", (e) => {
+  if (e.target === settings) settings.close();
+});
+
 window.addEventListener("hashchange", () => show(true));
 buildControls();
 buildNav();

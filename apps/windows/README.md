@@ -60,14 +60,15 @@ renderer is sandboxed with no Node access. Only the app's own pages open in the 
 link goes to the default browser.
 
 **Its own page, the shared converters.** The page (`src/renderer/main.ts`) is the desktop layout:
-role tabs, a sidebar with search, one converter at a time. Each converter is drawn by
+role tabs, a sidebar with search, one converter at a time, and a Settings dialog for the language
+and region. Each converter is drawn by
 `@uom/ui`'s `converter.ts`, as on the website.
 
 **The frame follows the page.** The title bar's colours in `main.cjs` (`FRAME`) are the page's
 `--sunken` and `--text` tokens from `@uom/brand`; `src/main/theme.test.ts` checks they match. On
 Windows 11 22H2 and later the frame shows Acrylic through the page's transparent parts.
 
-**What it keeps.** The role and region in the page's storage, and the window's size and position
+**What it keeps.** The role, region and language in the page's storage, and the window's size and position
 in `window-state.json`, both in the app's data folder (see [PRIVACY.md](../../PRIVACY.md)).
 
 ## Reference

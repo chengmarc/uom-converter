@@ -36,6 +36,7 @@ module.exports = {
     oneClick: false,
     perMachine: false,
     allowToChangeInstallationDirectory: true,
+    installerLanguages: ["en_US", "es_ES", "de_DE", "fr_FR"],
     artifactName: "UOM-Converter-setup.exe",
   },
   appx: {
@@ -47,7 +48,7 @@ module.exports = {
     backgroundColor: "transparent",
     minVersion: "10.0.17763.0",
     maxVersionTested: "10.0.26100.0",
-    languages: ["en-US"],
+    languages: ["en-US", "es-ES", "de-DE", "fr-FR"],
     artifactName: "UOM-Converter-${version}.${ext}",
   },
 };

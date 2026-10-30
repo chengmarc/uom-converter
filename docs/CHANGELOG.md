@@ -7,6 +7,11 @@ match the release tags (`v<version>`).
 
 ## [Unreleased]
 
+### Added
+
+- the Windows and Android apps in Spanish, German and French: they open in the system's language, and Settings changes it. The language is separate from the region, which still sets units, number formats
+  and voltages
+
 ### Fixed
 
 - in the US and Canada, a number with a comma that doesn't separate thousands, such as
