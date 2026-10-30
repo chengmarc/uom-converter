@@ -43,11 +43,12 @@ const landing = routeId();
 if (landing && !audience.tools.includes(landing)) audience = EVERYTHING;
 let region: Region = chosenRegion(params);
 
-function chip(label: string, pressed: boolean, onClick: () => void, opts: { title?: string; icon?: string } = {}) {
+function chip(label: string, pressed: boolean, onClick: () => void, opts: { title?: string; icon?: string; detail?: string } = {}) {
   const b = Object.assign(document.createElement("button"), { type: "button" });
   const i = opts.icon ? icon(opts.icon) : undefined;
   if (i) b.append(i);
   b.append(label);
+  if (opts.detail) b.append(el("small", undefined, opts.detail));
   b.setAttribute("aria-pressed", String(pressed));
   if (opts.title) b.title = opts.title;
   b.addEventListener("click", onClick);
@@ -57,8 +58,7 @@ function chip(label: string, pressed: boolean, onClick: () => void, opts: { titl
 function buildControls() {
   audienceBar.replaceChildren(...ALL_AUDIENCES.map((a) => chip(t(a.label), a === audience, () => setAudience(a), { title: t(a.description), icon: a.id })));
   audienceDesc.textContent = t(audience.description);
-  const regionHint = t("Sets units, number formats, voltages and the wiring code converters refer to.");
-  regionBar.replaceChildren(...REGIONS.map((r) => chip(t(r.label), r.id === region, () => setRegion(r.id), { title: `${r.code} · ${r.hz} Hz\n${regionHint}` })));
+  regionBar.replaceChildren(...REGIONS.map((r) => chip(t(r.label), r.id === region, () => setRegion(r.id), { detail: `${r.code} · ${r.hz} Hz` })));
   languageSelect.replaceChildren(...LANGUAGES.map((l) => Object.assign(document.createElement("option"), { value: l.id, textContent: l.name, selected: l.id === language })));
 }
 

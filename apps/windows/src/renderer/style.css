@@ -113,7 +113,10 @@ kbd {
   color: var(--text);
   font: inherit;
 }
-.setting .seg button { flex: 1; justify-content: center; }
+/* Each region's wiring code and frequency, under its name. */
+.setting .seg button { flex: 1 1 0; flex-direction: column; justify-content: center; gap: 0; height: auto; padding: 0.35rem 0.25rem; line-height: 1.25; }
+.setting .seg small { font-size: 0.75rem; font-weight: 400; color: var(--muted); }
+.setting .seg button[aria-pressed="true"] small { color: inherit; }
 .settings-hint { margin: 0; font-size: 0.875rem; color: var(--muted); }
 .settings-done {
   display: block;
