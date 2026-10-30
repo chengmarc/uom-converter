@@ -7,12 +7,14 @@ import { gauge } from "./visual";
 import { isNum, invalid } from "./checks";
 import { phaseField, phaseName, readPhase, voltsField } from "./electrical-fields";
 import { metalField, readMetal } from "./wire";
+import { t } from "@uom/i18n";
 
-const VDROP_NOTE: Record<Region, string> = {
-  us: "An estimate from DC resistance that ignores reactance, so it reads a little low for large conductors. NEC informational notes suggest at most 3% for a branch circuit or feeder and 5% overall.",
-  ca: "An estimate from DC resistance that ignores reactance, so it reads a little low for large conductors. CEC Rule 8-102 allows 3% in a feeder or branch circuit and 5% overall, from the supply side of the service to the load.",
-  eu: "An estimate from DC resistance that ignores reactance, so it reads a little low for large conductors. IEC 60364-5-52 (Annex G) recommends at most 3% for lighting and 5% for other uses when fed from the public low-voltage network; national rules may differ.",
-};
+const vdropNote = (region: Region) =>
+  region === "us"
+    ? t("An estimate from DC resistance that ignores reactance, so it reads a little low for large conductors. NEC informational notes suggest at most 3% for a branch circuit or feeder and 5% overall.")
+    : region === "ca"
+      ? t("An estimate from DC resistance that ignores reactance, so it reads a little low for large conductors. CEC Rule 8-102 allows 3% in a feeder or branch circuit and 5% overall, from the supply side of the service to the load.")
+      : t("An estimate from DC resistance that ignores reactance, so it reads a little low for large conductors. IEC 60364-5-52 (Annex G) recommends at most 3% for lighting and 5% for other uses when fed from the public low-voltage network; national rules may differ.");
 
 const sizeSystem = (v: Values) => v.str("sys") as "na" | "mm2";
 const lengthUnit = (v: Values) => v.str("lenUnit") as "ft" | "m";
@@ -23,7 +25,7 @@ export const vdrop: Converter = {
   title: "Voltage drop",
   blurb: "Voltage drop on a run, and the smallest wire that keeps it within your target.",
   empty: "Enter the wire size, run length and load current.",
-  note: (v) => VDROP_NOTE[v.region],
+  note: (v) => vdropNote(v.region),
   examples: byRegion((): RegionExamples => ({
     us: [
       { label: "12 AWG, 100 ft, 16 A at 120 V", set: { size: "12", len: "100", amps: "16", volts: "120", phase: "1", sys: "na", lenUnit: "ft", metal: "Cu" } },
@@ -96,7 +98,7 @@ export const vdrop: Converter = {
     let label: string;
     if (sys === "na") {
       const c = conductorInfo(raw);
-      if ("error" in c) return { error: c.error + ".", fields: ["size"] };
+      if ("error" in c) return { error: t("{error}.", { error: c.error }), fields: ["size"] };
       areaMm2 = c.areaMm2;
       label = c.label;
     } else {
@@ -119,21 +121,23 @@ export const vdrop: Converter = {
         : smallestSizeForDrop(METRIC_SIZES_MM2, (m) => m, target!, run);
     const fitLabel =
       fit === undefined
-        ? sys === "na" ? "Over 1000 kcmil" : "Over 1000 mm²"
+        ? sys === "na" ? t("Over 1000 kcmil") : t("Over 1000 mm²")
         : typeof fit === "number" ? `${fmt(fit, 2)} mm²` : fit.label;
     const limit = Math.max(5, target!);
     const status: Status = d.percent <= target! ? "good" : d.percent <= limit ? "warn" : "bad";
-    const verdict = status === "good" ? `within your ${fmt(target!, 2)}% target` : status === "warn" ? `over your ${fmt(target!, 2)}% target` : `over ${fmt(limit, 2)}%`;
+    const pct = fmt(target!, 2);
+    const verdict = status === "good" ? t("within your {pct}% target", { pct }) : status === "warn" ? t("over your {pct}% target", { pct }) : t("over {pct}%", { pct: fmt(limit, 2) });
+    const h = { size: label, len: fmt(len, 2), unit, amps: fmt(amps, 2), volts: fmt(volts!, 1), phase: phaseName(phase) };
 
     return {
-      heading: `${label} ${metal === "Cu" ? "copper" : "aluminum"}, ${fmt(len, 2)} ${unit}, ${fmt(amps, 2)} A at ${fmt(volts!, 1)} V ${phaseName(phase)}`,
+      heading: metal === "Cu" ? t("{size} copper, {len} {unit}, {amps} A at {volts} V {phase}", h) : t("{size} aluminum, {len} {unit}, {amps} A at {volts} V {phase}", h),
       rows: [
         { label: "Voltage drop", detail: verdict, ...amount(d.percent, 2, "%"), status },
         { label: "Drop in volts", ...amount(d.volts, 2, " V") },
         { label: "Voltage at the load", ...amount(d.atLoad, 1, " V") },
         {
           label: "Smallest size for your target",
-          detail: `keeps the drop at or under ${fmt(target!, 2)}%`,
+          detail: t("keeps the drop at or under {pct}%", { pct }),
           value: fitLabel,
           status: fit === undefined ? "warn" : undefined,
         },
@@ -143,13 +147,13 @@ export const vdrop: Converter = {
         unit: "%",
         status,
         marks: [
-          { at: target!, label: `${fmt(target!, 2)}% target` },
+          { at: target!, label: t("{pct}% target", { pct }) },
           ...(limit !== target ? [{ at: limit, label: `${fmt(limit, 2)}%` }] : []),
         ],
       }),
       formula: [
         phase === 3 ? "Three-phase: drop = √3 × amps × resistance per metre × one-way length." : "Single-phase: drop = 2 × amps × resistance per metre × one-way length.",
-        `Resistance: ${unit === "ft" ? `${fmt(ohmsKm * 0.3048, 4)} Ω per 1,000 ft` : `${fmt(ohmsKm, 4)} Ω/km`} for this conductor, DC at 75 °C.`,
+        unit === "ft" ? t("Resistance: {r} Ω per 1,000 ft for this conductor, DC at 75 °C.", { r: fmt(ohmsKm * 0.3048, 4) }) : t("Resistance: {r} Ω/km for this conductor, DC at 75 °C.", { r: fmt(ohmsKm, 4) }),
         "From resistivity: copper 1/58 Ω·mm²/m, aluminum 0.028264 Ω·mm²/m at 20 °C, rising 0.393% (Cu) or 0.403% (Al) per °C.",
         "Checked against NEC Chapter 9 Table 8: 12 AWG solid copper = 1.93 Ω per 1,000 ft.",
       ],

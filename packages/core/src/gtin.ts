@@ -5,6 +5,8 @@
 // change the GS1 check digit. That's why everything here normalizes to
 // GTIN-14 first.
 
+import { t } from "@uom/i18n";
+
 export type GtinKind = "GTIN-8" | "UPC-E" | "UPC-A" | "EAN-13" | "GTIN-14";
 
 export interface GtinOptions {
@@ -91,7 +93,7 @@ export function parseGtin(raw: string, opts: GtinOptions = {}): GtinResult {
 
   if (SCIENTIFIC.test(s)) {
     r.errors.push(
-      "Excel scientific notation (e.g. 7.12E+11): the trailing digits are already lost and can't be recovered. Re-export the column formatted as Text.",
+      t("Excel scientific notation (e.g. 7.12E+11): the trailing digits are already lost and can't be recovered. Re-export the column formatted as Text."),
     );
     return r;
   }
@@ -99,15 +101,15 @@ export function parseGtin(raw: string, opts: GtinOptions = {}): GtinResult {
   // Common spreadsheet/copy-paste junk: leading apostrophe, separators, trailing ".0".
   s = s.replace(/^'/, "").replace(/[\s-]/g, "").replace(/\.0+$/, "");
   if (s === "") {
-    r.errors.push("Empty");
+    r.errors.push(t("Empty"));
     return r;
   }
   if (!/^\d+$/.test(s)) {
-    r.errors.push("Contains non-digit characters");
+    r.errors.push(t("Contains non-digit characters"));
     return r;
   }
   if (s.length > 14) {
-    r.errors.push(`Too long (${s.length} digits; max is 14)`);
+    r.errors.push(t("Too long ({n} digits; max is 14)", { n: s.length }));
     return r;
   }
 
@@ -138,7 +140,7 @@ export function parseGtin(raw: string, opts: GtinOptions = {}): GtinResult {
   const gtin14 = normalized.padStart(14, "0");
   if (!hasValidCheckDigit(gtin14)) {
     const expected = checkDigit(gtin14.slice(0, 13));
-    r.errors.push(`Bad check digit: last digit is ${gtin14[13]}, expected ${expected}`);
+    r.errors.push(t("Bad check digit: last digit is {last}, expected {expected}", { last: gtin14[13], expected }));
     if (s.length === 11) {
       // 11 digits could also be a full UPC-A body with the check digit dropped.
       r.suggestion = s + checkDigit(s);

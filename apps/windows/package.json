@@ -18,6 +18,7 @@
     "@uom/brand": "*",
     "@uom/converters": "*",
     "@uom/core": "*",
+    "@uom/i18n": "*",
     "@uom/ui": "*",
     "electron": "^44.4.5",
     "electron-builder": "^26.15.3"

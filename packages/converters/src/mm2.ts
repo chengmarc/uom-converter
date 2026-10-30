@@ -3,6 +3,7 @@ import { amount, fmt, typed } from "./format";
 import type { Converter } from "./model";
 import { crossSections } from "./visual";
 import { metalField, readMetal, weightRows, WIRE_FORMULA } from "./wire";
+import { t } from "@uom/i18n";
 
 export const mm2: Converter = {
   id: "mm2",
@@ -23,17 +24,17 @@ export const mm2: Converter = {
     const kcmil = mm2ToKcmil(a);
     const next = na.nextLarger;
     return {
-      heading: `${fmt(a, 3)} mm² equals`,
+      heading: t("{value} equals", { value: `${fmt(a, 3)} mm²` }),
       rows: [
         { label: "Nearest AWG / kcmil size", value: na.nearest.label },
-        { label: "Smallest size at least as big", value: na.nextLarger?.label ?? "None, over 1000 kcmil", copy: na.nextLarger?.label ?? "", status: na.nextLarger ? undefined : "warn" },
+        { label: "Smallest size at least as big", value: na.nextLarger?.label ?? t("None, over 1000 kcmil"), copy: na.nextLarger?.label ?? "", status: na.nextLarger ? undefined : "warn" },
         { label: "Thousand circular mils", ...amount(kcmil, 2, " kcmil") },
         ...weightRows(a, readMetal(v)),
       ],
       visual: crossSections([
         { label: `${fmt(a, 2)} mm²`, sub: "entered", areaMm2: a, kind: "input" },
-        { label: na.nearest.label, sub: `nearest · ${fmt(na.nearest.areaMm2, 2)} mm²`, areaMm2: na.nearest.areaMm2, kind: "match" },
-        ...(next && next !== na.nearest ? [{ label: next.label, sub: `next larger · ${fmt(next.areaMm2, 2)} mm²`, areaMm2: next.areaMm2, kind: "other" as const }] : []),
+        { label: na.nearest.label, sub: t("nearest · {area} mm²", { area: fmt(na.nearest.areaMm2, 2) }), areaMm2: na.nearest.areaMm2, kind: "match" },
+        ...(next && next !== na.nearest ? [{ label: next.label, sub: t("next larger · {area} mm²", { area: fmt(next.areaMm2, 2) }), areaMm2: next.areaMm2, kind: "other" as const }] : []),
       ]),
       formula: WIRE_FORMULA,
     };

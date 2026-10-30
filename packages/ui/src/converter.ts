@@ -6,6 +6,7 @@ import type { Region } from "@uom/core/region";
 import { numberStyle } from "@uom/converters/format";
 import { dyn, fieldNumber, type Converter, type Output, type Row, type Table, type Values } from "@uom/converters/model";
 import { drawVisual } from "./visuals";
+import { t } from "@uom/i18n";
 
 /** Reads a converter's inputs from its panel's form. */
 class PanelValues implements Values {
@@ -40,16 +41,16 @@ export function renderConverter(conv: Converter, region: Region, heading: "h1" |
   panel.id = `c-${conv.id}`; // not the bare hash, so switching converters does not scroll
   panel.setAttribute("aria-labelledby", `${conv.id}-h`);
   const values = new PanelValues(conv, panel, region);
-  const h = el(heading, undefined, conv.title);
+  const h = el(heading, undefined, t(conv.title));
   h.id = `${conv.id}-h`;
-  panel.append(h, el("p", "blurb", dyn(conv.blurb, values)));
+  panel.append(h, el("p", "blurb", t(dyn(conv.blurb, values))));
 
   // Examples first: the quickest way to see what a converter does.
   const examples = dyn(conv.examples, values);
   const exampleBar = el("div", "examples");
-  exampleBar.append(el("span", "examples-label", "Try an example"));
+  exampleBar.append(el("span", "examples-label", t("Try an example")));
   const exampleButtons = examples.map((ex) => {
-    const b = el("button", "example", ex.label);
+    const b = el("button", "example", t(ex.label));
     b.type = "button";
     b.addEventListener("click", () => {
       fill(ex.set);
@@ -62,7 +63,7 @@ export function renderConverter(conv: Converter, region: Region, heading: "h1" |
 
   const flow = el("div", "flow");
   const from = el("div", "box from");
-  from.append(el("h3", "box-title", "Convert from"));
+  from.append(el("h3", "box-title", t("Convert from")));
   // Attached before the fields are built, so a field's label or placeholder can read another field.
   flow.append(from);
   panel.append(flow);
@@ -77,7 +78,7 @@ export function renderConverter(conv: Converter, region: Region, heading: "h1" |
     const target = f.advanced ? more : from;
     if (f.kind === "choice") {
       const fs = el("fieldset", "field");
-      fs.append(el("legend", "label", f.label));
+      fs.append(el("legend", "label", t(f.label)));
       const seg = el("div", "segmented");
       seg.style.setProperty("--n", String(f.options.length));
       const initial = f.value === undefined ? f.options[0].value : dyn(f.value, values);
@@ -88,12 +89,12 @@ export function renderConverter(conv: Converter, region: Region, heading: "h1" |
         input.name = `${conv.id}-${f.id}`;
         input.value = o.value;
         input.checked = o.value === initial;
-        lab.append(input, el("span", undefined, o.label));
+        lab.append(input, el("span", undefined, t(o.label)));
         seg.append(lab);
       }
       fs.append(seg);
       target.append(fs);
-      if (f.advanced) summaryParts.push(() => f.options.find((o) => o.value === values.str(f.id))!.label);
+      if (f.advanced) summaryParts.push(() => t(f.options.find((o) => o.value === values.str(f.id))!.label));
       continue;
     }
     const lab = el("label", "field");
@@ -121,16 +122,17 @@ export function renderConverter(conv: Converter, region: Region, heading: "h1" |
         dl.replaceChildren(...dyn(f.list!, values).map((v) => Object.assign(el("option"), { value: v }))),
       );
     }
-    const suffixText = () => [cur?.currencyAfter ? cur.currency : "", f.suffix ? dyn(f.suffix, values) : ""].filter(Boolean).join(" ");
+    const suffixText = () => [cur?.currencyAfter ? cur.currency : "", f.suffix ? t(dyn(f.suffix, values)) : ""].filter(Boolean).join(" ");
     dynamic.push(() => {
-      labelText.textContent = dyn(f.label, values) + (f.optional ? " (optional)" : "");
-      input.placeholder = f.placeholder === undefined ? "" : dyn(f.placeholder, values);
+      const label = t(dyn(f.label, values));
+      labelText.textContent = f.optional ? t("{label} (optional)", { label }) : label;
+      input.placeholder = f.placeholder === undefined ? "" : t(dyn(f.placeholder, values));
       suffix.textContent = suffixText();
     });
     if (f.advanced) {
       summaryParts.push(() => {
         const val = values.str(f.id);
-        return val === "" ? "" : `${dyn(f.label, values)} ${val}${suffixText() ? ` ${suffixText()}` : ""}`;
+        return val === "" ? "" : `${t(dyn(f.label, values))} ${val}${suffixText() ? ` ${suffixText()}` : ""}`;
       });
     }
     target.append(lab);
@@ -139,7 +141,7 @@ export function renderConverter(conv: Converter, region: Region, heading: "h1" |
     from.append(more);
     dynamic.push(() => {
       const parts = summaryParts.map((p) => p()).filter(Boolean);
-      moreSummary.replaceChildren(el("span", "more-title", "More options"), el("span", "more-values", parts.join(" · ")));
+      moreSummary.replaceChildren(el("span", "more-title", t("More options")), el("span", "more-values", parts.join(" · ")));
     });
   }
 
@@ -156,7 +158,7 @@ export function renderConverter(conv: Converter, region: Region, heading: "h1" |
   err.setAttribute("role", "alert");
 
   flow.append(arrow, to);
-  if (conv.note) panel.append(el("p", "note", dyn(conv.note, values)));
+  if (conv.note) panel.append(el("p", "note", t(dyn(conv.note, values))));
   const table = conv.table ? renderTable(conv.table()) : undefined;
   if (table) panel.append(table);
 
@@ -171,14 +173,14 @@ export function renderConverter(conv: Converter, region: Region, heading: "h1" |
     if (bad.some((id) => conv.fields.find((f) => f.id === id)?.advanced)) more.open = true;
 
     if (!out) {
-      toTitle.textContent = "Result";
-      toBody.replaceChildren(el("p", "empty", examples.length ? `${conv.empty} Or pick an example.` : conv.empty));
+      toTitle.textContent = t("Result");
+      toBody.replaceChildren(el("p", "empty", examples.length ? t("{hint} Or pick an example.", { hint: t(conv.empty) }) : t(conv.empty)));
     } else if ("error" in out) {
-      toTitle.textContent = "Result";
-      err.textContent = out.error;
+      toTitle.textContent = t("Result");
+      err.textContent = t(out.error);
       toBody.replaceChildren(err);
     } else {
-      toTitle.textContent = out.heading;
+      toTitle.textContent = t(out.heading);
       toBody.replaceChildren(...renderResult(out));
     }
     const hit = out && "rows" in out ? out.highlight : undefined;
@@ -233,14 +235,14 @@ function renderResult(out: Extract<Output, { rows: Row[] }>): Node[] {
   if (answer) {
     const hero = el("button", `answer${answer.status ? ` is-${answer.status}` : ""}`);
     hero.type = "button";
-    const top = el("span", "answer-label", answer.label);
+    const top = el("span", "answer-label", t(answer.label));
     const value = el("span", "answer-value", answer.value);
-    const hint = el("span", "row-copy", "Copy");
+    const hint = el("span", "row-copy", t("Copy"));
     hint.setAttribute("aria-hidden", "true");
     hero.append(top, value);
-    if (answer.detail) hero.append(el("span", "answer-detail", answer.detail));
+    if (answer.detail) hero.append(el("span", "answer-detail", t(answer.detail)));
     hero.append(hint);
-    hero.setAttribute("aria-label", `${answer.label}: ${answer.value}. Copy.`);
+    hero.setAttribute("aria-label", t("{label}: {value}. Copy.", { label: t(answer.label), value: answer.value }));
     hero.addEventListener("click", () => copy(hero, hint, answer.copy ?? answer.value));
     nodes.push(hero);
   }
@@ -252,9 +254,9 @@ function renderResult(out: Extract<Output, { rows: Row[] }>): Node[] {
   if (rest.length) nodes.push(renderRows(rest));
   if (out.formula?.length) {
     const how = el("details", "how");
-    how.append(el("summary", undefined, "How it's calculated"));
+    how.append(el("summary", undefined, t("How it's calculated")));
     const list = el("ul");
-    for (const line of out.formula) list.append(el("li", undefined, line));
+    for (const line of out.formula) list.append(el("li", undefined, t(line)));
     how.append(list);
     nodes.push(how);
   }
@@ -262,23 +264,23 @@ function renderResult(out: Extract<Output, { rows: Row[] }>): Node[] {
 }
 
 /** A reference table folded under "summary"; rows with a key can be highlighted by the answer. */
-function renderTable(t: Table): HTMLElement {
+function renderTable(spec: Table): HTMLElement {
   const details = el("details", "table-wrap");
-  details.append(el("summary", undefined, t.summary));
-  const table = el("table", t.wide ? "wide" : undefined);
+  details.append(el("summary", undefined, t(spec.summary)));
+  const table = el("table", spec.wide ? "wide" : undefined);
   const headRow = el("tr");
-  for (const c of t.columns) headRow.append(Object.assign(el("th", undefined, c), { scope: "col" }));
+  for (const c of spec.columns) headRow.append(Object.assign(el("th", undefined, t(c)), { scope: "col" }));
   const body = el("tbody");
-  for (const r of t.rows) {
-    const tr = el("tr");
+  for (const r of spec.rows) {
+    const row = el("tr");
     if ("group" in r) {
-      tr.className = "cat";
-      tr.append(Object.assign(el("td", undefined, r.group), { colSpan: t.columns.length }));
+      row.className = "cat";
+      row.append(Object.assign(el("td", undefined, t(r.group)), { colSpan: spec.columns.length }));
     } else {
-      if (r.key !== undefined) tr.dataset.key = r.key;
-      tr.append(...r.cells.map((c) => el("td", undefined, c)));
+      if (r.key !== undefined) row.dataset.key = r.key;
+      row.append(...r.cells.map((c) => el("td", undefined, t(c))));
     }
-    body.append(tr);
+    body.append(row);
   }
   const head = el("thead");
   head.append(headRow);
@@ -291,17 +293,17 @@ function renderRows(rows: Row[]): HTMLElement {
   const list = el("div", "rows");
   let group: string | undefined;
   for (const r of rows) {
-    if (r.group && r.group !== group) list.append(el("h4", "row-group", r.group));
+    if (r.group && r.group !== group) list.append(el("h4", "row-group", t(r.group)));
     group = r.group;
     const row = el("button", `row${r.status ? ` is-${r.status}` : ""}`);
     row.type = "button";
-    const left = el("span", "row-label", r.label);
-    if (r.detail) left.append(el("small", undefined, r.detail));
+    const left = el("span", "row-label", t(r.label));
+    if (r.detail) left.append(el("small", undefined, t(r.detail)));
     const value = el("span", "row-value", r.value);
-    const hint = el("span", "row-copy", "Copy");
+    const hint = el("span", "row-copy", t("Copy"));
     hint.setAttribute("aria-hidden", "true");
     row.append(left, hint, value);
-    row.setAttribute("aria-label", `${r.label}: ${r.value}. Copy.`);
+    row.setAttribute("aria-label", t("{label}: {value}. Copy.", { label: t(r.label), value: r.value }));
     row.addEventListener("click", () => copy(row, hint, r.copy ?? r.value));
     list.append(row);
   }
@@ -317,10 +319,10 @@ export function setClipboard(write: (text: string) => Promise<void>) {
 async function copy(row: HTMLElement, hint: HTMLElement, text: string) {
   try {
     await writeClipboard(text);
-    hint.textContent = "Copied";
+    hint.textContent = t("Copied");
     row.classList.add("copied");
     setTimeout(() => {
-      hint.textContent = "Copy";
+      hint.textContent = t("Copy");
       row.classList.remove("copied");
     }, 1200);
   } catch {

@@ -2,6 +2,7 @@ import { discountToMultiplier, multiplierToDiscount } from "@uom/core/pricing";
 import { amount, fmt, money, moneyAmount, parseNumber, plain, typed } from "./format";
 import type { Converter, Example, Row } from "./model";
 import { isNum } from "./checks";
+import { t } from "@uom/i18n";
 
 export const multiplier: Converter = {
   id: "multiplier",
@@ -10,8 +11,8 @@ export const multiplier: Converter = {
   blurb: 'Net price from list price. Discounts can be chained: "50/10" is 50% off, then 10% off that.',
   empty: "Enter a multiplier or a discount.",
   examples: (): Example[] => [
-    { label: `50/10 off ${money(100)} list`, set: { kind: "disc", value: "50/10", list: "100" } },
-    { label: `Multiplier × ${fmt(0.42, 2)}`, set: { kind: "mult", value: typed(0.42) } },
+    { label: t("{chain} off {price} list", { chain: "50/10", price: money(100) }), set: { kind: "disc", value: "50/10", list: "100" } },
+    { label: t("Multiplier × {value}", { value: fmt(0.42, 2) }), set: { kind: "mult", value: typed(0.42) } },
     { label: "35% off", set: { kind: "disc", value: "35" } },
   ],
   fields: [
@@ -46,7 +47,7 @@ export const multiplier: Converter = {
       m = n;
     } else {
       const r = discountToMultiplier(raw);
-      if (typeof r !== "number") return { error: r.error + ".", fields: ["value"] };
+      if (typeof r !== "number") return { error: t("{error}.", { error: r.error }), fields: ["value"] };
       m = r;
     }
     const discount = multiplierToDiscount(m);
@@ -54,7 +55,7 @@ export const multiplier: Converter = {
     if (list !== undefined) rows.push({ label: "Net price", ...moneyAmount(list * m) });
     rows.push(
       isMult
-        ? { label: "Equivalent discount", ...amount(discount, 2, "% off") }
+        ? { label: "Equivalent discount", ...amount(discount, 2, t("% off")) }
         : { label: "Multiplier", value: `× ${fmt(m, 4)}`, copy: plain(m, 4) },
     );
     if (!isMult && raw.includes("/")) rows.push({ label: "Same as a single discount of", ...amount(discount, 2, "%") });
@@ -62,11 +63,13 @@ export const multiplier: Converter = {
 
     const parts = isMult ? [] : raw.split("/").map((p) => 1 - Number(p.replace("%", "")) / 100);
     return {
-      heading: isMult ? `Multiplier ${fmt(m, 4)}${list !== undefined ? ` on ${money(list)} list` : ""}` : `${raw.replace(/%/g, "")}% off${list !== undefined ? ` ${money(list)} list` : ""}`,
+      heading: isMult
+        ? list !== undefined ? t("Multiplier {value} on {price} list", { value: fmt(m, 4), price: money(list) }) : t("Multiplier {value}", { value: fmt(m, 4) })
+        : list !== undefined ? t("{discount}% off {price} list", { discount: raw.replace(/%/g, ""), price: money(list) }) : t("{discount}% off", { discount: raw.replace(/%/g, "") }),
       rows,
       formula: [
         "Net price = list × multiplier. Multiplier = 1 − discount.",
-        ...(parts.length > 1 ? [`Chained discounts multiply: ${parts.map((p) => `× ${fmt(p, 4)}`).join(" ")} = × ${fmt(m, 4)}.`] : []),
+        ...(parts.length > 1 ? [t("Chained discounts multiply: {steps} = × {result}.", { steps: parts.map((p) => `× ${fmt(p, 4)}`).join(" "), result: fmt(m, 4) })] : []),
       ],
     };
   },

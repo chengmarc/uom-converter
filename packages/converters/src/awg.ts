@@ -3,6 +3,7 @@ import { amount, fmt, plain } from "./format";
 import type { Converter } from "./model";
 import { crossSections } from "./visual";
 import { metalField, readMetal, weightRows, WIRE_FORMULA } from "./wire";
+import { t } from "@uom/i18n";
 
 export const awg: Converter = {
   id: "awg",
@@ -25,17 +26,17 @@ export const awg: Converter = {
     const raw = v.str("size");
     if (raw === "") return undefined;
     const c = conductorInfo(raw);
-    if ("error" in c) return { error: c.error + ".", fields: ["size"] };
+    if ("error" in c) return { error: t("{error}.", { error: c.error }), fields: ["size"] };
     const next = c.nextLargerMetricMm2;
     return {
-      heading: `${c.label} equals`,
+      heading: t("{value} equals", { value: c.label }),
       rows: [
         { label: "Cross-section", ...amount(c.areaMm2, 3, " mm²") },
         { group: "Metric wire size (IEC)", label: "Nearest size", ...amount(c.nearestMetricMm2, 2, " mm²") },
         {
           group: "Metric wire size (IEC)",
           label: "Smallest size at least as big",
-          value: next === undefined ? "None, over 1000 mm²" : `${fmt(next, 2)} mm²`,
+          value: next === undefined ? t("None, over 1000 mm²") : `${fmt(next, 2)} mm²`,
           copy: next === undefined ? "" : plain(next, 2),
           status: next === undefined ? "warn" : undefined,
         },

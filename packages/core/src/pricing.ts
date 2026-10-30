@@ -2,6 +2,7 @@
 // price quantities.
 
 import { M_PER_FT } from "./units";
+import { t } from "@uom/i18n";
 
 // ---------- Pricing units of measure ----------
 
@@ -48,7 +49,7 @@ export const METRES_PER_PRICE_UNIT: Record<LengthPriceUnit, number> = {
 export function discountToMultiplier(raw: string): number | { error: string } {
   const parts = raw.replace(/%/g, "").split("/").map((p) => p.trim());
   if (parts.some((p) => !/^(\d+(\.\d+)?|\.\d+)$/.test(p) || Number(p) > 100)) {
-    return { error: "Enter a discount like 35 or a chain like 50/10/5" };
+    return { error: t("Enter a discount like 35 or a chain like 50/10/5") };
   }
   return parts.reduce((m, p) => m * (1 - Number(p) / 100), 1);
 }

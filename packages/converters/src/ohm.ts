@@ -1,6 +1,7 @@
 import { ohmsLaw } from "@uom/core/electrical";
 import { fmt, plain } from "./format";
 import { byRegion, type Converter, type RegionExamples } from "./model";
+import { t } from "@uom/i18n";
 
 const OHM_FIELDS = [
   { id: "volts", label: "Volts", unit: "V", digits: 3 },
@@ -49,7 +50,7 @@ export const ohm: Converter = {
       return `${fmt(known[id], f.digits)} ${f.unit}`;
     };
     return {
-      heading: `${describe(given[0])} and ${describe(given[1])} gives`,
+      heading: t("{a} and {b} gives", { a: describe(given[0]), b: describe(given[1]) }),
       rows: OHM_FIELDS.filter((f) => !given.includes(f.id)).map((f) => ({
         label: f.label,
         value: `${fmt(r[f.id], f.digits)} ${f.unit}`,

@@ -1,6 +1,7 @@
 import { toMetric } from "@uom/core/uom";
 import { amount } from "./format";
 import type { Converter } from "./model";
+import { t } from "@uom/i18n";
 
 export const metricSpec: Converter = {
   id: "metric",
@@ -15,9 +16,9 @@ export const metricSpec: Converter = {
     const raw = v.str("spec");
     if (raw === "") return undefined;
     const r = toMetric(raw);
-    if ("error" in r) return { error: r.error + ".", fields: ["spec"] };
+    if ("error" in r) return { error: t("{error}.", { error: r.error }), fields: ["spec"] };
     return {
-      heading: `${r.readAs} equals`,
+      heading: t("{value} equals", { value: r.readAs }),
       rows: [
         { label: "Metric value", ...amount(r.value, 4, ` ${r.unit}`) },
         { label: "Unit", value: r.unit },

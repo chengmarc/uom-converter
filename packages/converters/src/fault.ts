@@ -3,6 +3,7 @@ import { amount, fmt, plain, typed } from "./format";
 import { byRegion, type Converter, type RegionExamples } from "./model";
 import { isNum, invalid } from "./checks";
 import { phaseField, phaseName, readPhase, voltsField } from "./electrical-fields";
+import { t } from "@uom/i18n";
 
 export const fault: Converter = {
   id: "fault",
@@ -52,7 +53,7 @@ export const fault: Converter = {
       ],
       formula: [
         phase === 3 ? "Full-load amps = kVA × 1,000 ÷ (√3 × volts)." : "Full-load amps = kVA × 1,000 ÷ volts.",
-        `Fault current = full-load amps ÷ (%Z ÷ 100) = ${fmt(r.fla, 1)} ÷ ${fmt(z / 100, 4)}.`,
+        t("Fault current = full-load amps ÷ (%Z ÷ 100) = {fla} ÷ {z}.", { fla: fmt(r.fla, 1), z: fmt(z / 100, 4) }),
       ],
     };
   },

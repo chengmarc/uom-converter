@@ -2,6 +2,7 @@
 // power factor correction, motors and transformer fault current.
 
 import type { Region } from "./region";
+import { t } from "@uom/i18n";
 
 // ---------- Load: kVA, kW, amps ----------
 
@@ -53,7 +54,7 @@ export interface Electrical {
 export function ohmsLaw(known: Partial<Electrical>): Electrical | { error: string } {
   const { volts: V, amps: I, ohms: R, watts: P } = known;
   const given = [V, I, R, P].filter((x) => x !== undefined).length;
-  if (given !== 2) return { error: "Enter exactly two values" };
+  if (given !== 2) return { error: t("Enter exactly two values") };
   if (V !== undefined && I !== undefined) return { volts: V, amps: I, ohms: V / I, watts: V * I };
   if (V !== undefined && R !== undefined) return { volts: V, amps: V / R, ohms: R, watts: (V * V) / R };
   if (V !== undefined && P !== undefined) return { volts: V, amps: P / V, ohms: (V * V) / P, watts: P };

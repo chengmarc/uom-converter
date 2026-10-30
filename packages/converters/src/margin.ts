@@ -2,6 +2,7 @@ import { marginToMarkup, markupToMargin, sellFromCostAtMargin } from "@uom/core/
 import { amount, fmt, money, moneyAmount, plain } from "./format";
 import type { Converter, Example, Row } from "./model";
 import { isNum, invalid } from "./checks";
+import { t } from "@uom/i18n";
 
 export const margin: Converter = {
   id: "margin",
@@ -10,9 +11,9 @@ export const margin: Converter = {
   blurb: "Margin is profit as a % of the sell price; markup is profit as a % of cost. 25% margin = 33.3% markup.",
   empty: "Enter a margin or markup percentage.",
   examples: (): Example[] => [
-    { label: `25% margin on ${money(75)} cost`, set: { kind: "margin", pct: "25", cost: "75" } },
-    { label: "50% markup", set: { kind: "markup", pct: "50" } },
-    { label: "30% margin", set: { kind: "margin", pct: "30" } },
+    { label: t("{pct}% margin on {price} cost", { pct: 25, price: money(75) }), set: { kind: "margin", pct: "25", cost: "75" } },
+    { label: t("{pct}% markup", { pct: 50 }), set: { kind: "markup", pct: "50" } },
+    { label: t("{pct}% margin", { pct: 30 }), set: { kind: "margin", pct: "30" } },
   ],
   fields: [
     {
@@ -54,8 +55,11 @@ export const margin: Converter = {
       const profit = sellFromCostAtMargin(cost, marginF) - cost;
       rows.push({ label: "Profit", ...moneyAmount(profit) });
     }
+    const h = { pct: fmt(pct, 2), price: money(cost ?? 0) };
     return {
-      heading: `${fmt(pct, 2)}% ${isMargin ? "margin" : "markup"}${cost !== undefined ? ` on ${money(cost)} cost` : ""}`,
+      heading: cost !== undefined
+        ? isMargin ? t("{pct}% margin on {price} cost", h) : t("{pct}% markup on {price} cost", h)
+        : isMargin ? t("{pct}% margin", h) : t("{pct}% markup", h),
       rows,
       formula: [
         "Margin = profit ÷ sell price. Markup = profit ÷ cost.",

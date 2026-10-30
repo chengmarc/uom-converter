@@ -6,6 +6,7 @@
 import type { Region } from "@uom/core/region";
 import { parseNumber } from "./format";
 import type { Status, Visual } from "./visual";
+import { t } from "@uom/i18n";
 
 export type Dyn<T> = T | ((v: Values) => T);
 
@@ -138,4 +139,4 @@ export function exampleValues(conv: Converter, set: Record<string, string>, regi
 }
 
 /** A converter's description, where nothing is typed yet: descriptions only read the region. */
-export const blurb = (conv: Converter, region: Region) => dyn(conv.blurb, { region } as Values);
+export const blurb = (conv: Converter, region: Region) => t(dyn(conv.blurb, { region } as Values));

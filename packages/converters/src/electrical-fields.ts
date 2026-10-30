@@ -3,8 +3,9 @@
 import type { Phase } from "@uom/core/electrical";
 import { regionInfo } from "./regions";
 import type { Values } from "./model";
+import { t } from "@uom/i18n";
 
-export const phaseName = (p: Phase) => (p === 3 ? "three-phase" : "single-phase");
+export const phaseName = (p: Phase) => (p === 3 ? t("three-phase") : t("single-phase"));
 
 export const phaseField = (value: string, advanced = false) => ({
   kind: "choice" as const,

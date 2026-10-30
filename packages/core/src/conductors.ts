@@ -2,6 +2,7 @@
 
 import type { Phase } from "./electrical";
 import { LB_PER_KG, M_PER_FT } from "./units";
+import { t } from "@uom/i18n";
 
 // ---------- Conductor sizes ----------
 
@@ -30,7 +31,7 @@ export function parseConductor(raw: string): ConductorSize | { error: string } {
   if (/^\d{1,2}$/.test(s) && Number(s) >= 1 && Number(s) <= 40) {
     return { system: "AWG", awg: Number(s), label: `${Number(s)} AWG` };
   }
-  return { error: 'Use an AWG size ("12", "1/0", "4/0") or kcmil ("250 kcmil")' };
+  return { error: t('Use an AWG size ("12", "1/0", "4/0") or kcmil ("250 kcmil")') };
 }
 
 /** AWG definition: diameter = 0.005 in × 92^((36 - n) / 39). */

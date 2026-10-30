@@ -1,5 +1,6 @@
 import { lookupUom, UOM_CODES } from "@uom/core/uom";
 import type { Converter } from "./model";
+import { t } from "@uom/i18n";
 
 export const uomCodes: Converter = {
   id: "uom-codes",
@@ -15,18 +16,18 @@ export const uomCodes: Converter = {
     const u = lookupUom(raw);
     if (!u) return { error: "Not in this list. It covers units common in electrical product data; see “All codes” below.", fields: ["unit"] };
     return {
-      heading: `“${raw}” is`,
+      heading: t("“{raw}” is", { raw }),
       rows: [
         { label: "UN/ECE code", detail: u.note, value: u.code },
-        { label: "Name", value: u.name },
+        { label: "Name", value: t(u.name) },
         ...(u.symbol ? [{ label: "Symbol", value: u.symbol }] : []),
-        { label: "Category", value: u.category },
+        { label: "Category", value: t(u.category) },
       ],
       formula: ["UN/ECE Recommendation 20 unit codes; package types from Recommendation 21, written with an X prefix (XBX = box) as in the Peppol code list."],
     };
   },
   table: () => ({
-    summary: `All codes (${UOM_CODES.length})`,
+    summary: t("All codes ({n})", { n: UOM_CODES.length }),
     columns: ["Code", "Name", "Symbol", "Also written as"],
     wide: true,
     // A group row wherever the category changes.

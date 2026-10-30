@@ -3,6 +3,7 @@ import { amount, fmt, typed } from "./format";
 import type { Converter, Example, Row } from "./model";
 import { isNum, invalid } from "./checks";
 import { phaseField, phaseName, readPhase, voltsField } from "./electrical-fields";
+import { t } from "@uom/i18n";
 
 export const pf: Converter = {
   id: "pf",
@@ -12,9 +13,9 @@ export const pf: Converter = {
   empty: "Enter the load in kW and its present power factor.",
   note: "Round up to the next standard capacitor size. Don't correct past unity, and check for harmonic resonance on sites with drives or other non-linear loads.",
   examples: (): Example[] => [
-    { label: `100 kW from PF ${fmt(0.8, 2, 2)} to ${fmt(0.95, 2)}`, set: { kw: "100", pf1: typed(0.8), pf2: typed(0.95) } },
-    { label: `250 kW from PF ${fmt(0.72, 2)} to ${fmt(0.95, 2)}`, set: { kw: "250", pf1: typed(0.72), pf2: typed(0.95) } },
-    { label: `40 kW from PF ${fmt(0.85, 2)} to ${fmt(0.98, 2)}`, set: { kw: "40", pf1: typed(0.85), pf2: typed(0.98) } },
+    { label: t("{kw} kW from PF {from} to {to}", { kw: 100, from: fmt(0.8, 2, 2), to: fmt(0.95, 2) }), set: { kw: "100", pf1: typed(0.8), pf2: typed(0.95) } },
+    { label: t("{kw} kW from PF {from} to {to}", { kw: 250, from: fmt(0.72, 2), to: fmt(0.95, 2) }), set: { kw: "250", pf1: typed(0.72), pf2: typed(0.95) } },
+    { label: t("{kw} kW from PF {from} to {to}", { kw: 40, from: fmt(0.85, 2), to: fmt(0.98, 2) }), set: { kw: "40", pf1: typed(0.85), pf2: typed(0.98) } },
   ],
   fields: [
     { kind: "number", id: "kw", label: "Real power", suffix: "kW", placeholder: "100" },
@@ -44,16 +45,16 @@ export const pf: Converter = {
     const kva2 = kw / pf2!;
     const rows: Row[] = [
       { label: "Capacitor needed", ...amount(kvar, 1, " kvar") },
-      { group: "Before → after", label: "Apparent power", detail: `${fmt(((kva1 - kva2) / kva1) * 100, 1)}% less`, value: `${fmt(kva1, 1)} → ${fmt(kva2, 1)} kVA`, status: "good" },
+      { group: "Before → after", label: "Apparent power", detail: t("{pct}% less", { pct: fmt(((kva1 - kva2) / kva1) * 100, 1) }), value: `${fmt(kva1, 1)} → ${fmt(kva2, 1)} kVA`, status: "good" },
     ];
     if (volts !== undefined) {
       const phase = readPhase(v);
       const a1 = kvaToAmps(kva1, volts, phase);
       const a2 = kvaToAmps(kva2, volts, phase);
-      rows.push({ group: "Before → after", label: "Line current", detail: `at ${fmt(volts, 1)} V ${phaseName(phase)}`, value: `${fmt(a1, 1)} → ${fmt(a2, 1)} A`, status: "good" });
+      rows.push({ group: "Before → after", label: "Line current", detail: t("at {volts} V {phase}", { volts: fmt(volts, 1), phase: phaseName(phase) }), value: `${fmt(a1, 1)} → ${fmt(a2, 1)} A`, status: "good" });
     }
     return {
-      heading: `${fmt(kw, 2)} kW from PF ${fmt(pf1, 3)} to ${fmt(pf2!, 3)}`,
+      heading: t("{kw} kW from PF {from} to {to}", { kw: fmt(kw, 2), from: fmt(pf1, 3), to: fmt(pf2!, 3) }),
       rows,
       formula: ["kvar = kW × (tan φ₁ − tan φ₂), where φ = arccos(power factor).", "kVA = kW ÷ power factor."],
     };

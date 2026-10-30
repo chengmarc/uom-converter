@@ -3,6 +3,7 @@ import { fmt, money, moneyAmount, plain, typed } from "./format";
 import type { Converter, Example, Row } from "./model";
 import { packs as packsVisual, type Visual } from "./visual";
 import { invalid } from "./checks";
+import { t } from "@uom/i18n";
 
 export const packs: Converter = {
   id: "packs",
@@ -12,8 +13,8 @@ export const packs: Converter = {
   empty: "Enter a quantity and pack size, or a price and pack size.",
   examples: (): Example[] => [
     { label: "250 each, packs of 100", set: { need: "250", size: "100" } },
-    { label: `${money(12.5)} per box of 100`, set: { size: "100", price: typed(12.5), per: "pack" } },
-    { label: `${fmt(1000, 0)} each at ${money(0.18)}, packs of 50`, set: { need: "1000", size: "50", price: typed(0.18), per: "each" } },
+    { label: t("{price} per box of {size}", { price: money(12.5), size: 100 }), set: { size: "100", price: typed(12.5), per: "pack" } },
+    { label: t("{need} each at {price}, packs of {size}", { need: fmt(1000, 0), price: money(0.18), size: 50 }), set: { need: "1000", size: "50", price: typed(0.18), per: "each" } },
   ],
   fields: [
     { kind: "number", id: "need", label: "Quantity needed", suffix: "each", placeholder: "250", optional: true },
@@ -42,19 +43,19 @@ export const packs: Converter = {
     if (size === undefined || (need === undefined && p === undefined)) return undefined;
 
     const rows: Row[] = [];
-    let heading = `Packs of ${fmt(size, 3)}`;
+    let heading = t("Packs of {size}", { size: fmt(size, 3) });
     let visual: Visual | undefined;
     const perPack = v.str("per") === "pack";
     const packPrice = p === undefined ? undefined : perPack ? p : p * size;
     if (need !== undefined) {
       const o = unitsToOrder(need, size);
-      heading = `${fmt(need, 3)} each, in packs of ${fmt(size, 3)}`;
+      heading = t("{need} each, in packs of {size}", { need: fmt(need, 3), size: fmt(size, 3) });
       rows.push(
         { label: "Packs to order", value: fmt(o.units, 0) },
         {
           label: "You receive",
-          detail: o.over > 0 ? `${fmt(o.over, 3)} more than you need` : "exactly what you need",
-          value: `${fmt(o.total, 3)} each`,
+          detail: o.over > 0 ? t("{extra} more than you need", { extra: fmt(o.over, 3) }) : t("exactly what you need"),
+          value: t("{n} each", { n: fmt(o.total, 3) }),
           copy: plain(o.total, 3),
           status: o.over > 0 ? "warn" : "good",
         },
@@ -65,7 +66,7 @@ export const packs: Converter = {
           count: o.units,
           lastUsed: 1 - o.over / size,
           shape: "box",
-          label: o.over > 0 ? `${fmt(o.units, 0)} packs · last one has ${fmt(o.over, 3)} extra` : `${fmt(o.units, 0)} full packs`,
+          label: o.over > 0 ? t("{n} packs · last one has {extra} extra", { n: fmt(o.units, 0), extra: fmt(o.over, 3) }) : t("{n} full packs", { n: fmt(o.units, 0) }),
         });
       }
     }

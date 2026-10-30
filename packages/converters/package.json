@@ -11,6 +11,7 @@
     "./visual": "./src/visual.ts"
   },
   "dependencies": {
-    "@uom/core": "*"
+    "@uom/core": "*",
+    "@uom/i18n": "*"
   }
 }

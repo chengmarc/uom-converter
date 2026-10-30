@@ -4,6 +4,7 @@ import type { Region } from "@uom/core/region";
 import { fmt, plain, typed } from "./format";
 import { dyn, type Converter, type Dyn, type Table, type Topic, type Values } from "./model";
 import type { Visual } from "./visual";
+import { t } from "@uom/i18n";
 
 export interface Unit {
   key: string;
@@ -75,7 +76,7 @@ export function unitConverter(opts: {
       const from = unit(v.str("unit"));
       const base = from.toBase(n);
       return {
-        heading: `${format(n, from)} equals`,
+        heading: t("{value} equals", { value: format(n, from) }),
         rows: opts.units
           .filter((u) => u !== from)
           .sort((a, b) => Number(b.key === opts.counterpart?.[from.key]) - Number(a.key === opts.counterpart?.[from.key]))

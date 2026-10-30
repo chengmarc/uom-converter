@@ -2,6 +2,7 @@ import { CONDUIT_TRADE_SIZES, conduitSize, KNOCKOUT_PUNCH_IN } from "@uom/core/c
 import { MM_PER_IN } from "@uom/core/units";
 import { fmt, plain } from "./format";
 import type { Converter, Example, Row } from "./model";
+import { t } from "@uom/i18n";
 
 export const conduit: Converter = {
   id: "conduit",
@@ -26,18 +27,18 @@ export const conduit: Converter = {
     const raw = v.str("size");
     if (raw === "") return undefined;
     const c = conduitSize(raw);
-    if ("error" in c) return { error: c.error + ".", fields: ["size"] };
+    if ("error" in c) return { error: t("{error}.", { error: c.error }), fields: ["size"] };
     const ko = KNOCKOUT_PUNCH_IN[c.inch];
     // Answer in the system the user didn't type.
     const typedMetric = c.typed === "metric";
     const inchRow: Row = { label: "Inch trade size", value: `${c.inch}"`, copy: c.inch };
     const metricRow: Row = { label: "Metric designator", value: String(c.metric) };
     return {
-      heading: typedMetric ? `Metric designator ${c.metric}` : `Trade size ${c.inch}"`,
+      heading: typedMetric ? t("Metric designator {n}", { n: c.metric }) : t('Trade size {size}"', { size: c.inch }),
       rows: [
         ...(typedMetric ? [inchRow, metricRow] : [metricRow, inchRow]),
         ko === undefined
-          ? { label: "Knockout punch", value: "Not listed", copy: "", status: "warn" }
+          ? { label: "Knockout punch", value: t("Not listed"), copy: "", status: "warn" }
           : { label: "Knockout punch", detail: `${fmt(ko * MM_PER_IN, 1, 1)} mm`, value: `${fmt(ko, 3, 3)}"`, copy: plain(ko, 3) },
       ],
       highlight: String(c.metric),

@@ -3,6 +3,7 @@ import { amount, fmt } from "./format";
 import { byRegion, type Converter, type RegionExamples, type Values } from "./model";
 import { packs as packsVisual } from "./visual";
 import { invalid } from "./checks";
+import { t } from "@uom/i18n";
 
 const REEL_SUGGESTIONS = { ft: ["100", "250", "500", "1000", "2500", "5000"], m: ["75", "150", "300", "500", "1000"] };
 const reelUnit = (v: Values) => v.str("unit") as "ft" | "m";
@@ -58,7 +59,7 @@ export const reels: Converter = {
     const total = run * count;
     const o = unitsToOrder(total, size);
     return {
-      heading: `${fmt(count, 0)} × ${fmt(run, 2)} ${unit} run, ${fmt(size, 2)} ${unit} coils or reels`,
+      heading: t("{count} × {run} {unit} run, {size} {unit} coils or reels", { count: fmt(count, 0), run: fmt(run, 2), size: fmt(size, 2), unit }),
       rows: [
         { label: "Coils / reels to order", value: fmt(o.units, 0) },
         { label: "Total wire", ...amount(total, 2, ` ${unit}`) },
@@ -66,7 +67,7 @@ export const reels: Converter = {
       ],
       visual:
         o.units > 0
-          ? packsVisual({ count: o.units, lastUsed: 1 - o.over / size, shape: "reel", label: `${fmt(o.units, 0)} × ${fmt(size, 2)} ${unit} · ${fmt(o.over, 2)} ${unit} left over` })
+          ? packsVisual({ count: o.units, lastUsed: 1 - o.over / size, shape: "reel", label: t("{n} × {size} {unit} · {left} {unit} left over", { n: fmt(o.units, 0), size: fmt(size, 2), left: fmt(o.over, 2), unit }) })
           : undefined,
       formula: ["Total wire = run length × conductors.", "Coils or reels = total ÷ coil length, rounded up."],
     };

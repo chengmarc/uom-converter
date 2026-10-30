@@ -2,6 +2,7 @@ import { makePackGtin14, parseGtin } from "@uom/core/gtin";
 import { fmt } from "./format";
 import type { Converter, Example, Row } from "./model";
 import { isNum, invalid } from "./checks";
+import { t } from "@uom/i18n";
 
 export const packaging: Converter = {
   id: "packaging",
@@ -33,24 +34,28 @@ export const packaging: Converter = {
     ]);
     if (bad.length) return { error: "Quantities must be whole numbers above 0.", fields: bad };
     if (kase === undefined) return undefined;
-    if (inner !== undefined && kase % inner !== 0) return { error: `${fmt(kase, 0)} each per case doesn't divide into inner packs of ${fmt(inner, 0)}.`, fields: ["inner", "case"] };
+    if (inner !== undefined && kase % inner !== 0) return { error: t("{case} each per case doesn't divide into inner packs of {inner}.", { case: fmt(kase, 0), inner: fmt(inner, 0) }), fields: ["inner", "case"] };
 
-    const q = "Quantities";
+    const q = t("Quantities");
     const rows: Row[] = [];
     if (pallet !== undefined) rows.push({ group: q, label: "Each per pallet", value: fmt(kase * pallet, 0) });
     if (inner !== undefined) rows.push({ group: q, label: "Inner packs per case", value: fmt(kase / inner, 0) });
     if (pallet !== undefined && inner !== undefined) rows.push({ group: q, label: "Inner packs per pallet", value: fmt((kase / inner) * pallet, 0) });
     if (gtin !== "") {
       const parsed = parseGtin(gtin);
-      if (!parsed.valid) return { error: `Item GTIN: ${parsed.errors[0] ?? "not valid"}`, fields: ["gtin"] };
-      const g = "GTIN-14 (indicator digit)";
+      if (!parsed.valid) return { error: t("Item GTIN: {error}", { error: parsed.errors[0] ?? t("not valid") }), fields: ["gtin"] };
+      const g = t("GTIN-14 (indicator digit)");
       if (inner !== undefined) rows.push({ group: g, label: "Inner pack (1)", value: makePackGtin14(gtin, 1) });
       rows.push({ group: g, label: "Case (2)", value: makePackGtin14(gtin, 2) });
       if (pallet !== undefined) rows.push({ group: g, label: "Pallet (3)", value: makePackGtin14(gtin, 3) });
     }
     if (!rows.length) rows.push({ group: q, label: "Each per case", value: fmt(kase, 0) });
     return {
-      heading: `${inner !== undefined ? `${fmt(inner, 0)} per inner, ` : ""}${fmt(kase, 0)} per case${pallet !== undefined ? `, ${fmt(pallet, 0)} cases per pallet` : ""}`,
+      heading: [
+        ...(inner !== undefined ? [t("{n} per inner", { n: fmt(inner, 0) })] : []),
+        t("{n} per case", { n: fmt(kase, 0) }),
+        ...(pallet !== undefined ? [t("{n} cases per pallet", { n: fmt(pallet, 0) })] : []),
+      ].join(", "),
       rows,
       formula: ["GTIN-14 = indicator digit + first 12 digits of the item's GTIN-13 form + a new check digit (GS1 mod-10)."],
     };

@@ -4,6 +4,7 @@
 
 import { fmt } from "@uom/converters/format";
 import type { Section, Visual } from "@uom/converters/visual";
+import { t } from "@uom/i18n";
 
 type Of<K extends Visual["kind"]> = Extract<Visual, { kind: K }>;
 
@@ -60,7 +61,7 @@ function gauge(opts: Of<"gauge">): Element {
   for (const m of opts.marks) {
     parts.push(s("line", { x1: x(m.at), x2: x(m.at), y1: 18, y2: 38, class: "viz-mark" }), text(x(m.at), 52, m.label));
   }
-  return svg(W, 58, `${fmt(opts.value, 2)}${opts.unit} against ${opts.marks.map((m) => m.label).join(" and ")}`, ...parts);
+  return svg(W, 58, t("{value} against {marks}", { value: `${fmt(opts.value, 2)}${opts.unit}`, marks: opts.marks.map((m) => m.label).join(t(" and ")) }), ...parts);
 }
 
 // ---------- Conductor cross-sections to scale ----------
@@ -77,10 +78,10 @@ function crossSections(items: Section[]): Element {
     parts.push(
       s("circle", { cx, cy: 8 + maxD / 2, r, class: `viz-wire is-${it.kind}` }),
       text(cx, maxD + 30, it.label, "viz-text strong"),
-      text(cx, maxD + 46, it.sub),
+      text(cx, maxD + 46, t(it.sub)),
     );
   });
-  return svg(W, maxD + 52, `Cross-sections to scale: ${items.map((i) => `${i.label} (${i.sub})`).join(", ")}`, ...parts);
+  return svg(W, maxD + 52, t("Cross-sections to scale: {items}", { items: items.map((i) => `${i.label} (${t(i.sub)})`).join(", ") }), ...parts);
 }
 
 // ---------- Ruler ----------
@@ -103,7 +104,7 @@ function ruler(inches: number, marks: Of<"ruler">["marks"]): Element {
     parts.push(s("line", { x1: mx, x2: mx, y1: 12, y2: 48, class: `viz-pointer is-${m.kind}` }));
     parts.push(text(mx, i === 0 ? 9 : 62, m.label, `viz-text ${m.kind === "exact" ? "strong" : ""}`));
   });
-  return svg(W, 68, `Ruler from ${start} to ${start + 1} inches: ${marks.map((m) => m.label).join(", ")}`, ...parts);
+  return svg(W, 68, t("Ruler from {start} to {end} inches: {marks}", { start, end: start + 1, marks: marks.map((m) => m.label).join(", ") }), ...parts);
 }
 
 // ---------- Packs, coils and reels ----------
@@ -129,7 +130,7 @@ function packs(opts: Of<"packs">): Element {
       parts.push(s("circle", { cx, cy: 6 + size / 2, r: 4, class: "viz-hub" }));
     }
   }
-  if (opts.count > shown) parts.push(text(shown * (size + gap) + 10, 26, `+ ${opts.count - shown} more`, "viz-text", "start"));
+  if (opts.count > shown) parts.push(text(shown * (size + gap) + 10, 26, t("+ {n} more", { n: opts.count - shown }), "viz-text", "start"));
   parts.push(text(4, size + 26, opts.label, "viz-text", "start"));
   return svg(W, size + 32, opts.label, ...parts);
 }
@@ -149,7 +150,7 @@ function temperatureScale(celsius: number): Element {
     s("circle", { cx: x(celsius), cy: 29, r: 7, class: "viz-dot" }),
     text(Math.min(Math.max(x(celsius), 30), W - 30), 14, `${fmt(celsius, 1)} °C`, "viz-text strong"),
   );
-  return svg(W, 58, `${fmt(celsius, 1)} °C on a scale from −40 to 120 °C with 60, 75 and 90 °C ratings marked`, ...parts);
+  return svg(W, 58, t("{c} °C on a scale from −40 to 120 °C with 60, 75 and 90 °C ratings marked", { c: fmt(celsius, 1) }), ...parts);
 }
 
 // ---------- Two prices on a log scale ----------
@@ -171,5 +172,5 @@ function priceGap(a: number, b: number, factor: number | undefined): Element {
     text(x(a), 20, "A", "viz-text strong"),
     text(x(b), 20, "B", "viz-text strong"),
   );
-  return svg(W, 60, `Price A and B on a logarithmic scale${factor ? `, ${factor} times apart` : ""}`, ...parts);
+  return svg(W, 60, t("Price A and B on a logarithmic scale") + (factor ? t(", {n} times apart", { n: factor }) : ""), ...parts);
 }

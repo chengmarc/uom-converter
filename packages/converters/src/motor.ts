@@ -3,6 +3,7 @@ import { regionInfo } from "./regions";
 import { amount, fmt } from "./format";
 import { byRegion, type Converter, type RegionExamples, type Row } from "./model";
 import { isNum, invalid } from "./checks";
+import { t } from "@uom/i18n";
 
 export const motor: Converter = {
   id: "motor",
@@ -49,22 +50,22 @@ export const motor: Converter = {
     if (polesIn === undefined && rpm === undefined) return undefined;
 
     const poles = polesIn ?? polesForRpm(hz, rpm!);
-    if (poles === undefined) return { error: `Faster than a 2-pole motor at ${hz} Hz (${fmt(syncSpeedRpm(hz, 2), 0)} r/min).`, fields: ["rpm"] };
+    if (poles === undefined) return { error: t("Faster than a 2-pole motor at {hz} Hz ({rpm} r/min).", { hz, rpm: fmt(syncSpeedRpm(hz, 2), 0) }), fields: ["rpm"] };
     const sync = syncSpeedRpm(hz, poles);
-    if (rpm !== undefined && rpm > sync) return { error: `A ${poles}-pole motor at ${hz} Hz can't run faster than ${fmt(sync, 0)} r/min.`, fields: ["rpm", "poles"] };
+    if (rpm !== undefined && rpm > sync) return { error: t("A {poles}-pole motor at {hz} Hz can't run faster than {rpm} r/min.", { poles, hz, rpm: fmt(sync, 0) }), fields: ["rpm", "poles"] };
 
     const other = hz === 60 ? 50 : 60;
     const rows: Row[] = [{ label: "Synchronous speed", ...amount(sync, 0, " r/min") }];
     if (polesIn === undefined) rows.push({ label: "Poles", detail: "worked out from the nameplate speed", value: String(poles) });
     if (rpm !== undefined) {
       const slip = motorSlip(sync, rpm);
-      rows.push({ label: "Slip", detail: `${fmt(sync - rpm, 0)} r/min below synchronous`, ...amount(slip * 100, 2, "%") });
+      rows.push({ label: "Slip", detail: t("{rpm} r/min below synchronous", { rpm: fmt(sync - rpm, 0) }), ...amount(slip * 100, 2, "%") });
     }
-    const g = `On ${other} Hz`;
+    const g = t("On {hz} Hz", { hz: other });
     rows.push({ group: g, label: "Synchronous speed", ...amount(syncSpeedRpm(other, poles), 0, " r/min") });
     if (rpm !== undefined) rows.push({ group: g, label: "Running speed, about", detail: "same slip", ...amount((rpm * other) / hz, 0, " r/min") });
     return {
-      heading: `${poles}-pole motor at ${hz} Hz${rpm !== undefined ? `, ${fmt(rpm, 0)} r/min nameplate` : ""}`,
+      heading: rpm !== undefined ? t("{poles}-pole motor at {hz} Hz, {rpm} r/min nameplate", { poles, hz, rpm: fmt(rpm, 0) }) : t("{poles}-pole motor at {hz} Hz", { poles, hz }),
       rows,
       formula: ["Synchronous speed = 120 × frequency ÷ poles.", "Slip = (synchronous − nameplate) ÷ synchronous.", "Poles from a nameplate: the pole count whose synchronous speed is just above it."],
     };

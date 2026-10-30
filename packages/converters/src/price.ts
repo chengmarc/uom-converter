@@ -1,12 +1,16 @@
 import { convertPrice, type PriceUom } from "@uom/core/pricing";
 import { money, moneyAmount, typed } from "./format";
 import type { Converter, Example } from "./model";
+import { t } from "@uom/i18n";
 
 const PRICE_UNITS: { uom: PriceUom; name: string; short: string }[] = [
   { uom: "E", name: "Per each (E)", short: "each" },
   { uom: "C", name: "Per 100 (C)", short: "per C" },
   { uom: "M", name: "Per 1,000 (M)", short: "per M" },
 ];
+
+const headingFor = (uom: PriceUom, price: string) =>
+  uom === "E" ? t("{price} per each (E) equals", { price }) : uom === "C" ? t("{price} per 100 (C) equals", { price }) : t("{price} per 1,000 (M) equals", { price });
 
 export const price: Converter = {
   id: "price",
@@ -15,9 +19,9 @@ export const price: Converter = {
   blurb: "Distributor price units: E is per each, C is per 100, M is per 1,000. Wire is usually priced per M feet.",
   empty: "Enter a price to see it per each, per 100 and per 1,000.",
   examples: (): Example[] => [
-    { label: `${money(450)} per M (wire)`, set: { price: "450", uom: "M" } },
-    { label: `${money(125)} per C`, set: { price: "125", uom: "C" } },
-    { label: `${money(0.45)} each`, set: { price: typed(0.45), uom: "E" } },
+    { label: t("{price} per M (wire)", { price: money(450) }), set: { price: "450", uom: "M" } },
+    { label: t("{price} per C", { price: money(125) }), set: { price: "125", uom: "C" } },
+    { label: t("{price} each", { price: money(0.45) }), set: { price: typed(0.45), uom: "E" } },
   ],
   fields: [
     { kind: "number", id: "price", label: "Price", currency: true, placeholder: "0.00" },
@@ -37,11 +41,8 @@ export const price: Converter = {
     if (p === undefined) return undefined;
     if (Number.isNaN(p)) return { error: "Enter a number, like 125 or 0.45.", fields: ["price"] };
     const from = v.str("uom") as PriceUom;
-    // "Per 1,000 (M)" → "per 1,000 (M)": only the first letter. The code stays a capital (lowercase m is a metre).
-    const name = PRICE_UNITS.find((u) => u.uom === from)!.name;
-    const fromName = name[0].toLowerCase() + name.slice(1);
     return {
-      heading: `${money(p)} ${fromName} equals`,
+      heading: headingFor(from, money(p)),
       rows: PRICE_UNITS.filter((u) => u.uom !== from).map((u) => {
         const out = convertPrice(p, from, u.uom);
         return { label: u.name, ...moneyAmount(out) };

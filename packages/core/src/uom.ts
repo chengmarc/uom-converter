@@ -3,6 +3,7 @@
 
 import { conductorInfo } from "./conductors";
 import { BTUH_PER_W, CM3_PER_IN3, fToC, LB_PER_KG, LUX_PER_FC, M_PER_FT, MM_PER_IN, NM_PER_LBF_IN, parseInches, W_PER_HP } from "./units";
+import { t } from "@uom/i18n";
 
 // ---------- UN/ECE unit codes ----------
 
@@ -196,7 +197,7 @@ const AWG_HINT = /(awg|kcmil|mcm|^#\s*\d)|^\d\/0$/i;
  */
 export function toMetric(raw: string): MetricValue | { error: string } {
   const s = raw.trim().replace(/\s+/g, " ");
-  if (s === "") return { error: "Empty" };
+  if (s === "") return { error: t("Empty") };
 
   if (AWG_HINT.test(s)) {
     const c = conductorInfo(s);
@@ -206,15 +207,15 @@ export function toMetric(raw: string): MetricValue | { error: string } {
 
   // Number (decimal, fraction or mixed fraction), then the unit.
   const m = /^(-)?\s*(\d+[\s-]+\d+\/\d+|\d+\/\d+|\d*\.?\d+)\s*(.*)$/.exec(s);
-  if (!m) return { error: "No number found" };
+  if (!m) return { error: t("No number found") };
   const [, minus, num, unitRaw] = m;
   const unit = unitRaw.toLowerCase().replace(/\.$/, "").trim();
-  if (unit === "") return { error: "No unit: add one, like 12 AWG, 3/4 in or 75 ft" };
+  if (unit === "") return { error: t("No unit: add one, like 12 AWG, 3/4 in or 75 ft") };
   const rule = RULES.find((r) => r.units.includes(unit));
-  if (!rule) return { error: `Unknown unit "${unitRaw}"` };
+  if (!rule) return { error: t('Unknown unit "{unit}"', { unit: unitRaw }) };
 
   const n = num.includes("/") ? parseInches(num) : Number(num);
-  if (n === undefined || Number.isNaN(n)) return { error: "Can't read the number" };
+  if (n === undefined || Number.isNaN(n)) return { error: t("Can't read the number") };
   const value = minus ? -n : n;
   return { value: rule.convert(value), unit: rule.to, code: rule.code, readAs: `${minus ?? ""}${num} ${rule.from}` };
 }

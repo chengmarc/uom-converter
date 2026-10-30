@@ -3,6 +3,7 @@ import { regionInfo } from "./regions";
 import { amount, fmt, moneyAmount } from "./format";
 import type { Converter, Example, Row } from "./model";
 import { isNum, invalid } from "./checks";
+import { t } from "@uom/i18n";
 
 export const energy: Converter = {
   id: "energy",
@@ -13,9 +14,9 @@ export const energy: Converter = {
   examples: (v): Example[] => {
     const rate = regionInfo(v.region).energyRate;
     return [
-      { label: `${fmt(1500, 0)} W heater, 8 h a day`, set: { watts: "1500", hours: "8", rate } },
+      { label: t("{watts} W heater, 8 h a day", { watts: fmt(1500, 0) }), set: { watts: "1500", hours: "8", rate } },
       { label: "LED retrofit 400 W → 150 W, 12 h", set: { watts: "400", hours: "12", rate, after: "150" } },
-      { label: `Parking lot lights ${fmt(2000, 0)} W, 11 h`, set: { watts: "2000", hours: "11", rate } },
+      { label: t("Parking lot lights {watts} W, 11 h", { watts: fmt(2000, 0) }), set: { watts: "2000", hours: "11", rate } },
     ];
   },
   fields: [
@@ -44,7 +45,7 @@ export const energy: Converter = {
     const rows: Row[] = [];
     if (after !== undefined) {
       const saved = energyUse(watts - after, hours, days!, rate ?? 0);
-      const g = `Retrofit saves (${fmt(watts, 0)} W → ${fmt(after, 0)} W)`;
+      const g = t("Retrofit saves ({before} W → {after} W)", { before: fmt(watts, 0), after: fmt(after, 0) });
       if (rate !== undefined) rows.push({ group: g, label: "Money per year", ...moneyAmount(saved.costPerYear, 2), status: saved.costPerYear > 0 ? "good" : "warn" });
       rows.push({ group: g, label: "Energy per year", ...amount(saved.kwhPerYear, 0, " kWh") });
     }
@@ -60,7 +61,7 @@ export const energy: Converter = {
       { group: "Energy", label: "Per day", ...amount(e.kwhPerDay, 2, " kWh") },
     );
     return {
-      heading: `${fmt(watts, 0)} W for ${fmt(hours, 2)} h a day, ${fmt(days!, 0)} days a year`,
+      heading: t("{watts} W for {hours} h a day, {days} days a year", { watts: fmt(watts, 0), hours: fmt(hours, 2), days: fmt(days!, 0) }),
       rows,
       formula: ["kWh = watts × hours ÷ 1,000.", "Cost = kWh × rate. Per month = per year ÷ 12."],
     };

@@ -2,6 +2,7 @@ import { MM_PER_IN, parseInches, toFraction } from "@uom/core/units";
 import { amount, fmt, parseNumber, typed } from "./format";
 import type { Converter, Example, Status } from "./model";
 import { ruler } from "./visual";
+import { t } from "@uom/i18n";
 
 export const fraction: Converter = {
   id: "fraction",
@@ -15,7 +16,7 @@ export const fraction: Converter = {
     { label: `${fmt(22.5, 1)} mm`, set: { value: typed(22.5), unit: "mm" } },
   ],
   fields: [
-    { kind: "text", id: "value", label: "Size", placeholder: `1-23/32 or ${typed(0.885)}` },
+    { kind: "text", id: "value", label: "Size", placeholder: t("1-23/32 or {n}", { n: typed(0.885) }) },
     {
       kind: "choice",
       id: "unit",
@@ -38,11 +39,15 @@ export const fraction: Converter = {
     const inches = fromMm ? n / MM_PER_IN : n;
     const exact = (f: { error: number }) => Math.abs(f.error) < 5e-7;
     const off = (f: { error: number }) =>
-      exact(f) ? "exact" : `${fmt(Math.abs(f.error), 4)}" (${fmt(Math.abs(f.error) * MM_PER_IN, 2)} mm) ${f.error > 0 ? "over" : "under"}`;
+      exact(f)
+        ? t("exact")
+        : f.error > 0
+          ? t('{inches}" ({mm} mm) over', { inches: fmt(Math.abs(f.error), 4), mm: fmt(Math.abs(f.error) * MM_PER_IN, 2) })
+          : t('{inches}" ({mm} mm) under', { inches: fmt(Math.abs(f.error), 4), mm: fmt(Math.abs(f.error) * MM_PER_IN, 2) });
     const f16 = toFraction(inches, 16);
     const f64 = toFraction(inches, 64);
     return {
-      heading: `${fromMm ? `${fmt(n, 3)} mm` : `${raw.replace(/["″]$/, "")}"`} equals`,
+      heading: t("{value} equals", { value: fromMm ? `${fmt(n, 3)} mm` : `${raw.replace(/["″]$/, "")}"` }),
       rows: [
         ...(fromMm
           ? [{ label: "Nearest 1/64\"", detail: off(f64), value: f64.label, status: (exact(f64) ? "good" : undefined) as Status | undefined }]

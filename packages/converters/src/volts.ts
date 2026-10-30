@@ -2,6 +2,7 @@ import { lineToLine, lineToNeutral, wyeSystem } from "@uom/core/electrical";
 import { regionInfo } from "./regions";
 import { amount, fmt } from "./format";
 import { byRegion, type Converter, type RegionExamples } from "./model";
+import { t } from "@uom/i18n";
 
 export const volts: Converter = {
   id: "volts",
@@ -47,7 +48,7 @@ export const volts: Converter = {
     const out = fromLL ? lineToNeutral(n) : lineToLine(n);
     const system = wyeSystem(n, v.region);
     return {
-      heading: `${fmt(n, 2)} V ${fromLL ? "line-to-line" : "line-to-neutral"} equals`,
+      heading: fromLL ? t("{volts} V line-to-line equals", { volts: fmt(n, 2) }) : t("{volts} V line-to-neutral equals", { volts: fmt(n, 2) }),
       rows: [
         { label: fromLL ? "Line-to-neutral" : "Line-to-line", ...amount(out, 1, " V") },
         ...(system ? [{ label: "Standard system", value: `${system[0]}/${system[1]} V`, copy: `${system[0]}/${system[1]}` }] : []),

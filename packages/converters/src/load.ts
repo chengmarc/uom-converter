@@ -3,6 +3,7 @@ import { fmt, plain, typed } from "./format";
 import { byRegion, type Converter, type RegionExamples } from "./model";
 import { isNum, invalid } from "./checks";
 import { phaseField, phaseName, readPhase, voltsField } from "./electrical-fields";
+import { t } from "@uom/i18n";
 
 const LOAD_UNITS = [
   { value: "kVA", label: "kVA", name: "Apparent power" },
@@ -31,7 +32,7 @@ export const load: Converter = {
     eu: [
       { label: "100 kVA at 400 V, 3-phase", set: { value: "100", unit: "kVA", volts: "400", phase: "3" } },
       { label: "32 A at 400 V, 3-phase", set: { value: "32", unit: "A", volts: "400", phase: "3" } },
-      { label: `${fmt(7.4, 1)} kW at 230 V, 1-phase`, set: { value: typed(7.4), unit: "kW", volts: "230", phase: "1" } },
+      { label: t("{kw} kW at 230 V, 1-phase", { kw: fmt(7.4, 1) }), set: { value: typed(7.4), unit: "kW", volts: "230", phase: "1" } },
     ],
   })),
   fields: [
@@ -63,7 +64,7 @@ export const load: Converter = {
     // Amps is what people usually want, so it leads unless it's what they typed.
     const order = unit === "A" ? ["kVA", "kW"] : ["A", ...(unit === "kVA" ? ["kW"] : ["kVA"])];
     return {
-      heading: `${values[unit][1]} at ${fmt(volts!, 1)} V ${phaseName(phase)}${pf !== 1 ? `, PF ${fmt(pf!, 2)}` : ""}`,
+      heading: t("{load} at {volts} V {phase}", { load: values[unit][1], volts: fmt(volts!, 1), phase: phaseName(phase) }) + (pf !== 1 ? t(", PF {pf}", { pf: fmt(pf!, 2) }) : ""),
       rows: order.map((k) => ({ label: LOAD_UNITS.find((u) => u.value === k)!.name, value: values[k][1], copy: plain(values[k][0], 2) })),
       formula: ["Single-phase: amps = kVA × 1,000 ÷ volts.", "Three-phase: amps = kVA × 1,000 ÷ (√3 × line-to-line volts).", "kW = kVA × power factor."],
     };

@@ -9,6 +9,7 @@
   "dependencies": {
     "@uom/brand": "*",
     "@uom/converters": "*",
-    "@uom/core": "*"
+    "@uom/core": "*",
+    "@uom/i18n": "*"
   }
 }

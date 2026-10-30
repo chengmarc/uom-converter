@@ -1,0 +1,13 @@
+{
+  "name": "@uom/i18n",
+  "description": "Text in the reader's language: t(), the languages, and each language's translations.",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./catalogues": "./src/catalogues.ts",
+    "./zh": "./src/zh.ts",
+    "./ja": "./src/ja.ts",
+    "./scan": "./src/scan.ts"
+  }
+}

@@ -1,6 +1,7 @@
 // Conduit trade sizes, metric designators and knockout punch sizes.
 
 import { parseInches } from "./units";
+import { t } from "@uom/i18n";
 
 // ---------- Conduit trade sizes ----------
 
@@ -33,11 +34,11 @@ export function conduitSize(raw: string): { inch: string; metric: number; typed:
 
   if (metricMarked || (/^\d+$/.test(s) && Number(s) >= 12)) {
     const hit = CONDUIT_TRADE_SIZES.find((c) => c.metric === Number(s));
-    return hit ? { ...hit, typed: "metric" } : { error: `No conduit trade size with metric designator ${s}` };
+    return hit ? { ...hit, typed: "metric" } : { error: t("No conduit trade size with metric designator {n}", { n: s }) };
   }
   const v = parseInches(s);
   const hit = v === undefined ? undefined : CONDUIT_TRADE_SIZES.find((c) => Math.abs(parseInches(c.inch)! - v) < 1e-9);
-  return hit ? { ...hit, typed: "inch" } : { error: `Not a standard conduit trade size: ${raw}` };
+  return hit ? { ...hit, typed: "inch" } : { error: t("Not a standard conduit trade size: {size}", { size: raw }) };
 }
 
 // ---------- Knockouts ----------

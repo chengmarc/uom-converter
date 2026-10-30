@@ -3,6 +3,7 @@
 import { conductorKgPerKm, kgPerKmToLbPerKft, type Metal } from "@uom/core/conductors";
 import { amount } from "./format";
 import type { Row, Values } from "./model";
+import { t } from "@uom/i18n";
 
 export const metalField = {
   kind: "choice" as const,
@@ -21,7 +22,7 @@ export const readMetal = (v: Values) => v.str("metal") as Metal;
 export function weightRows(areaMm2: number, metal: Metal): Row[] {
   const kgKm = conductorKgPerKm(areaMm2, metal);
   const lb = kgPerKmToLbPerKft(kgKm);
-  const group = `Weight, bare ${metal === "Cu" ? "copper" : "aluminum"}`;
+  const group = metal === "Cu" ? t("Weight, bare copper") : t("Weight, bare aluminum");
   return [
     { group, label: "Pounds per 1,000 ft", ...amount(lb, 1, " lb") },
     { group, label: "Kilograms per km", ...amount(kgKm, 1, " kg") },
