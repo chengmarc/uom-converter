@@ -30,6 +30,9 @@ export function icon(name: string): SVGSVGElement | undefined {
   return d ? lineIcon(d) : undefined;
 }
 
+/** The settings button's icon, in the apps with settings. */
+export const settingsIcon = () => lineIcon("M4 7h10 M18 7h2 M4 17h4 M12 17h8 M16 5v4 M10 15v4");
+
 /** A 24×24 line icon from its path, for an app's own controls drawn the same way. */
 export function lineIcon(d: string): SVGSVGElement {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");

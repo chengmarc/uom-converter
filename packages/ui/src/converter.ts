@@ -1,10 +1,11 @@
 // Renders a converter (packages/converters/src/model.ts) as a panel: examples, the "Convert from" form,
-// and the result, all laid out the same way for every converter. Shared by the apps built on a
-// web page (apps/web and apps/windows); each styles it in its own stylesheet.
+// and the result, all laid out the same way for every converter. Shared by the apps, all
+// built on a web page; each styles it in its own stylesheet.
 
 import type { Region } from "@uom/core/region";
 import { numberStyle } from "@uom/converters/format";
 import { dyn, fieldNumber, type Converter, type Output, type Row, type Table, type Values } from "@uom/converters/model";
+import { el } from "./dom";
 import { drawVisual } from "./visuals";
 import { t } from "@uom/i18n";
 
@@ -26,13 +27,6 @@ class PanelValues implements Values {
   num(id: string): number | undefined {
     return fieldNumber(this.conv, id, this.str(id));
   }
-}
-
-export function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: string) {
-  const e = document.createElement(tag);
-  if (cls) e.className = cls;
-  if (text !== undefined) e.textContent = text;
-  return e;
 }
 
 /** `heading`: h1 when the converter is the page's subject (a website page), h2 when it sits in an app or another page. */

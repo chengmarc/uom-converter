@@ -8,7 +8,7 @@
 //   );
 
 import type { Topic } from "@uom/converters/model";
-import { el } from "./converter";
+import { el } from "./dom";
 
 /**
  * Each topic's photos: "<slot>-banner", cut 6:1 for a band across a page, and "<slot>-thumb",

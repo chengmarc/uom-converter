@@ -5,11 +5,12 @@ import "@fontsource-variable/inter/opsz.css";
 import type { Region } from "@uom/core/region";
 import { ALL_AUDIENCES, EVERYTHING, type Audience } from "@uom/ui/audiences";
 import { byId, TOOLS } from "@uom/converters";
-import { icon, lineIcon } from "@uom/ui/icons";
+import { icon, settingsIcon } from "@uom/ui/icons";
 import { REGIONS } from "@uom/converters/regions";
 import type { Converter, Topic } from "@uom/converters/model";
 import { LANGUAGES, t, type Language } from "@uom/i18n";
-import { el, renderConverter } from "@uom/ui/converter";
+import { renderConverter } from "@uom/ui/converter";
+import { el } from "@uom/ui/dom";
 import { photoLibrary, TOPIC_SLOTS } from "@uom/ui/photos";
 import { search } from "@uom/ui/search";
 import { chooseAudience, chooseRegion, chosenAudience, chosenRegion } from "@uom/ui/choices";
@@ -24,7 +25,8 @@ if (overlay?.visible) document.documentElement.classList.add("desktop");
 
 // The native menus are in the same language; a browser (npm run windows:dev without Electron) has none.
 const shell = (window as Window & { uomApp?: { setLanguage(language: Language): void } }).uomApp;
-let language = chosenLanguage(new URLSearchParams(location.search));
+const params = new URLSearchParams(location.search);
+let language = chosenLanguage(params);
 shell?.setLanguage(language);
 
 const content = document.querySelector<HTMLElement>("#content")!;
@@ -36,7 +38,6 @@ const languageSelect = document.querySelector<HTMLSelectElement>("#language")!;
 const settings = document.querySelector<HTMLDialogElement>("#settings")!;
 const audienceDesc = document.querySelector<HTMLElement>("#audience-desc")!;
 
-const params = new URLSearchParams(location.search);
 let audience = chosenAudience(params);
 // A converter's own page always opens on that converter, whatever the audience last chosen.
 const landing = routeId();
@@ -280,7 +281,7 @@ languageSelect.addEventListener("change", () => setLanguage(languageSelect.value
 // ---------- Settings ----------
 
 const openSettings = document.querySelector<HTMLElement>("#open-settings")!;
-openSettings.prepend(lineIcon("M4 7h10 M18 7h2 M4 17h4 M12 17h8 M16 5v4 M10 15v4"));
+openSettings.prepend(settingsIcon());
 openSettings.addEventListener("click", () => settings.showModal());
 document.querySelector("#close-settings")!.addEventListener("click", () => settings.close());
 // A click on the dimmed area outside the dialog closes it.

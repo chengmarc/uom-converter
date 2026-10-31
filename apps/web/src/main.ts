@@ -9,7 +9,8 @@ import { blurb, dyn, exampleValues, type Converter, type Topic, type Values } fr
 import { REGIONS } from "@uom/converters/regions";
 import { ALL_AUDIENCES, EVERYTHING, type Audience } from "@uom/ui/audiences";
 import { chooseAudience, chooseRegion, chosenAudience, chosenRegion } from "@uom/ui/choices";
-import { el, renderConverter } from "@uom/ui/converter";
+import { renderConverter } from "@uom/ui/converter";
+import { el } from "@uom/ui/dom";
 import { photoLibrary, TOPIC_SLOTS } from "@uom/ui/photos";
 import { HOME, idFromPath, PAGES, PRIVACY, topicFromPath, TOPIC_PAGES } from "./pages";
 import { PRIVACY_HTML } from "./privacy";
@@ -66,12 +67,6 @@ function syncUrl() {
   if (audience !== EVERYTHING) p.set("for", audience.id);
   p.set("region", region);
   history.replaceState(null, "", `${location.pathname}?${p}${location.hash}`);
-}
-
-/** Follow a link to one of the site's pages without reloading. */
-function go(path: string, hash = "") {
-  history.pushState(null, "", path + location.search + hash);
-  render();
 }
 
 /** The page's own head, as a fresh load of this address has it (scripts/head.ts writes those). */
@@ -231,7 +226,7 @@ function homeView(missing: boolean): Node[] {
 function windowsApp() {
   const s = el("aside", "app-note wrap");
   s.setAttribute("aria-label", "Windows app");
-  s.append(appBox("h2"));
+  s.append(appBox());
   return s;
 }
 
@@ -240,7 +235,7 @@ function windowsApp() {
  * its icon, what it is, and a button to the Store with Microsoft's logo. On the home page, and at
  * the foot of every converter page's menu, where it stacks.
  */
-function appBox(heading: "h2" | "h3") {
+function appBox() {
   const card = el("div", "app-card");
   const inner = el("div", "app-card-inner");
 
@@ -252,7 +247,7 @@ function appBox(heading: "h2" | "h3") {
   const text = el("div", "app-card-text");
   text.append(
     el("p", "app-card-eyebrow", "Windows app · Free"),
-    el(heading, "app-card-title", "Every converter, in its own window"),
+    el("h2", "app-card-title", "Every converter, in its own window"),
     el("p", "app-card-lede", "The same converters as this site, working offline."),
   );
 
@@ -291,7 +286,7 @@ function sidebar(current: { id?: string; topic?: Topic }) {
   side.setAttribute("aria-label", "Converters");
   const picker = audienceSelect();
   const nav = el("nav");
-  side.append(picker.pick, nav, appBox("h2"));
+  side.append(picker.pick, nav, appBox());
   refreshLists = () => {
     picker.sync();
     nav.replaceChildren(
@@ -567,7 +562,8 @@ document.addEventListener("click", (e) => {
     if (a.hash) return scrollToHash();
     return window.scrollTo(0, 0);
   }
-  go(a.pathname, a.hash);
+  history.pushState(null, "", a.pathname + location.search + a.hash);
+  render();
   // As after a page load, the next Tab starts at the top of the new page.
   main.focus({ preventScroll: true });
 });
