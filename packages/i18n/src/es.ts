@@ -1122,6 +1122,9 @@ const es: Catalogue = {
   "Equipment": "Equipos",
   "Lighting, EV & solar": "Alumbrado, VE y solar",
   "Pricing & ordering": "Precios y pedidos",
+  "Theme": "Tema",
+  "Light": "Claro",
+  "Dark": "Oscuro",
 };
 
 export default es;

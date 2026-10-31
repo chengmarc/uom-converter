@@ -61,7 +61,7 @@ export const neutral = (s: string) =>
 export function messages(): Set<string> {
   const out = new Set<string>();
   for (const f of sources("packages/converters/src")) scanTs(f, true, out);
-  for (const f of ["converter", "visuals", "audiences", "search"]) scanTs(join(REPO, "packages/ui/src", `${f}.ts`), true, out);
+  for (const f of ["converter", "visuals", "audiences", "search", "theme"]) scanTs(join(REPO, "packages/ui/src", `${f}.ts`), true, out);
   for (const f of sources("packages/core/src")) scanTs(f, false, out);
   for (const f of ["apps/android/src/main.ts", "apps/windows/src/renderer/main.ts"]) scanTs(join(REPO, f), false, out);
   for (const f of ["apps/android/src/index.html", "apps/windows/src/renderer/index.html"]) scanHtml(join(REPO, f), out);

@@ -9,6 +9,7 @@ match the release tags (`v<version>`).
 
 ### Added
 
+- the Windows and Android apps have a theme setting: system, light or dark
 - gentle motion: a converter eases in as it opens, a picked example's answer lands piece by piece,
   and buttons respond to a press. Nothing moves while you type, and it all follows the system's
   reduced-motion setting

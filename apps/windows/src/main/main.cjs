@@ -157,6 +157,10 @@ if (!app.requestSingleInstanceLock()) {
     };
     setLanguage(language);
     ipcMain.on("language", (_event, l) => setLanguage(l));
+    // The page says this as it opens, so a chosen theme is in place before the window shows.
+    ipcMain.on("theme", (_event, theme) => {
+      if (["system", "light", "dark"].includes(theme)) nativeTheme.themeSource = theme;
+    });
     serveApp();
     createWindow();
   });

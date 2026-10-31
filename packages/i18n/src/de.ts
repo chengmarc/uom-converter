@@ -1122,6 +1122,9 @@ const de: Catalogue = {
   "Equipment": "Betriebsmittel",
   "Lighting, EV & solar": "Beleuchtung, E-Auto und Solar",
   "Pricing & ordering": "Preise und Bestellung",
+  "Theme": "Design",
+  "Light": "Hell",
+  "Dark": "Dunkel",
 };
 
 export default de;

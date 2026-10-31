@@ -20,6 +20,7 @@ import { renderConverter, setClipboard } from "@uom/ui/converter";
 import { el } from "@uom/ui/dom";
 import { icon, lineIcon, settingsIcon } from "@uom/ui/icons";
 import { chooseLanguage, chosenLanguage } from "@uom/ui/language";
+import { chooseTheme, chosenTheme, pageTheme, THEMES, type Theme } from "@uom/ui/theme";
 import { photoLibrary, TOPIC_SLOTS } from "@uom/ui/photos";
 import { search } from "@uom/ui/search";
 import { store, stored } from "@uom/ui/storage";
@@ -27,6 +28,8 @@ import { store, stored } from "@uom/ui/storage";
 declare const __APP_VERSION__: string;
 
 let language = chosenLanguage();
+let theme = chosenTheme();
+pageTheme(theme);
 
 // The web view's own clipboard needs permissions an app page doesn't get; the plugin doesn't.
 setClipboard((text) => Clipboard.write({ string: text }));
@@ -186,7 +189,7 @@ let homeScroll = 0;
 // theme, dark in the light one.
 const darkTheme = matchMedia("(prefers-color-scheme: dark)");
 function statusBar() {
-  const light = darkTheme.matches;
+  const light = theme === "system" ? darkTheme.matches : theme === "dark";
   // Style.Dark is for a dark background: light icons. Outside the app (vite's dev server in a
   // browser) there's no status bar.
   StatusBar.setStyle({ style: light ? Style.Dark : Style.Light }).catch(() => {});
@@ -271,12 +274,38 @@ function drawLanguages() {
   );
 }
 
+function drawThemes() {
+  $("#themes").replaceChildren(
+    ...THEMES.map((x) => {
+      const lab = el("label", "choice");
+      const input = el("input");
+      input.type = "radio";
+      input.name = "theme";
+      input.value = x.id;
+      input.checked = x.id === theme;
+      input.addEventListener("change", () => setTheme(x.id));
+      const text = el("span", "choice-text");
+      text.append(el("span", undefined, t(x.label)));
+      lab.append(input, text);
+      return lab;
+    }),
+  );
+}
+
+function setTheme(chosen: Theme) {
+  theme = chosen;
+  chooseTheme(chosen);
+  pageTheme(chosen);
+  statusBar();
+}
+
 function setLanguage(l: Language) {
   language = l;
   chooseLanguage(l);
   panels = new Map();
   drawRoles();
   drawRegions();
+  drawThemes();
   drawVersion();
   drawList();
   show();
@@ -326,6 +355,7 @@ App.addListener("backButton", ({ canGoBack }) => {
 drawRoles();
 drawList();
 drawRegions();
+drawThemes();
 drawLanguages();
 drawVersion();
 show();

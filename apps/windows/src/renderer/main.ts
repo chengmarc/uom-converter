@@ -15,6 +15,7 @@ import { photoLibrary, TOPIC_SLOTS } from "@uom/ui/photos";
 import { search } from "@uom/ui/search";
 import { chooseAudience, chooseRegion, chosenAudience, chosenRegion } from "@uom/ui/choices";
 import { chooseLanguage, chosenLanguage } from "@uom/ui/language";
+import { chooseTheme, chosenTheme, THEMES, type Theme } from "@uom/ui/theme";
 
 // ---------- Page ----------
 
@@ -24,10 +25,11 @@ const overlay = (navigator as Navigator & { windowControlsOverlay?: { visible: b
 if (overlay?.visible) document.documentElement.classList.add("desktop");
 
 // The native menus are in the same language; a browser (npm run windows:dev without Electron) has none.
-const shell = (window as Window & { uomApp?: { setLanguage(language: Language): void } }).uomApp;
+const shell = (window as Window & { uomApp?: { setLanguage(language: Language): void; setTheme(theme: Theme): void } }).uomApp;
 const params = new URLSearchParams(location.search);
 let language = chosenLanguage(params);
 shell?.setLanguage(language);
+shell?.setTheme(chosenTheme());
 
 const content = document.querySelector<HTMLElement>("#content")!;
 const sidebar = document.querySelector<HTMLElement>("#sidebar")!;
@@ -35,6 +37,7 @@ const picker = document.querySelector<HTMLSelectElement>("#picker")!;
 const audienceBar = document.querySelector<HTMLElement>("#audience")!;
 const regionBar = document.querySelector<HTMLElement>("#region")!;
 const languageSelect = document.querySelector<HTMLSelectElement>("#language")!;
+const themeSelect = document.querySelector<HTMLSelectElement>("#theme")!;
 const settings = document.querySelector<HTMLDialogElement>("#settings")!;
 const audienceDesc = document.querySelector<HTMLElement>("#audience-desc")!;
 
@@ -61,6 +64,8 @@ function buildControls() {
   audienceDesc.textContent = t(audience.description);
   regionBar.replaceChildren(...REGIONS.map((r) => chip(t(r.label), r.id === region, () => setRegion(r.id), { detail: `${r.code} · ${r.hz} Hz` })));
   languageSelect.replaceChildren(...LANGUAGES.map((l) => Object.assign(document.createElement("option"), { value: l.id, textContent: l.name, selected: l.id === language })));
+  const theme = chosenTheme();
+  themeSelect.replaceChildren(...THEMES.map((x) => Object.assign(document.createElement("option"), { value: x.id, textContent: t(x.label), selected: x.id === theme })));
 }
 
 function navLink(id: string, text: string) {
@@ -277,6 +282,11 @@ document.addEventListener("keydown", (e) => {
 
 picker.addEventListener("change", () => navigate(picker.value));
 languageSelect.addEventListener("change", () => setLanguage(languageSelect.value as Language));
+themeSelect.addEventListener("change", () => {
+  const theme = themeSelect.value as Theme;
+  chooseTheme(theme);
+  shell?.setTheme(theme);
+});
 
 // ---------- Settings ----------
 

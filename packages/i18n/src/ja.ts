@@ -1122,6 +1122,9 @@ const ja: Catalogue = {
   "Equipment": "機器",
   "Lighting, EV & solar": "照明、EV、太陽光",
   "Pricing & ordering": "価格と発注",
+  "Theme": "テーマ",
+  "Light": "ライト",
+  "Dark": "ダーク",
 };
 
 export default ja;

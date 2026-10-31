@@ -1122,6 +1122,9 @@ const zh: Catalogue = {
   "Equipment": "设备",
   "Lighting, EV & solar": "照明、电动汽车和光伏",
   "Pricing & ordering": "定价与订购",
+  "Theme": "主题",
+  "Light": "浅色",
+  "Dark": "深色",
 };
 
 export default zh;
