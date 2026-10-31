@@ -17,5 +17,9 @@ apps/android/store-listing/icon-512.png linguist-generated
 apps/android/store-listing/feature-graphic.png linguist-generated
 apps/android/store-listing/*/*.png linguist-generated
 
+# Written by `cap sync` (npm run android:sync), always with LF. Change Capacitor's plugins, not these.
+apps/android/native/app/capacitor.build.gradle eol=lf linguist-generated
+apps/android/native/capacitor.settings.gradle eol=lf linguist-generated
+
 # packages/brand/photos.mjs (`npm run photos -w @uom/brand`), from originals/ (not in git)
 packages/brand/photos/*.webp linguist-generated
