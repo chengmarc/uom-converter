@@ -11,7 +11,7 @@ import { t } from "@uom/i18n";
  * E = per each, C = per 100, M = per 1000. Wire is commonly priced per M feet.
  */
 export type PriceUom = "E" | "C" | "M";
-export const UOM_FACTOR: Record<PriceUom, number> = { E: 1, C: 100, M: 1000 };
+const UOM_FACTOR: Record<PriceUom, number> = { E: 1, C: 100, M: 1000 };
 
 export function convertPrice(price: number, from: PriceUom, to: PriceUom): number {
   return (price / UOM_FACTOR[from]) * UOM_FACTOR[to];
@@ -31,7 +31,7 @@ export function suspectUomMismatch(a: number, b: number, tolerance = 0.05): numb
 // ---------- Price per length ----------
 
 /** Wire price units by length, as metres per unit (C ft = 100 ft, M ft = 1000 ft). */
-export type LengthPriceUnit = "ft" | "Cft" | "Mft" | "m" | "km";
+type LengthPriceUnit = "ft" | "Cft" | "Mft" | "m" | "km";
 export const METRES_PER_PRICE_UNIT: Record<LengthPriceUnit, number> = {
   ft: M_PER_FT,
   Cft: 100 * M_PER_FT,

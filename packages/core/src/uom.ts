@@ -7,7 +7,7 @@ import { t } from "@uom/i18n";
 
 // ---------- UN/ECE unit codes ----------
 
-export type UomCategory =
+type UomCategory =
   | "count"
   | "package"
   | "length"
@@ -21,7 +21,7 @@ export type UomCategory =
   | "light"
   | "other";
 
-export interface UomCode {
+interface UomCode {
   /** UN/ECE Recommendation 20 common code (package types: Rec 21 code with an X prefix). */
   code: string;
   name: string;

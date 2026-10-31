@@ -7,14 +7,14 @@
 
 import { t } from "@uom/i18n";
 
-export type GtinKind = "GTIN-8" | "UPC-E" | "UPC-A" | "EAN-13" | "GTIN-14";
+type GtinKind = "GTIN-8" | "UPC-E" | "UPC-A" | "EAN-13" | "GTIN-14";
 
-export interface GtinOptions {
+interface GtinOptions {
   /** How to read 8-digit codes starting with 0 or 1. North America: usually UPC-E. */
   eightDigit?: "upc-e" | "gtin-8";
 }
 
-export interface GtinResult {
+interface GtinResult {
   input: string;
   valid: boolean;
   kind?: GtinKind;
@@ -45,7 +45,7 @@ export function checkDigit(body: string): number {
   return (10 - (sum % 10)) % 10;
 }
 
-export function hasValidCheckDigit(code: string): boolean {
+function hasValidCheckDigit(code: string): boolean {
   return /^\d{2,}$/.test(code) && checkDigit(code.slice(0, -1)) === Number(code.at(-1));
 }
 

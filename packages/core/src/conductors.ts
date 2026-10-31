@@ -7,14 +7,14 @@ import { t } from "@uom/i18n";
 // ---------- Conductor sizes ----------
 
 /** 1 kcmil in mm² (1 circular mil = π/4 × 0.0254² mm²). */
-export const MM2_PER_KCMIL = (Math.PI / 4) * 0.0254 ** 2 * 1000;
+const MM2_PER_KCMIL = (Math.PI / 4) * 0.0254 ** 2 * 1000;
 
 /** IEC 60228 standard metric conductor sizes, mm². */
 export const METRIC_SIZES_MM2 = [
   0.5, 0.75, 1, 1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240, 300, 400, 500, 630, 800, 1000,
 ];
 
-export type ConductorSize = { system: "AWG"; awg: number; label: string } | { system: "kcmil"; kcmil: number; label: string };
+type ConductorSize = { system: "AWG"; awg: number; label: string } | { system: "kcmil"; kcmil: number; label: string };
 
 /**
  * Parse "12", "12 AWG", "#12", "1/0", "4/0", "250 kcmil", "250 MCM".
@@ -35,11 +35,11 @@ export function parseConductor(raw: string): ConductorSize | { error: string } {
 }
 
 /** AWG definition: diameter = 0.005 in × 92^((36 - n) / 39). */
-export function awgDiameterMm(awg: number): number {
+function awgDiameterMm(awg: number): number {
   return 0.127 * 92 ** ((36 - awg) / 39);
 }
 
-export function awgAreaKcmil(awg: number): number {
+function awgAreaKcmil(awg: number): number {
   const mils = awgDiameterMm(awg) / 0.0254;
   return (mils * mils) / 1000;
 }
@@ -82,7 +82,7 @@ function metricNeighbours(areaMm2: number) {
   return { nearestMetricMm2, nextLargerMetricMm2 };
 }
 
-export interface NaSize {
+interface NaSize {
   /** "12 AWG", "1/0 AWG", "250 kcmil". */
   label: string;
   areaMm2: number;
@@ -111,7 +111,7 @@ export function metricToNorthAmerican(mm2: number): { nearest: NaSize; nextLarge
 export type Metal = "Cu" | "Al";
 
 /** g/cm³: annealed copper (IACS) and 1350 aluminum. */
-export const METAL_DENSITY: Record<Metal, number> = { Cu: 8.89, Al: 2.705 };
+const METAL_DENSITY: Record<Metal, number> = { Cu: 8.89, Al: 2.705 };
 
 /**
  * Bare conductor mass per km (1 mm² × 1 km = 1000 cm³, so kg/km = mm² × g/cm³).
@@ -126,7 +126,7 @@ export const kgPerKmToLbPerKft = (kgPerKm: number) => kgPerKm * LB_PER_KG * M_PE
  * Resistivity at 20 °C (Ω·mm²/m) and its temperature coefficient: annealed copper at 100%
  * IACS (1/58) and 1350 aluminum at 61% IACS.
  */
-export const RESISTIVITY_20C: Record<Metal, { rho: number; alpha: number }> = {
+const RESISTIVITY_20C: Record<Metal, { rho: number; alpha: number }> = {
   Cu: { rho: 1 / 58, alpha: 0.00393 },
   Al: { rho: 0.028264, alpha: 0.00403 },
 };
@@ -137,7 +137,7 @@ export function conductorOhmsPerKm(areaMm2: number, metal: Metal, tempC = 75): n
   return ((rho * (1 + alpha * (tempC - 20))) / areaMm2) * 1000;
 }
 
-export interface VoltageDropInput {
+interface VoltageDropInput {
   areaMm2: number;
   metal: Metal;
   /** One-way length of the run, metres. */

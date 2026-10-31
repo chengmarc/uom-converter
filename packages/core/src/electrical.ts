@@ -19,7 +19,7 @@ export const lineToNeutral = (volts: number) => volts / Math.sqrt(3);
 export const lineToLine = (volts: number) => volts * Math.sqrt(3);
 
 /** Common wye systems as [line-to-neutral, line-to-line], and where they're used. */
-export const WYE_SYSTEMS: { ln: number; ll: number; regions: Region[] }[] = [
+const WYE_SYSTEMS: { ln: number; ll: number; regions: Region[] }[] = [
   { ln: 120, ll: 208, regions: ["us", "ca"] },
   { ln: 277, ll: 480, regions: ["us", "ca"] },
   { ln: 347, ll: 600, regions: ["ca"] },

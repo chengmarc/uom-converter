@@ -25,7 +25,7 @@ interface FieldBase {
   advanced?: boolean;
 }
 
-export type Field =
+type Field =
   | (FieldBase & {
       kind: "number" | "text";
       label: Dyn<string>;

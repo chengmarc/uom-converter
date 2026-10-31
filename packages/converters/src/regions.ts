@@ -1,7 +1,7 @@
 import type { Region } from "@uom/core/region";
 import type { NumberStyle } from "./format";
 
-export interface RegionInfo {
+interface RegionInfo {
   id: Region;
   label: string;
   /** The wiring code notes should cite. */
