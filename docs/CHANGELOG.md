@@ -7,10 +7,18 @@ match the release tags (`v<version>`).
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-31
+
 ### Added
 
+- the Android app, in closed testing on Google Play: every converter on its own touch screen,
+  offline and with no account
 - the Windows and Android apps in Spanish, German and French: they open in the system's language, and Settings changes it. The language is separate from the region, which still sets units, number formats
   and voltages
+
+### Changed
+
+- the Windows app's regions each show their wiring code and frequency, not only on hover
 
 ### Fixed
 

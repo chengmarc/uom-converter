@@ -8,12 +8,12 @@ package is `com.chengmarc.uomconverter`; the bundle is built and signed as
 
 ## Release
 
-- **Release name:** `<version> (<versionCode>)`, e.g. `1.1.0 (10101)`. Not shown to users.
-- **Release notes** (500 characters or fewer per language). For 1.1.0, the first Android release:
+- **Release name:** `<version> (<versionCode>)`, e.g. `1.2.0 (10200)`. Not shown to users.
+- **Release notes** (500 characters or fewer per language). For 1.2.0:
 
   ```
   <en-US>
-  First Android release: 31 converters for the electrical trade, for the US, Canada and Europe. Price units (E/C/M), wire sizes (AWG and mm²), voltage drop, conduit, kVA and amps, units and UOM codes, each with its formula and worked examples. Works offline, with no account. Tap any result to copy it.
+  Now in Spanish, German and French: the app opens in your phone's language, and Settings changes it. The language is separate from the region, which still sets units, number formats and voltages. In the US and Canada, a number with a comma that doesn't separate thousands, such as "7,4", is now an error instead of being read as 74.
   </en-US>
   ```
 
