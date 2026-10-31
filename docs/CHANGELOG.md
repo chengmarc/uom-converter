@@ -37,6 +37,8 @@ match the release tags (`v<version>`).
 
 ### Changed
 
+- each converter's web address now sits under its topic, such as
+  /wire-and-conduit/voltage-drop-calculator. The old addresses redirect permanently
 - seven topics in one order on every app: Power & loads, Wire & conduit, Equipment, Lighting, EV &
   solar, Pricing & ordering, Units and Product data. Voltage drop moves to Wire & conduit and metal
   price to Pricing & ordering. The website's electrical page moves to power-and-loads, and its old

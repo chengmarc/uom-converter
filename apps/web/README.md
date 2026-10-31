@@ -1,7 +1,7 @@
 # The website
 
-<https://uom-converter.com/>: every converter at its own address (`/voltage-drop-calculator`,
-`/awg-to-mm2`…) so a search can land on it, a page per topic listing its converters (`/electrical`,
+<https://uom-converter.com/>: every converter at its own address (`/wire-and-conduit/voltage-drop-calculator`,
+`/units/feet-to-metres`…) so a search can land on it, a page per topic listing its converters (`/power-and-loads`,
 `/units`…), and a home page. Static files on Cloudflare; the converters run in the browser.
 
 ← Back to the [README](../../README.md).

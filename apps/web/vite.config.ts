@@ -1,10 +1,10 @@
 // The website build: `npm run web:build` writes apps/web/dist/, served by Cloudflare Workers
 // (wrangler.jsonc). It is the page in src/, plus what sitePages() below writes, each from its
 // module in scripts/:
-//   <slug>.html         one page per converter (src/pages.ts), each with its own title,
+//   <topic>/<name>.html one page per converter (src/pages.ts), each with its own title,
 //                       description and canonical address, so searches land on the converter.
-//                       Cloudflare serves it at /<slug> (no .html, no slash), which is the
-//                       address the canonical tag, sitemap and links use.
+//                       Cloudflare serves it at /<topic>/<name> (no .html, no slash), which is
+//                       the address the canonical tag, sitemap and links use.
 //                       Every page's <body> is drawn at build time (prerender.ts) and its head
 //                       written (head.ts), so the HTML itself has the converter and links, not
 //                       just an empty <main>.
@@ -15,16 +15,17 @@
 //   llms.txt            the site and every converter, for AI assistants (llmstxt.org; llms-txt.ts)
 //   manifest.webmanifest, sw.js, icons        offline.ts: install from the browser and use it offline
 //   og.png              the preview image when a link is shared
-//   _headers, _redirects                      cloudflare.ts: caching rules, and /<slug>.html and
-//                                             /index.html → the canonical address, permanently
+//   _headers, _redirects                      cloudflare.ts: caching rules, and /<slug>.html,
+//                                             /index.html and moved pages' old addresses → the
+//                                             canonical address, permanently
 // app-icon.svg is @uom/brand's (its vite.ts), as in every app. scripts/check-pages.mjs
 // (`npm run web:check`) checks the result as search engines read it. The address it is served
 // from is SITE_URL (scripts/site.ts); its path becomes Vite's base.
 
 import { createHash } from "node:crypto";
 import { createRequire } from "node:module";
-import { copyFileSync, readFileSync, writeFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
 import { defineConfig, type Plugin } from "vite";
 import type { Topic } from "@uom/converters/model";
 import { appIcon, photos } from "@uom/brand/vite";
@@ -64,7 +65,9 @@ function sitePages(): Plugin {
       all.forEach(({ page, kind, leaf, noindex }, i) => {
         const d = drawn[i];
         const html = withHead(shell, page, kind, d, leaf ?? d.name, noindex).replace(BODY, (_, open, __, close) => open + d.body + close);
-        writeFileSync(join(OUT, `${page.slug || "index"}.html`), html);
+        const file = join(OUT, `${page.slug || "index"}.html`);
+        mkdirSync(dirname(file), { recursive: true });
+        writeFileSync(file, html);
       });
 
       writeFileSync(join(OUT, "sitemap.xml"), sitemap(slugs));

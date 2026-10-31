@@ -29,7 +29,8 @@ if (!existsSync(DIST)) {
   process.exit(1);
 }
 
-const files = readdirSync(DIST).filter((f) => f.endsWith(".html"));
+// Pages sit in their topic's folder, so the walk goes down; names use / as addresses do.
+const files = readdirSync(DIST, { recursive: true }).map((f) => f.replaceAll("\\", "/")).filter((f) => f.endsWith(".html"));
 const indexed = new Map(); // canonical address → file
 const titles = new Map();
 const descriptions = new Map();

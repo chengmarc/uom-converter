@@ -8,8 +8,9 @@
   "assets": {
     "directory": "./dist",
     // Unknown addresses get 404.html with a 404 status. HTML handling is left at the default
-    // (auto-trailing-slash): awg-to-mm2.html is served at /awg-to-mm2, and /awg-to-mm2.html and
-    // /awg-to-mm2/ redirect there. dist/_redirects makes the .html redirects permanent (301).
+    // (auto-trailing-slash): units/feet-to-metres.html is served at /units/feet-to-metres, and the
+    // .html and trailing-slash spellings redirect there. dist/_redirects makes the .html redirects
+    // permanent (301), and sends the addresses of pages that have moved to where they are now.
     "not_found_handling": "404-page"
   },
   "routes": [{ "pattern": "uom-converter.com", "custom_domain": true }],

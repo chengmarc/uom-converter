@@ -12,11 +12,14 @@ export const headers = () =>
 /** Pages that have moved, so old links and search results still land. */
 const MOVED: Record<string, string> = { electrical: "power-and-loads" };
 
+/** Converters' addresses from before they moved into their topic's folder: the slug without it. */
+const unfoldered = (slugs: string[]) => Object.fromEntries(slugs.filter((s) => s.includes("/")).map((s) => [s.split("/").at(-1)!, s]));
+
 // Cloudflare already redirects these spellings, but with a 307 (temporary). A 301 tells
 // search engines the extensionless address is the one to keep. 404.html is left out on purpose.
 export const redirects = (slugs: string[]) =>
   [
     `${BASE}index.html ${BASE} 301`,
     ...slugs.map((slug) => `${BASE}${slug}.html ${BASE}${slug} 301`),
-    ...Object.entries(MOVED).flatMap(([from, to]) => [`${BASE}${from} ${BASE}${to} 301`, `${BASE}${from}.html ${BASE}${to} 301`]),
+    ...Object.entries({ ...MOVED, ...unfoldered(slugs) }).flatMap(([from, to]) => [`${BASE}${from} ${BASE}${to} 301`, `${BASE}${from}.html ${BASE}${to} 301`]),
   ].join("\n") + "\n";
