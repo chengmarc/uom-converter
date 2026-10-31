@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./*": "./src/*.ts"
+    "./*": "./src/*.ts",
+    "./visuals.css": "./src/visuals.css"
   },
   "dependencies": {
     "@uom/brand": "*",

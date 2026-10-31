@@ -52,8 +52,8 @@ npm run typecheck
 
 **No page.** Converters run in Node with no DOM, as the tests run them, so every app can use the
 same ones. `@uom/ui`'s `converter.ts` draws them as HTML for all three apps. Diagrams
-(`visual.ts`) and reference tables are described as data for the same reason; each app styles
-them its own way.
+(`visual.ts`) and reference tables are described as data for the same reason: `@uom/ui` draws
+them, and each app frames them its own way.
 
 **Maths in `@uom/core`, everything else here.** Core has the formulas and standards tables, tested
 against published values. A converter adds what a person sees: which fields, which examples, how

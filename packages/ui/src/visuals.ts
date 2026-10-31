@@ -1,6 +1,5 @@
 // Draws a result's diagram (packages/converters/src/visual.ts) as inline SVG. Colours come from CSS
-// classes (in each app's stylesheet), so they follow light and dark mode. Each is a <svg> with a text
-// alternative.
+// classes (visuals.css), so they follow light and dark mode. Each is a <svg> with a text alternative.
 
 import { fmt } from "@uom/converters/format";
 import type { Section, Visual } from "@uom/converters/visual";

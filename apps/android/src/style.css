@@ -11,6 +11,7 @@
    Windows app, there's no navy: the home header is the frame's grey (--sunken), the screens --bg,
    cards and fields --surface, and the blue marks what's chosen. */
 @import "@uom/brand/tokens.css";
+@import "@uom/ui/visuals.css";
 
 :root {
   --font: "Inter Variable", system-ui, Roboto, sans-serif;
@@ -397,32 +398,8 @@ th { font-size: 0.85rem; font-weight: 600; color: var(--muted); }
 tr.cat td { padding-top: 14px; font-size: 0.85rem; font-weight: 650; }
 tr.hit td { background: var(--sunken); color: var(--accent); font-weight: 600; }
 
-/* Diagrams (packages/ui/src/visuals.ts) */
+/* Diagrams (packages/ui/src/visuals.ts, visuals.css) */
 .visual { margin: 0; padding: 12px; background: var(--surface); border-radius: 12px; box-shadow: var(--lifted); }
-.viz { display: block; width: 100%; height: auto; max-height: 11rem; overflow: visible; }
-.viz-text { font: 13px var(--font); fill: var(--muted); }
-.viz-text.strong { font-weight: 700; fill: var(--text); }
-.viz-track { fill: var(--sunken); stroke: var(--line); }
-.viz-fill { fill: var(--accent); }
-.viz-fill.is-good, .viz-span.is-good { fill: var(--good); stroke: var(--good); }
-.viz-fill.is-warn { fill: var(--warn); }
-.viz-fill.is-bad, .viz-span.is-bad { fill: var(--bad); stroke: var(--bad); }
-.viz-span { stroke-width: 4; }
-.viz-mark { stroke: var(--text); stroke-width: 1.5; stroke-dasharray: 3 2; }
-.viz-tick { stroke: var(--muted); stroke-width: 1; }
-.viz-axis { stroke: var(--line); stroke-width: 2; }
-.viz-pointer { stroke-width: 2; }
-.viz-pointer.is-exact { stroke: var(--accent); }
-.viz-pointer.is-near { stroke: var(--warn); stroke-dasharray: 3 2; }
-.viz-wire { stroke-width: 1.5; }
-.viz-wire.is-input { fill: var(--copper); stroke: var(--copper-edge); }
-.viz-wire.is-match { fill: var(--sunken); stroke: var(--accent); }
-.viz-wire.is-other { fill: var(--sunken); stroke: var(--muted); stroke-dasharray: 3 2; }
-.viz-pack { fill: var(--sunken); stroke: var(--muted); stroke-width: 1.5; }
-.viz-pack-used { fill: var(--accent); opacity: 0.85; }
-.viz-hub { fill: var(--surface); stroke: var(--muted); }
-.viz-temp { fill: var(--sunken); stroke: var(--line); }
-.viz-dot { fill: var(--accent); stroke: var(--surface); stroke-width: 2; }
 
 /* ---------- Settings sheet ---------- */
 
