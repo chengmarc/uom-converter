@@ -215,11 +215,11 @@ kbd {
   width: 100%;
   height: 50%;
   object-fit: cover;
-  opacity: 0.3;
+  opacity: 0.36;
   mask-image: linear-gradient(to bottom, transparent, #000 75%);
 }
 @media (prefers-color-scheme: dark) {
-  .backdrop img { opacity: 0.2; }
+  .backdrop img { opacity: 0.24; }
 }
 
 /* Wide windows: fixed frame, and the sidebar and converter scroll on their own. */
