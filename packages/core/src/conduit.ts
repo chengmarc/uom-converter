@@ -41,6 +41,24 @@ export function conduitSize(raw: string): { inch: string; metric: number; typed:
   return hit ? { ...hit, typed: "inch" } : { error: t("Not a standard conduit trade size: {size}", { size: raw }) };
 }
 
+// ---------- European conduit ----------
+
+/** European conduit sizes: the outside diameter in mm (EN 61386), with EN 60423 threads. */
+const EU_CONDUIT_SIZES = [16, 20, 25, 32, 40, 50, 63];
+
+/**
+ * An M size as Europe means it, which is not a North American designator: M16 is 16 mm across,
+ * trade size 16 (1/2") is 21 mm. The clearance hole is typically the thread + 0.5 mm. Undefined
+ * for input that isn't an M size.
+ */
+export function euConduitSize(raw: string): { size: number; holeMm: number } | { error: string } | undefined {
+  const m = /^m\s*(\d+)$/.exec(raw.trim().toLowerCase());
+  if (!m) return undefined;
+  const size = Number(m[1]);
+  if (!EU_CONDUIT_SIZES.includes(size)) return { error: t("No European conduit size M{n}: they run M16, M20, M25, M32, M40, M50, M63", { n: size }) };
+  return { size, holeMm: size + 0.5 };
+}
+
 // ---------- Knockouts ----------
 
 /**

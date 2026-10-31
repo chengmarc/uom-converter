@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ampsToKva, energyUse, kvaToAmps, lineToLine, lineToNeutral, motorSlip, ohmsLaw, pfCorrectionKvar, polesForRpm, syncSpeedRpm, transformerFaultAmps, wyeSystem } from "./electrical";
+import { ampsToKva, energyUse, highLegVolts, kvaToAmps, lineToLine, lineToNeutral, motorSlip, ohmsLaw, pfCorrectionKvar, polesForRpm, readingBand, resistiveAt, supplyRange, syncSpeedRpm, transformerFaultAmps, wyeSystem } from "./electrical";
 
 describe("load", () => {
   it("converts kVA and amps", () => {
@@ -28,6 +28,68 @@ describe("line and neutral voltage", () => {
     expect(wyeSystem(690, "eu")).toEqual([400, 690]);
     expect(wyeSystem(600, "us")).toBeUndefined();
     expect(wyeSystem(600, "ca")).toEqual([347, 600]);
+  });
+
+  it("matches only the side that was measured", () => {
+    expect(wyeSystem(400, "eu", "ln")).toEqual([400, 690]);
+    expect(wyeSystem(400, "eu", "ll")).toEqual([230, 400]);
+    expect(wyeSystem(208, "us", "ln")).toBeUndefined();
+    expect(wyeSystem(120, "us", "ll")).toBeUndefined();
+  });
+});
+
+describe("high-leg delta", () => {
+  it("is 208 V to neutral on a 240 V delta", () => {
+    expect(highLegVolts(240)).toBeCloseTo(207.8, 1);
+  });
+});
+
+describe("supply voltage limits", () => {
+  it("matches published ANSI C84.1 service voltages", () => {
+    const us = (n: number) => supplyRange(n, "us")!;
+    expect(us(120).normal).toEqual([expect.closeTo(114), expect.closeTo(126)]);
+    expect(us(120).extreme).toEqual([expect.closeTo(110), expect.closeTo(127)]);
+    expect(us(240).extreme).toEqual([expect.closeTo(220), expect.closeTo(254)]);
+    expect(us(480).normal).toEqual([expect.closeTo(456), expect.closeTo(504)]);
+    expect(us(480).extreme).toEqual([expect.closeTo(440), expect.closeTo(508)]);
+  });
+
+  it("holds 120/208 V tighter than 120/240 V in Canada, as CSA C235 does", () => {
+    expect(supplyRange(120, "ca")).toEqual({ normal: [112, 125], extreme: [110, 127] });
+    expect(supplyRange(120, "ca", true)).toEqual({ normal: [110, 125], extreme: [106, 127] });
+    expect(supplyRange(240, "ca")).toEqual({ normal: [220, 250], extreme: [212, 254] });
+    expect(supplyRange(208, "ca")).toEqual({ normal: [194, 216], extreme: [190, 220] });
+    expect(supplyRange(600, "ca")).toEqual({ normal: [550, 625], extreme: [530, 635] });
+  });
+
+  it("gives Europe ±10% and no second band", () => {
+    const r = supplyRange(230, "eu")!;
+    expect(r.normal).toEqual([expect.closeTo(207), expect.closeTo(253)]);
+    expect(r.extreme).toEqual(r.normal);
+  });
+
+  it("has no limits for a nominal the region doesn't use", () => {
+    expect(supplyRange(230, "us")).toBeUndefined();
+    expect(supplyRange(480, "ca")).toBeUndefined();
+    expect(supplyRange(120, "eu")).toBeUndefined();
+  });
+
+  it("places a reading in the limits", () => {
+    const r = supplyRange(120, "ca", true)!;
+    expect(readingBand(118, r)).toBe("normal");
+    expect(readingBand(110, r)).toBe("normal");
+    expect(readingBand(108, r)).toBe("extreme");
+    expect(readingBand(104, r)).toBe("outside");
+    expect(readingBand(130, r)).toBe("outside");
+  });
+});
+
+describe("a resistive load on another voltage", () => {
+  it("follows the square of the voltage", () => {
+    const r = resistiveAt(4800, 240, 208);
+    expect(r.watts).toBeCloseTo(3605, 0);
+    expect(r.share).toBeCloseTo(0.751, 3);
+    expect(r.amps).toBeCloseTo(17.33, 2);
   });
 });
 
@@ -62,6 +124,19 @@ describe("transformer fault current", () => {
     const r = transformerFaultAmps(1000, 480, 3, 5.75);
     expect(r.fla).toBeCloseTo(1202.8, 1);
     expect(r.faultAmps).toBeCloseTo(20918, 0);
+  });
+
+  it("takes the impedance tolerance and motors in the worst case", () => {
+    const r = transformerFaultAmps(1000, 480, 3, 5.75);
+    expect(r.worstCase).toBeCloseTo(r.faultAmps / 0.9);
+    const withMotors = transformerFaultAmps(1000, 480, 3, 5.75, 600);
+    expect(withMotors.motorContribution).toBe(2400);
+    expect(withMotors.worstCase).toBeCloseTo(r.worstCase + 2400);
+  });
+
+  it("gives line-to-neutral at a centre-tapped secondary", () => {
+    const r = transformerFaultAmps(50, 240, 1, 2);
+    expect(r.lineToNeutral).toBeCloseTo(r.worstCase * 1.5);
   });
 });
 

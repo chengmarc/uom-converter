@@ -1,5 +1,5 @@
 import { discountToMultiplier, multiplierToDiscount } from "@uom/core/pricing";
-import { amount, fmt, money, moneyAmount, parseNumber, plain, typed } from "./format";
+import { amount, dotDecimal, fmt, money, moneyAmount, parseNumber, plain, typed } from "./format";
 import type { Converter, Example, Row } from "./model";
 import { isNum } from "./checks";
 import { t } from "@uom/i18n";
@@ -46,7 +46,7 @@ export const multiplier: Converter = {
       if (!isNum(n) || n === 0) return { error: "Enter a multiplier like 0.42.", fields: ["value"] };
       m = n;
     } else {
-      const r = discountToMultiplier(raw);
+      const r = discountToMultiplier(dotDecimal(raw));
       if (typeof r !== "number") return { error: t("{error}.", { error: r.error }), fields: ["value"] };
       m = r;
     }
@@ -61,7 +61,7 @@ export const multiplier: Converter = {
     if (!isMult && raw.includes("/")) rows.push({ label: "Same as a single discount of", ...amount(discount, 2, "%") });
     if (list !== undefined) rows.push({ label: "Off list", ...moneyAmount(list - list * m) });
 
-    const parts = isMult ? [] : raw.split("/").map((p) => 1 - Number(p.replace("%", "")) / 100);
+    const parts = isMult ? [] : dotDecimal(raw).split("/").map((p) => 1 - Number(p.replace("%", "")) / 100);
     return {
       heading: isMult
         ? list !== undefined ? t("Multiplier {value} on {price} list", { value: fmt(m, 4), price: money(list) }) : t("Multiplier {value}", { value: fmt(m, 4) })

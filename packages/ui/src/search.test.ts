@@ -29,6 +29,6 @@ describe("search", () => {
 
   it("lists the audience's converters first, in the audience's order", () => {
     // Wire price comes first in Everything, but isn't on the electrician's list.
-    expect(ids("wire", electrician).slice(0, 5)).toEqual(["awg", "mm2", "conduit", "reels", "wire-price"]);
+    expect(ids("wire", electrician).slice(0, 6)).toEqual(["awg", "mm2", "conduit", "box-fill", "reels", "wire-price"]);
   });
 });

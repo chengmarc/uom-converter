@@ -32,13 +32,70 @@ const WYE_SYSTEMS: { ln: number; ll: number; regions: Region[] }[] = [
 
 /**
  * The standard wye system a voltage belongs to, within 2% (208 / √3 = 120.09). With a region,
- * only that region's systems count, so 400 V reads as 230/400 in Europe.
+ * only that region's systems count, so 400 V reads as 230/400 in Europe. With a side, the voltage
+ * must be that side of the system: 400 V line-to-neutral is 400/690, not 230/400.
  */
-export function wyeSystem(volts: number, region?: Region): [number, number] | undefined {
+export function wyeSystem(volts: number, region?: Region, side?: "ll" | "ln"): [number, number] | undefined {
   const hit = WYE_SYSTEMS.filter((s) => !region || s.regions.includes(region)).find((s) =>
-    [s.ln, s.ll].some((v) => Math.abs(volts / v - 1) <= 0.02),
+    (side ? [s[side]] : [s.ln, s.ll]).some((v) => Math.abs(volts / v - 1) <= 0.02),
   );
   return hit && [hit.ln, hit.ll];
+}
+
+/**
+ * A centre-tapped delta (120/240 V): each leg of the tapped side is half the line-to-line voltage
+ * from neutral, and the third, the high leg, is √3 ÷ 2 of it, 208 V on a 240 V delta.
+ */
+export const highLegVolts = (lineToLine: number) => (lineToLine * Math.sqrt(3)) / 2;
+
+// ---------- Supply voltage limits ----------
+
+type Limits = [low: number, high: number];
+
+/** Limits for a nominal voltage: within `normal` needs no action, within `extreme` should be corrected. */
+interface SupplyRange {
+  normal: Limits;
+  extreme: Limits;
+}
+
+const of = (nominal: number, low: number, high: number): Limits => [nominal * low, nominal * high];
+
+/** CSA CAN3-C235-83 at the service entrance, by system: 120/208 V is held tighter than 120/240 V. */
+const CA_120_240: Record<number, SupplyRange> = {
+  120: { normal: [110, 125], extreme: [106, 127] },
+  240: { normal: [220, 250], extreme: [212, 254] },
+};
+const CA_RANGES: Record<number, SupplyRange> = {
+  ...CA_120_240,
+  120: { normal: [112, 125], extreme: [110, 127] },
+  208: { normal: [194, 216], extreme: [190, 220] },
+  347: { normal: [318, 360], extreme: [306, 367] },
+  600: { normal: [550, 625], extreme: [530, 635] },
+};
+
+/** ANSI C84.1 service voltages, which are the same fractions at every nominal: Range A, then B. */
+const US_NOMINALS = [120, 208, 240, 277, 480, 600];
+const usRange = (nominal: number): SupplyRange => ({ normal: of(nominal, 0.95, 1.05), extreme: of(nominal, 110 / 120, 127 / 120) });
+
+/** EN 50160: ±10% at the supply terminals, with no second band. */
+const EU_NOMINALS = [230, 400];
+const euRange = (nominal: number): SupplyRange => ({ normal: of(nominal, 0.9, 1.1), extreme: of(nominal, 0.9, 1.1) });
+
+/**
+ * The supply limits for a nominal voltage, at the service. `splitPhase` is a single-phase 120/240 V
+ * supply, where 120 V is that system and not the 120 V leg of a 120/208 V wye. Undefined for a
+ * nominal the region doesn't list.
+ */
+export function supplyRange(nominal: number, region: Region, splitPhase = false): SupplyRange | undefined {
+  if (region === "ca") return (splitPhase ? CA_120_240 : CA_RANGES)[nominal];
+  if (region === "us") return US_NOMINALS.includes(nominal) ? usRange(nominal) : undefined;
+  return EU_NOMINALS.includes(nominal) ? euRange(nominal) : undefined;
+}
+
+/** Where a reading falls in those limits. */
+export function readingBand(reading: number, range: SupplyRange): "normal" | "extreme" | "outside" {
+  const within = ([low, high]: Limits) => reading >= low && reading <= high;
+  return within(range.normal) ? "normal" : within(range.extreme) ? "extreme" : "outside";
 }
 
 // ---------- Ohm's law ----------
@@ -61,6 +118,15 @@ export function ohmsLaw(known: Partial<Electrical>): Electrical | { error: strin
   if (I !== undefined && R !== undefined) return { volts: I * R, amps: I, ohms: R, watts: I * I * R };
   if (I !== undefined && P !== undefined) return { volts: P / I, amps: I, ohms: P / (I * I), watts: P };
   return { volts: Math.sqrt(P! * R!), amps: Math.sqrt(P! / R!), ohms: R!, watts: P! };
+}
+
+/**
+ * A resistive load off its rated voltage: resistance holds, so power follows the square of the
+ * voltage. A 240 V heater on 208 V gives 75% of its rating.
+ */
+export function resistiveAt(ratedWatts: number, ratedVolts: number, volts: number) {
+  const watts = ratedWatts * (volts / ratedVolts) ** 2;
+  return { watts, amps: watts / volts, share: watts / ratedWatts };
 }
 
 // ---------- Energy cost ----------
@@ -95,11 +161,22 @@ export function polesForRpm(hz: number, ratedRpm: number): number | undefined {
 
 // ---------- Transformer fault current ----------
 
+/** Real impedance can sit this far under the nameplate: ±10% is the UL 1561 tolerance from 25 kVA up. */
+const Z_TOLERANCE = 0.9;
+/** Running motors feed a fault: 4 × their full-load amps is the usual estimate (4 to 6 is accepted). */
+const MOTOR_CONTRIBUTION = 4;
+/** A centre-tapped single-phase secondary: line-to-neutral at the terminals, against line-to-line. */
+const CENTRE_TAP_LN = 1.5;
+
 /**
- * Maximum symmetrical fault current at a transformer's secondary, assuming an infinite source
- * (utility impedance zero): full-load amps ÷ per-unit impedance. A worst case, not a study.
+ * Symmetrical fault current at a transformer's secondary, assuming an infinite source (utility
+ * impedance zero): full-load amps ÷ per-unit impedance. `worstCase` also takes the impedance
+ * tolerance and any motor contribution, and is what to hold interrupting ratings against.
  */
-export function transformerFaultAmps(kva: number, volts: number, phase: Phase, impedancePercent: number) {
+export function transformerFaultAmps(kva: number, volts: number, phase: Phase, impedancePercent: number, motorAmps = 0) {
   const fla = kvaToAmps(kva, volts, phase);
-  return { fla, faultAmps: fla / (impedancePercent / 100) };
+  const faultAmps = fla / (impedancePercent / 100);
+  const atTolerance = faultAmps / Z_TOLERANCE;
+  const motorContribution = motorAmps * MOTOR_CONTRIBUTION;
+  return { fla, faultAmps, motorContribution, worstCase: atTolerance + motorContribution, lineToNeutral: atTolerance * CENTRE_TAP_LN + motorContribution };
 }

@@ -37,6 +37,32 @@ describe("UOM codes", () => {
     expect(lookupUom("nothing")).toBeUndefined();
     expect(lookupUom("")).toBeUndefined();
   });
+
+  it("reads a symbol as written before a code: lm is lumen, LM is linear metre", () => {
+    expect(lookupUom("lm")?.code).toBe("LUM");
+    expect(lookupUom("LM")?.code).toBe("LM");
+    expect(lookupUom("lx")?.code).toBe("LUX");
+  });
+
+  it("has the electrical units product data uses", () => {
+    expect(lookupUom("VA")?.code).toBe("D46");
+    expect(lookupUom("kA")?.code).toBe("B22");
+    expect(lookupUom("kAIC")?.code).toBe("B22");
+    expect(lookupUom("mV")?.code).toBe("2Z");
+    expect(lookupUom("MW")?.code).toBe("MAW");
+    expect(lookupUom("MWh")?.code).toBe("MWH");
+    expect(lookupUom("K")?.code).toBe("KEL");
+    expect(lookupUom("cd")?.code).toBe("CDL");
+  });
+
+  it("won't read a prefix in the wrong case as a factor of a million out", () => {
+    expect(lookupUom("MV")).toBeUndefined();
+    expect(lookupUom("mw")).toBeUndefined();
+  });
+
+  it("warns that a wire spec's mil isn't the code MIL", () => {
+    expect(lookupUom("mil")).toMatchObject({ code: "MIL", note: expect.stringContaining("0.001 inch") });
+  });
 });
 
 describe("toMetric", () => {
@@ -74,6 +100,28 @@ describe("toMetric", () => {
     expect(metric("2.5 cm")).toMatchObject({ value: 25, unit: "mm" });
     expect(metric("2.5 mm2")).toMatchObject({ value: 2.5, unit: "mm²" });
     expect(metric("90 °C")).toMatchObject({ value: 90, unit: "°C" });
+  });
+
+  it("passes electrical ratings through", () => {
+    expect(metric("600 V")).toMatchObject({ value: 600, unit: "V", code: "VLT" });
+    expect(metric("2 kV")).toMatchObject({ value: 2000, unit: "V", code: "VLT" });
+    expect(metric("20 A")).toMatchObject({ value: 20, unit: "A", code: "AMP" });
+    expect(metric("30 mA")).toMatchObject({ value: 30, unit: "mA", code: "4K" });
+    expect(metric("22 kA")).toMatchObject({ value: 22, unit: "kA", code: "B22" });
+    expect(metric("60 Hz")).toMatchObject({ value: 60, unit: "Hz", code: "HTZ" });
+    expect(metric("75 kVA")).toMatchObject({ value: 75, unit: "kV·A", code: "KVA" });
+    expect(metric("3000 K")).toMatchObject({ value: 3000, unit: "K", code: "KEL" });
+    expect(metric("800 lm")).toMatchObject({ value: 800, unit: "lm", code: "LUM" });
+  });
+
+  it("converts mils and M feet", () => {
+    expect(metric("45 mil").value).toBeCloseTo(1.143, 3);
+    expect(metric("2 MFT").value).toBeCloseTo(609.6, 1);
+  });
+
+  it("won't guess at a bare upper-case M", () => {
+    expect(toMetric("10 M")).toHaveProperty("error");
+    expect(metric("10 m")).toMatchObject({ value: 10, unit: "m" });
   });
 
   it("refuses what it can't read", () => {

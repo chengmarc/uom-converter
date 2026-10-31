@@ -1,7 +1,7 @@
 // Distributor pricing: E/C/M price units, price per length, discounts, margin, packs and
 // price quantities.
 
-import { M_PER_FT } from "./units";
+import { FT_PER_M, LB_PER_KG, M_PER_FT } from "./units";
 import { t } from "@uom/i18n";
 
 // ---------- Pricing units of measure ----------
@@ -18,14 +18,30 @@ export function convertPrice(price: number, from: PriceUom, to: PriceUom): numbe
 }
 
 /**
- * Compare two prices for the same item (e.g. supplier file vs. your system).
- * If one is ~10x, ~100x, or ~1000x the other, it's almost always a UOM mix-up
- * (a per-C price loaded as per-each, and so on). Returns the suspected factor.
+ * Ratios that mean a UOM mix-up, closest-packed first so 12 is tried before 10. Powers of ten get a
+ * wide band, since two sources' prices can also differ for real; the rest would catch ordinary
+ * price gaps if they were as wide.
+ */
+const MIX_UPS = [
+  { factor: LB_PER_KG, tolerance: 0.05 },
+  { factor: FT_PER_M, tolerance: 0.05 },
+  { factor: 12, tolerance: 0.05 },
+  { factor: 25, tolerance: 0.05 },
+  { factor: 50, tolerance: 0.05 },
+  { factor: 10, tolerance: 0.15 },
+  { factor: 100, tolerance: 0.15 },
+  { factor: 1000, tolerance: 0.15 },
+];
+
+/**
+ * Compare two prices for the same item (e.g. supplier file vs. your system). If their ratio is
+ * near one of MIX_UPS, it's probably a UOM mix-up (a per-C price loaded as per-each, per foot
+ * against per metre, and so on). Returns the suspected factor.
  */
 export function suspectUomMismatch(a: number, b: number): number | undefined {
   if (a <= 0 || b <= 0) return undefined;
   const ratio = Math.max(a, b) / Math.min(a, b);
-  return [10, 100, 1000].find((f) => Math.abs(ratio / f - 1) <= 0.05);
+  return MIX_UPS.find((m) => Math.abs(ratio / m.factor - 1) <= m.tolerance)?.factor;
 }
 
 // ---------- Price per length ----------
@@ -75,6 +91,20 @@ export function unitsToOrder(needed: number, perUnit: number): { units: number; 
   const units = needed <= 0 ? 0 : Math.ceil(needed / perUnit - 1e-9);
   const total = units * perUnit;
   return { units, total, over: total - needed };
+}
+
+/**
+ * Coils or reels for a set of pulls. A pull can't be spliced, so each one has to come whole from
+ * a single reel: three 300 ft pulls need three 500 ft spools, not two. Undefined when one pull
+ * doesn't fit on a reel at all.
+ */
+export function reelsForPulls(pull: number, pulls: number, reel: number) {
+  const perReel = Math.floor(reel / pull + 1e-9);
+  if (perReel === 0) return undefined;
+  const units = Math.ceil(pulls / perReel);
+  const total = pull * pulls;
+  const onLast = pulls - (units - 1) * perReel;
+  return { units, perReel, total, over: units * reel - total, lastUsed: (onLast * pull) / reel };
 }
 
 // ---------- Price quantity ----------

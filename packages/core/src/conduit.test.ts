@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CONDUIT_TRADE_SIZES, conduitSize, KNOCKOUT_PUNCH_IN } from "./conduit";
+import { CONDUIT_TRADE_SIZES, conduitSize, euConduitSize, KNOCKOUT_PUNCH_IN } from "./conduit";
 
 describe("conduit trade sizes", () => {
   it("converts both ways, however it's written", () => {
@@ -17,6 +17,19 @@ describe("conduit trade sizes", () => {
   it("rejects non-standard sizes", () => {
     expect(conduitSize("7")).toHaveProperty("error");
     expect(conduitSize("30")).toHaveProperty("error");
+  });
+});
+
+describe("European conduit", () => {
+  it("reads M sizes as outside diameters, with the typical clearance hole", () => {
+    expect(euConduitSize("M32")).toEqual({ size: 32, holeMm: 32.5 });
+    expect(euConduitSize("m 20")).toEqual({ size: 20, holeMm: 20.5 });
+  });
+
+  it("refuses M sizes Europe doesn't have, and leaves other input alone", () => {
+    expect(euConduitSize("M35")).toHaveProperty("error");
+    expect(euConduitSize('1-1/4"')).toBeUndefined();
+    expect(euConduitSize("16")).toBeUndefined();
   });
 });
 

@@ -8,6 +8,7 @@ import { reels } from "./reels";
 import { awg } from "./awg";
 import { mm2 } from "./mm2";
 import { conduit } from "./conduit";
+import { boxFillConverter } from "./box-fill";
 import { load } from "./load";
 import { vdrop } from "./vdrop";
 import { pf } from "./pf";
@@ -24,7 +25,6 @@ import { light } from "./light";
 import { torque } from "./torque";
 import { weight } from "./weight";
 import { metal } from "./metal";
-import { volume } from "./volume";
 import { uomCodes } from "./uom-codes";
 import { metricSpec } from "./metric";
 import { priceQty } from "./price-qty";
@@ -42,6 +42,7 @@ export const TOOLS: Converter[] = [
   awg,
   mm2,
   conduit,
+  boxFillConverter,
   load,
   vdrop,
   pf,
@@ -58,7 +59,6 @@ export const TOOLS: Converter[] = [
   torque,
   weight,
   metal,
-  volume,
   uomCodes,
   metricSpec,
   priceQty,

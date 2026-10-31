@@ -6,8 +6,9 @@ export const length = unitConverter({
   counterpart: { ft: "m", m: "ft", in: "mm", mm: "in" },
   topic: "Units",
   title: "Length",
-  blurb: "Feet, metres, inches and millimetres.",
+  blurb: "Feet, metres, inches and millimetres, and feet and inches as plans write them: 12'-6\".",
   defaultUnit: { eu: "m" },
+  feetInches: "ft",
   examples: (v) => (v.region === "eu" ? [[100, "m"], [25, "mm"], [1000, "ft"]] : [[1000, "ft"], [12, "in"], [50, "m"]]),
   units: [
     linear("ft", "Feet", "ft", FT_PER_M),

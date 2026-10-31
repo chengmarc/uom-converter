@@ -1,6 +1,7 @@
-import { conductorInfo, conductorOhmsPerKm, METRIC_SIZES_MM2, NA_BUILDING_SIZES, smallestSizeForDrop, voltageDrop } from "@uom/core/conductors";
+import { buildingSizesFor, conductorImpedance, conductorInfo, METRIC_SIZES_MM2, metricSizesFor, NA_WIRE_SIZES, type Raceway, smallestSizeForDrop, voltageDrop } from "@uom/core/conductors";
 import type { Region } from "@uom/core/region";
 import { ftToM } from "@uom/core/units";
+import { regionInfo } from "./regions";
 import { amount, fmt, parseNumber, typed } from "./format";
 import { byRegion, type Converter, type RegionExamples, type Status, type Values } from "./model";
 import { gauge } from "./visual";
@@ -11,13 +12,16 @@ import { t } from "@uom/i18n";
 
 const vdropNote = (region: Region) =>
   region === "us"
-    ? t("An estimate from DC resistance that ignores reactance, so it reads a little low for large conductors. NEC informational notes suggest at most 3% for a branch circuit or feeder and 5% overall.")
+    ? t("NEC informational notes suggest at most 3% for a branch circuit or feeder and 5% overall.")
     : region === "ca"
-      ? t("An estimate from DC resistance that ignores reactance, so it reads a little low for large conductors. CEC Rule 8-102 allows 3% in a feeder or branch circuit and 5% overall, from the supply side of the service to the load.")
-      : t("An estimate from DC resistance that ignores reactance, so it reads a little low for large conductors. IEC 60364-5-52 (Annex G) recommends at most 3% for lighting and 5% for other uses when fed from the public low-voltage network; national rules may differ.");
+      ? t("CEC Rule 8-102 limits a feeder or branch circuit to 3% and the total to 5%, from the supply side of the service to the load. It works from the connected load, or 80% of the overcurrent device if that isn't known.")
+      : t("IEC 60364-5-52 (Annex G) recommends at most 3% for lighting and 5% for other uses when fed from the public low-voltage network; national rules may differ.");
 
 const sizeSystem = (v: Values) => v.str("sys") as "na" | "mm2";
 const lengthUnit = (v: Values) => v.str("lenUnit") as "ft" | "m";
+
+/** The most a single circuit should drop: a limit in Canada, a suggestion elsewhere. */
+const dropLimit = (region: Region, target: number) => (region === "ca" ? 3 : Math.max(5, target));
 
 export const vdrop: Converter = {
   id: "vdrop",
@@ -47,10 +51,10 @@ export const vdrop: Converter = {
       id: "size",
       label: (v) => (sizeSystem(v) === "mm2" ? "Wire size (mm²)" : "Wire size (AWG / kcmil)"),
       placeholder: (v) => (sizeSystem(v) === "mm2" ? typed(2.5) : "12, 1/0, 250 kcmil"),
-      list: (v) => (sizeSystem(v) === "mm2" ? METRIC_SIZES_MM2.map((m) => typed(m)) : NA_BUILDING_SIZES.map((s) => s.label)),
+      list: (v) => (sizeSystem(v) === "mm2" ? METRIC_SIZES_MM2.map((m) => typed(m)) : NA_WIRE_SIZES.map((s) => s.label)),
     },
     { kind: "number", id: "len", label: "One-way length of the run", suffix: lengthUnit, placeholder: "100" },
-    { kind: "number", id: "amps", label: "Load current", suffix: "A", placeholder: "16" },
+    { kind: "number", id: "amps", label: (v) => (v.region === "ca" ? "Load current (connected load, or 80% of the breaker)" : "Load current"), suffix: "A", placeholder: "16" },
     voltsField("Supply voltage", "branchVolts"),
     phaseField("1"),
     {
@@ -76,6 +80,19 @@ export const vdrop: Converter = {
       ],
     },
     { ...metalField, label: "Conductor metal" },
+    {
+      kind: "choice",
+      id: "raceway",
+      label: "Run in",
+      advanced: true,
+      value: (v) => (v.region === "eu" ? "nonmetallic" : "steel"),
+      options: [
+        { value: "steel", label: "Steel conduit" },
+        { value: "nonmetallic", label: "PVC conduit or cable" },
+      ],
+    },
+    { kind: "number", id: "pf", label: "Load power factor (blank for the worst case)", placeholder: () => typed(0.85), optional: true, advanced: true },
+    { kind: "number", id: "sets", label: "Parallel sets", value: "1", advanced: true },
     { kind: "number", id: "target", label: "Target drop", suffix: "%", value: "3", advanced: true },
   ],
   compute(v) {
@@ -85,13 +102,17 @@ export const vdrop: Converter = {
     const amps = v.num("amps");
     const volts = v.num("volts");
     const target = v.num("target");
+    const pf = v.num("pf");
+    const sets = v.num("sets");
     const bad = invalid([
       ["len", Number.isNaN(len) || len === 0],
       ["amps", Number.isNaN(amps) || amps === 0],
       ["volts", !isNum(volts) || volts === 0],
       ["target", !isNum(target) || target <= 0 || target >= 100],
+      ["pf", Number.isNaN(pf) || (isNum(pf) && (pf <= 0 || pf > 1))],
+      ["sets", !isNum(sets) || sets < 1 || !Number.isInteger(sets)],
     ]);
-    if (bad.length) return { error: "Enter numbers above 0; the target is a percentage.", fields: bad };
+    if (bad.length) return { error: "Enter numbers above 0; the target is a percentage, power factor at most 1, parallel sets a whole number.", fields: bad };
     if (raw === "" || len === undefined || amps === undefined) return undefined;
 
     let areaMm2: number;
@@ -112,22 +133,24 @@ export const vdrop: Converter = {
     const unit = lengthUnit(v);
     const lengthM = unit === "ft" ? ftToM(len) : len;
     const phase = readPhase(v);
-    const run = { metal, lengthM, amps, volts: volts!, phase };
+    const setup = { metal, system: sys === "na" ? ("na" as const) : ("iec" as const), raceway: v.str("raceway") as Raceway, hz: regionInfo(v.region).hz };
+    const run = { ...setup, pf, sets: sets!, lengthM, amps, volts: volts!, phase };
     const d = voltageDrop({ ...run, areaMm2 });
-    const ohmsKm = conductorOhmsPerKm(areaMm2, metal);
+    const { r, x } = conductorImpedance({ ...setup, areaMm2 });
     const fit =
       sys === "na"
-        ? smallestSizeForDrop(NA_BUILDING_SIZES, (s) => s.areaMm2, target!, run)
-        : smallestSizeForDrop(METRIC_SIZES_MM2, (m) => m, target!, run);
+        ? smallestSizeForDrop(buildingSizesFor(metal), (s) => s.areaMm2, target!, run)
+        : smallestSizeForDrop(metricSizesFor(metal), (m) => m, target!, run);
     const fitLabel =
       fit === undefined
-        ? sys === "na" ? t("Over 1000 kcmil") : t("Over 1000 mm²")
+        ? sys === "na" ? t("Over 2000 kcmil") : t("Over 1000 mm²")
         : typeof fit === "number" ? `${fmt(fit, 2)} mm²` : fit.label;
-    const limit = Math.max(5, target!);
-    const status: Status = d.percent <= target! ? "good" : d.percent <= limit ? "warn" : "bad";
+    const limit = dropLimit(v.region, target!);
+    const status: Status = d.percent <= Math.min(target!, limit) ? "good" : d.percent <= limit ? "warn" : "bad";
     const pct = fmt(target!, 2);
     const verdict = status === "good" ? t("within your {pct}% target", { pct }) : status === "warn" ? t("over your {pct}% target", { pct }) : t("over {pct}%", { pct: fmt(limit, 2) });
-    const h = { size: label, len: fmt(len, 2), unit, amps: fmt(amps, 2), volts: fmt(volts!, 1), phase: phaseName(phase) };
+    const h = { size: sets === 1 ? label : t("{sets} × {size}", { sets: fmt(sets!, 0), size: label }), len: fmt(len, 2), unit, amps: fmt(amps, 2), volts: fmt(volts!, 1), phase: phaseName(phase) };
+    const perKft = (n: number) => fmt(n * 0.3048, 4);
 
     return {
       heading: metal === "Cu" ? t("{size} copper, {len} {unit}, {amps} A at {volts} V {phase}", h) : t("{size} aluminum, {len} {unit}, {amps} A at {volts} V {phase}", h),
@@ -136,10 +159,10 @@ export const vdrop: Converter = {
         { label: "Drop in volts", ...amount(d.volts, 2, " V") },
         { label: "Voltage at the load", ...amount(d.atLoad, 1, " V") },
         {
-          label: "Smallest size for your target",
-          detail: t("keeps the drop at or under {pct}%", { pct }),
+          label: "Smallest size for voltage drop only",
+          detail: fit === undefined ? "add parallel sets, or shorten the run" : t("not an ampacity check: confirm it's rated for {amps} A", { amps: fmt(amps, 2) }),
           value: fitLabel,
-          status: fit === undefined ? "warn" : undefined,
+          status: "warn",
         },
       ],
       visual: gauge({
@@ -152,10 +175,12 @@ export const vdrop: Converter = {
         ],
       }),
       formula: [
-        phase === 3 ? "Three-phase: drop = √3 × amps × resistance per metre × one-way length." : "Single-phase: drop = 2 × amps × resistance per metre × one-way length.",
-        unit === "ft" ? t("Resistance: {r} Ω per 1,000 ft for this conductor, DC at 75 °C.", { r: fmt(ohmsKm * 0.3048, 4) }) : t("Resistance: {r} Ω/km for this conductor, DC at 75 °C.", { r: fmt(ohmsKm, 4) }),
-        "From resistivity: copper 1/58 Ω·mm²/m, aluminum 0.028264 Ω·mm²/m at 20 °C, rising 0.393% (Cu) or 0.403% (Al) per °C.",
-        "Checked against NEC Chapter 9 Table 8: 12 AWG solid copper = 1.93 Ω per 1,000 ft.",
+        phase === 3 ? "Three-phase: drop = √3 × amps × Z × one-way length ÷ parallel sets." : "Single-phase: drop = 2 × amps × Z × one-way length ÷ parallel sets.",
+        pf === undefined ? "Z = √(R² + X²), the most any power factor could give." : "Z = R × PF + X × sin φ, where φ = arccos(PF).",
+        unit === "ft" ? t("R = {r}, X = {x} Ω per 1,000 ft, AC at 75 °C.", { r: perKft(r), x: perKft(x) }) : t("R = {r}, X = {x} Ω/km, AC at 75 °C.", { r: fmt(r, 4), x: fmt(x, 4) }),
+        sys === "na"
+          ? "R and X from NEC Chapter 9 Tables 8 and 9: stranded, three conductors in one conduit. Past 500 kcmil, reactance sets a floor that a bigger wire can't get under."
+          : "R from the IEC 60228 class 2 limit at 20 °C, corrected to 75 °C. X from NEC Chapter 9 Table 9 at the same area, scaled to the frequency.",
       ],
     };
   },

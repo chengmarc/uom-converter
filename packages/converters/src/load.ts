@@ -16,23 +16,23 @@ export const load: Converter = {
   topic: "Electrical",
   title: "kVA · kW · amps",
   blurb: "Transformer, generator and UPS sizing. Three-phase uses line-to-line volts.",
-  empty: "Enter a value in kVA, kW or amps.",
+  empty: "Enter a value in kVA, kW or amps. From kW, also enter the power factor.",
   note: "Not for motors: motor full-load amps come from the code tables, not this formula.",
   examples: byRegion((): RegionExamples => ({
     us: [
       { label: "75 kVA at 208 V, 3-phase", set: { value: "75", unit: "kVA", volts: "208", phase: "3" } },
       { label: "100 A at 480 V, 3-phase", set: { value: "100", unit: "A", volts: "480", phase: "3" } },
-      { label: "10 kW at 240 V, 1-phase", set: { value: "10", unit: "kW", volts: "240", phase: "1" } },
+      { label: "10 kW at 240 V, 1-phase", set: { value: "10", unit: "kW", volts: "240", phase: "1", pf: "1" } },
     ],
     ca: [
       { label: "45 kVA at 600 V, 3-phase", set: { value: "45", unit: "kVA", volts: "600", phase: "3" } },
       { label: "100 A at 600 V, 3-phase", set: { value: "100", unit: "A", volts: "600", phase: "3" } },
-      { label: "10 kW at 240 V, 1-phase", set: { value: "10", unit: "kW", volts: "240", phase: "1" } },
+      { label: "10 kW at 240 V, 1-phase", set: { value: "10", unit: "kW", volts: "240", phase: "1", pf: "1" } },
     ],
     eu: [
       { label: "100 kVA at 400 V, 3-phase", set: { value: "100", unit: "kVA", volts: "400", phase: "3" } },
       { label: "32 A at 400 V, 3-phase", set: { value: "32", unit: "A", volts: "400", phase: "3" } },
-      { label: t("{kw} kW at 230 V, 1-phase", { kw: fmt(7.4, 1) }), set: { value: typed(7.4), unit: "kW", volts: "230", phase: "1" } },
+      { label: t("{kw} kW at 230 V, 1-phase", { kw: fmt(7.4, 1) }), set: { value: typed(7.4), unit: "kW", volts: "230", phase: "1", pf: "1" } },
     ],
   })),
   fields: [
@@ -40,7 +40,7 @@ export const load: Converter = {
     { kind: "choice", id: "unit", label: "Unit", options: LOAD_UNITS },
     voltsField("Volts"),
     phaseField("3"),
-    { kind: "number", id: "pf", label: "Power factor", value: typed(1), advanced: true },
+    { kind: "number", id: "pf", label: "Power factor", placeholder: () => typed(0.8), optional: true },
   ],
   compute(v) {
     const n = v.num("value");
@@ -49,22 +49,23 @@ export const load: Converter = {
     const bad = invalid([
       ["value", Number.isNaN(n)],
       ["volts", !isNum(volts) || volts === 0],
-      ["pf", !isNum(pf) || pf <= 0 || pf > 1],
+      ["pf", Number.isNaN(pf) || (isNum(pf) && (pf <= 0 || pf > 1))],
     ]);
     if (bad.length) return { error: "Enter numbers; volts more than 0, power factor between 0 and 1.", fields: bad };
-    if (n === undefined) return undefined;
     const unit = v.str("unit");
+    // kW says nothing about current without a power factor, and assuming 1 would read low.
+    if (n === undefined || (unit === "kW" && pf === undefined)) return undefined;
     const phase = readPhase(v);
     const kva = unit === "kVA" ? n : unit === "kW" ? n / pf! : ampsToKva(n, volts!, phase);
     const values: Record<string, [number, string]> = {
       kVA: [kva, `${fmt(kva, 2)} kVA`],
-      kW: [kva * pf!, `${fmt(kva * pf!, 2)} kW`],
       A: [kvaToAmps(kva, volts!, phase), `${fmt(kvaToAmps(kva, volts!, phase), 1)} A`],
     };
+    if (pf !== undefined) values.kW = [kva * pf, `${fmt(kva * pf, 2)} kW`];
     // Amps is what people usually want, so it leads unless it's what they typed.
-    const order = unit === "A" ? ["kVA", "kW"] : ["A", ...(unit === "kVA" ? ["kW"] : ["kVA"])];
+    const order = (unit === "A" ? ["kVA", "kW"] : ["A", ...(unit === "kVA" ? ["kW"] : ["kVA"])]).filter((k) => k in values);
     return {
-      heading: t("{load} at {volts} V {phase}", { load: values[unit][1], volts: fmt(volts!, 1), phase: phaseName(phase) }) + (pf !== 1 ? t(", PF {pf}", { pf: fmt(pf!, 2) }) : ""),
+      heading: t("{load} at {volts} V {phase}", { load: values[unit][1], volts: fmt(volts!, 1), phase: phaseName(phase) }) + (pf !== undefined ? t(", PF {pf}", { pf: fmt(pf, 2) }) : ""),
       rows: order.map((k) => ({ label: LOAD_UNITS.find((u) => u.value === k)!.name, value: values[k][1], copy: plain(values[k][0], 2) })),
       formula: ["Single-phase: amps = kVA × 1,000 ÷ volts.", "Three-phase: amps = kVA × 1,000 ÷ (√3 × line-to-line volts).", "kW = kVA × power factor."],
     };

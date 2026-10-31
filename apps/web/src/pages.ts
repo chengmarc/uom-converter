@@ -141,10 +141,11 @@ export const PAGES: Record<string, Page> = {
     title: "Copper and Aluminum Price per lb to per kg",
     description: "Convert copper and aluminum prices per pound to per kilogram and back, for metal surcharges on wire and cable.",
   },
-  volume: {
+  // The address predates the calculator; it stays so links to it keep working.
+  "box-fill": {
     slug: "box-fill-cubic-inches-to-ml",
-    title: "Box Fill Volume: Cubic Inches to mL",
-    description: "Convert box fill volume between cubic inches (NEC) and millilitres (CEC).",
+    title: "Box Fill Calculator: NEC and CEC",
+    description: "Check that wires and devices fit a box, or find the box volume they need, by NEC Table 314.16(B) or CEC Table 22, in cubic inches or mL.",
   },
   "uom-codes": {
     slug: "uom-codes-un-ece",
@@ -223,10 +224,10 @@ export const TOPIC_PAGES: Record<Topic, TopicPage> = {
     photo: "Hand tools hung on a pegboard: wrenches, pliers and screwdrivers.",
     title: "Unit Converters: Length, Torque, Power, Temperature",
     description:
-      "Unit converters for the electrical trade: feet to metres, inch fractions to mm, °C to °F, hp to kW, foot-candles to lux, torque, weight and box fill.",
+      "Unit converters for the electrical trade: feet to metres, inch fractions to mm, °C to °F, hp to kW, foot-candles to lux, torque and weight.",
     heading: "Unit converters",
     intro:
-      "Conversions between US customary and metric units, with the values the trade uses: 60, 75 and 90 °C insulation ratings, lug and breaker torque, box fill in cubic inches (NEC) or millilitres (CEC), and copper and aluminum prices per pound or kilogram. Most have a table of common values.",
+      "Conversions between US customary and metric units, with the values the trade uses: 60, 75 and 90 °C insulation ratings, lug and breaker torque, and copper and aluminum prices per pound or kilogram. Most have a table of common values.",
   },
   "Product data": {
     slug: "product-data",

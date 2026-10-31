@@ -10,7 +10,7 @@ interface RegionInfo {
   hz: 50 | 60;
   /** Voltages offered in voltage fields, most common first. */
   volts: string[];
-  /** Default voltage for load, fault-current and voltage-drop fields. */
+  /** Default voltage for load and fault-current fields. */
   loadVolts: string;
   /** Default for branch-circuit fields (voltage drop). */
   branchVolts: string;

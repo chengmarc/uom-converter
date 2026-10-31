@@ -5,13 +5,16 @@ import { byRegion, type Converter, type RegionExamples, type Row } from "./model
 import { isNum, invalid } from "./checks";
 import { t } from "@uom/i18n";
 
+/** Above this, it isn't a healthy induction motor: NEMA design D, the highest-slip kind, reaches about 13%. */
+const IMPLAUSIBLE_SLIP = 0.15;
+
 export const motor: Converter = {
   id: "motor",
   topic: "Electrical",
   title: "Motor speed & slip",
   blurb: "Synchronous speed from frequency and poles, slip from the nameplate speed, and the same motor on the other frequency.",
   empty: "Enter the poles, the nameplate speed, or both.",
-  note: "A 60 Hz motor on 50 Hz runs about 17% slower and its voltage must drop in proportion (e.g. 460 V → 380 V); check the nameplate before using a motor on the other frequency.",
+  note: "A 60 Hz motor on 50 Hz runs about 17% slower, its voltage must drop in proportion (e.g. 460 V → 380 V), and its output falls about 17% too; check the nameplate before using a motor on the other frequency.",
   examples: byRegion((): RegionExamples => ({
     us: [
       { label: "1,750 r/min nameplate", set: { hz: "60", rpm: "1750" } },
@@ -59,15 +62,17 @@ export const motor: Converter = {
     if (polesIn === undefined) rows.push({ label: "Poles", detail: "worked out from the nameplate speed", value: String(poles) });
     if (rpm !== undefined) {
       const slip = motorSlip(sync, rpm);
-      rows.push({ label: "Slip", detail: t("{rpm} r/min below synchronous", { rpm: fmt(sync - rpm, 0) }), ...amount(slip * 100, 2, "%") });
+      const below = t("{rpm} r/min below synchronous", { rpm: fmt(sync - rpm, 0) });
+      const odd = slip > IMPLAUSIBLE_SLIP;
+      rows.push({ label: "Slip", detail: odd ? t("{below}. Too high for an induction motor: check the frequency and poles.", { below }) : below, ...amount(slip * 100, 2, "%"), status: odd ? "warn" : undefined });
     }
     const g = t("On {hz} Hz", { hz: other });
     rows.push({ group: g, label: "Synchronous speed", ...amount(syncSpeedRpm(other, poles), 0, " r/min") });
-    if (rpm !== undefined) rows.push({ group: g, label: "Running speed, about", detail: "same slip", ...amount((rpm * other) / hz, 0, " r/min") });
+    if (rpm !== undefined) rows.push({ group: g, label: "Running speed, about", detail: "same r/min below synchronous", ...amount(Math.max(0, syncSpeedRpm(other, poles) - (sync - rpm)), 0, " r/min") });
     return {
       heading: rpm !== undefined ? t("{poles}-pole motor at {hz} Hz, {rpm} r/min nameplate", { poles, hz, rpm: fmt(rpm, 0) }) : t("{poles}-pole motor at {hz} Hz", { poles, hz }),
       rows,
-      formula: ["Synchronous speed = 120 × frequency ÷ poles.", "Slip = (synchronous − nameplate) ÷ synchronous.", "Poles from a nameplate: the pole count whose synchronous speed is just above it."],
+      formula: ["Synchronous speed = 120 × frequency ÷ poles.", "Slip = (synchronous − nameplate) ÷ synchronous.", "Poles from a nameplate: the pole count whose synchronous speed is just above it.", "On the other frequency, a motor at the same torque, with its voltage changed in proportion, runs the same r/min below synchronous."],
     };
   },
 };

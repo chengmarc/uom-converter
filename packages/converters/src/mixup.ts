@@ -1,12 +1,23 @@
 import { suspectUomMismatch } from "@uom/core/pricing";
+import { FT_PER_M, LB_PER_KG } from "@uom/core/units";
 import { fmt, money, moneyAmount, plain, typed } from "./format";
 import type { Converter, Example, Status } from "./model";
 import { priceGap } from "./visual";
 import { invalid } from "./checks";
 import { t } from "@uom/i18n";
 
-const mixupMeaning = (factor: number) =>
-  factor === 10 ? t("a per-10 or pack-of-10 price") : factor === 100 ? t("a per-100 (C) price") : t("a per-1,000 (M) price");
+/** What a suspected factor would mean, with the lower price as `lo` and the higher as `hi`. */
+function mixupMeaning(factor: number, lo: string, hi: string) {
+  if (factor === FT_PER_M) return t("A price per foot and the same price per metre differ by this much.");
+  if (factor === LB_PER_KG) return t("A price per pound and the same price per kilogram differ by this much.");
+  const meaning =
+    factor === 10 ? t("a per-10 or pack-of-10 price")
+    : factor === 12 ? t("a per-dozen price")
+    : factor === 100 ? t("a per-100 (C) price")
+    : factor === 1000 ? t("a per-1,000 (M) price")
+    : t("a price for a box of {n}", { n: factor });
+  return t("If {lo} is per each, {hi} is probably {meaning}.", { lo, hi, meaning });
+}
 
 export const mixup: Converter = {
   id: "mixup",
@@ -38,13 +49,13 @@ export const mixup: Converter = {
       heading: t("{a} vs {b}", { a: money(a), b: money(b) }),
       rows: [
         f
-          ? { label: "Likely UOM mix-up", detail: t("If {lo} is per each, {hi} is probably {meaning}.", { lo, hi, meaning: mixupMeaning(f) }), value: t("{f}× apart", { f }), status: "bad" as Status }
-          : { label: "No UOM mix-up pattern", detail: "Not near 10×, 100× or 1000×: a real price difference, not a UOM problem.", value: "OK", status: "good" as Status },
+          ? { label: "Likely UOM mix-up", detail: mixupMeaning(f, lo, hi), value: t("{f}× apart", { f: fmt(f, 2) }), status: "bad" as Status }
+          : { label: "No common mix-up ratio", detail: "Probably a real price difference, though an unusual pack size could still explain it.", value: "OK", status: "good" as Status },
         { label: "B ÷ A", value: `× ${fmt(b / a, 4)}`, copy: plain(b / a, 4) },
-        ...(f ? [{ label: t("{hi} corrected", { hi }), detail: `${hi} ÷ ${f}`, ...moneyAmount((b > a ? b : a) / f) }] : []),
+        ...(f ? [{ label: t("{hi} corrected", { hi }), detail: `${hi} ÷ ${fmt(f, 2)}`, ...moneyAmount((b > a ? b : a) / f) }] : []),
       ],
       visual: priceGap(a, b, f),
-      formula: ["Flags a ratio within 5% of 10, 100 or 1000."],
+      formula: ["Flags a ratio within 15% of 10, 100 or 1000.", "Also within 5% of 12 (dozen), 25 or 50 (box), 3.28 (ft to m) or 2.2 (lb to kg)."],
     };
   },
 };

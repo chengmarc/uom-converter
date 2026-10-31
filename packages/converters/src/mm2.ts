@@ -2,7 +2,7 @@ import { METRIC_SIZES_MM2, metricToNorthAmerican, mm2ToKcmil } from "@uom/core/c
 import { amount, fmt, typed } from "./format";
 import type { Converter } from "./model";
 import { crossSections } from "./visual";
-import { metalField, readMetal, weightRows, WIRE_FORMULA } from "./wire";
+import { AREA_NOTE, metalField, readMetal, weightRows, WIRE_FORMULA } from "./wire";
 import { t } from "@uom/i18n";
 
 export const mm2: Converter = {
@@ -11,6 +11,7 @@ export const mm2: Converter = {
   title: "mm² → AWG / kcmil",
   blurb: "Metric wire area to the matching North American building-wire size.",
   empty: "Enter an area in mm², like 2.5 or 120.",
+  note: AREA_NOTE,
   examples: () => [2.5, 35, 120].map((n) => ({ label: `${fmt(n, 2)} mm²`, set: { area: typed(n) } })),
   fields: [
     { kind: "number", id: "area", label: "Wire area", suffix: "mm²", placeholder: typed(2.5), list: METRIC_SIZES_MM2.map((m) => typed(m)) },
@@ -26,8 +27,8 @@ export const mm2: Converter = {
     return {
       heading: t("{value} equals", { value: `${fmt(a, 3)} mm²` }),
       rows: [
+        { label: "Smallest size at least as big", value: na.nextLarger?.label ?? t("None, over 2000 kcmil"), copy: na.nextLarger?.label ?? "", status: na.nextLarger ? undefined : "warn" },
         { label: "Nearest AWG / kcmil size", value: na.nearest.label },
-        { label: "Smallest size at least as big", value: na.nextLarger?.label ?? t("None, over 1000 kcmil"), copy: na.nextLarger?.label ?? "", status: na.nextLarger ? undefined : "warn" },
         { label: "Thousand circular mils", ...amount(kcmil, 2, " kcmil") },
         ...weightRows(a, readMetal(v)),
       ],

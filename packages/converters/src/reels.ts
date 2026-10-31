@@ -1,4 +1,4 @@
-import { unitsToOrder } from "@uom/core/pricing";
+import { reelsForPulls } from "@uom/core/pricing";
 import { amount, fmt } from "./format";
 import { byRegion, type Converter, type RegionExamples, type Values } from "./model";
 import { packs as packsVisual } from "./visual";
@@ -14,6 +14,7 @@ export const reels: Converter = {
   title: "Wire coils & reels",
   blurb: "Coils or reels needed to cover a run. Three wires pulled 200 ft is 600 ft of wire.",
   empty: "Enter the run length and the coil or reel length.",
+  note: "A pull can't be spliced, so each run has to come whole from one coil or reel. Conductors pulled at the same time, and different colours, each need their own coil or reel.",
   examples: byRegion((): RegionExamples => ({
     us: [
       { label: "3 wires × 200 ft, 500 ft spools", set: { unit: "ft", run: "200", count: "3", size: "500" } },
@@ -32,6 +33,7 @@ export const reels: Converter = {
     { kind: "number", id: "run", label: "Run length", suffix: reelUnit, placeholder: "200" },
     { kind: "number", id: "count", label: "Conductors in the run", value: "1" },
     { kind: "number", id: "size", label: "Coil or reel length", suffix: reelUnit, placeholder: "500", list: (v) => REEL_SUGGESTIONS[reelUnit(v)] },
+    { kind: "number", id: "extra", label: "Extra per conductor, for terminations", suffix: reelUnit, value: "0", advanced: true },
     {
       kind: "choice",
       id: "unit",
@@ -49,27 +51,27 @@ export const reels: Converter = {
     const run = v.num("run");
     const count = v.num("count") ?? 1;
     const size = v.num("size");
+    const extra = v.num("extra") ?? 0;
     const bad = invalid([
-      ["run", Number.isNaN(run)],
+      ["run", Number.isNaN(run) || run === 0],
       ["count", Number.isNaN(count) || count < 1 || !Number.isInteger(count)],
       ["size", Number.isNaN(size) || size === 0],
+      ["extra", Number.isNaN(extra)],
     ]);
-    if (bad.length) return { error: "Enter numbers; conductors is a whole number, reel length more than 0.", fields: bad };
+    if (bad.length) return { error: "Enter numbers; conductors is a whole number, run and reel lengths more than 0.", fields: bad };
     if (run === undefined || size === undefined) return undefined;
-    const total = run * count;
-    const o = unitsToOrder(total, size);
+    const o = reelsForPulls(run + extra, count, size);
+    if (!o) return { error: t("One pull is {pull} {unit}, longer than a {size} {unit} coil or reel, and it can't be spliced. Use a longer reel.", { pull: fmt(run + extra, 2), size: fmt(size, 2), unit }), fields: ["run", "size"] };
     return {
       heading: t("{count} × {run} {unit} run, {size} {unit} coils or reels", { count: fmt(count, 0), run: fmt(run, 2), size: fmt(size, 2), unit }),
       rows: [
         { label: "Coils / reels to order", value: fmt(o.units, 0) },
-        { label: "Total wire", ...amount(total, 2, ` ${unit}`) },
-        { label: "Left over", detail: "on the last coil or reel", ...amount(o.over, 2, ` ${unit}`) },
+        { label: "Whole pulls per coil or reel", value: fmt(o.perReel, 0) },
+        { label: "Total wire", ...amount(o.total, 2, ` ${unit}`) },
+        { label: "Left over", detail: "offcuts, and what's left on the last coil or reel", ...amount(o.over, 2, ` ${unit}`) },
       ],
-      visual:
-        o.units > 0
-          ? packsVisual({ count: o.units, lastUsed: 1 - o.over / size, shape: "reel", label: t("{n} × {size} {unit} · {left} {unit} left over", { n: fmt(o.units, 0), size: fmt(size, 2), left: fmt(o.over, 2), unit }) })
-          : undefined,
-      formula: ["Total wire = run length × conductors.", "Coils or reels = total ÷ coil length, rounded up."],
+      visual: packsVisual({ count: o.units, lastUsed: o.lastUsed, shape: "reel", label: t("{n} × {size} {unit} · {left} {unit} left over", { n: fmt(o.units, 0), size: fmt(size, 2), left: fmt(o.over, 2), unit }) }),
+      formula: ["One pull = run length + extra for terminations.", "Whole pulls per coil or reel = its length ÷ one pull, rounded down.", "Coils or reels = conductors ÷ whole pulls per coil or reel, rounded up."],
     };
   },
 };

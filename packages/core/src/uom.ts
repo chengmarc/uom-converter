@@ -30,6 +30,8 @@ interface UomCode {
   /** Other ways the unit shows up in supplier files and ERP exports, matched case-insensitively. */
   aliases: string[];
   note?: string;
+  /** Its symbol only matches as written: "MW" is megawatt, and "mw" must not read as one. */
+  caseSensitive?: boolean;
 }
 
 const PACKAGE_NOTE =
@@ -48,7 +50,7 @@ export const UOM_CODES: UomCode[] = [
   { code: "SET", name: "set", category: "count", aliases: ["set", "sets", "kit"] },
   { code: "DZN", name: "dozen", category: "count", aliases: ["dozen", "dz", "doz"] },
   { code: "CEN", name: "hundred", category: "count", aliases: ["hundred", "c", "/100", "per 100"], note: "The C in E/C/M pricing." },
-  { code: "MIL", name: "thousand", category: "count", aliases: ["thousand", "m", "/1000", "per 1000"], note: 'The M in E/C/M pricing. Upper-case M is read as thousand, lower-case m as metre: check the column before trusting either.' },
+  { code: "MIL", name: "thousand", category: "count", aliases: ["thousand", "m", "/1000", "per 1000"], note: 'The M in E/C/M pricing. Upper-case M is read as thousand, lower-case m as metre: check the column before trusting either. In a wire spec, "mil" is 0.001 inch, not this.' },
 
   { code: "XBX", name: "box", category: "package", aliases: ["bx", "box", "boxes"], note: PACKAGE_NOTE },
   { code: "XCT", name: "carton", category: "package", aliases: ["ct", "ctn", "carton"], note: PACKAGE_NOTE },
@@ -67,7 +69,7 @@ export const UOM_CODES: UomCode[] = [
   { code: "MMT", name: "millimetre", symbol: "mm", category: "length", aliases: ["millimeter"] },
   { code: "FOT", name: "foot", symbol: "ft", category: "length", aliases: ["feet", "'"] },
   { code: "INH", name: "inch", symbol: "in", category: "length", aliases: ["inches", '"'] },
-  { code: "LM", name: "linear metre", category: "length", aliases: ["linear meter", "lin m"] },
+  { code: "LM", name: "linear metre", category: "length", aliases: ["linear meter", "lin m"], note: "Not lumens, which are LUM. Lower-case lm is read as lumen: check the column if the file is in capitals." },
   { code: "LF", name: "linear foot", category: "length", aliases: ["linear feet", "lin ft", "lft"] },
 
   { code: "MMK", name: "square millimetre", symbol: "mm²", category: "area", aliases: ["mm2", "sq mm", "square millimeter"] },
@@ -89,20 +91,26 @@ export const UOM_CODES: UomCode[] = [
 
   { code: "CEL", name: "degree Celsius", symbol: "°C", category: "temperature", aliases: ["deg c", "celsius", "c°"] },
   { code: "FAH", name: "degree Fahrenheit", symbol: "°F", category: "temperature", aliases: ["deg f", "fahrenheit", "f°"] },
+  { code: "KEL", name: "kelvin", symbol: "K", category: "temperature", aliases: ["cct"], note: "Also the unit of a lamp's colour temperature." },
 
   { code: "VLT", name: "volt", symbol: "V", category: "electrical", aliases: ["volts", "vac", "vdc"] },
   { code: "KVT", name: "kilovolt", symbol: "kV", category: "electrical", aliases: [] },
+  { code: "2Z", name: "millivolt", symbol: "mV", category: "electrical", aliases: [], caseSensitive: true },
   { code: "AMP", name: "ampere", symbol: "A", category: "electrical", aliases: ["amp", "amps"] },
   { code: "4K", name: "milliampere", symbol: "mA", category: "electrical", aliases: [] },
+  { code: "B22", name: "kiloampere", symbol: "kA", category: "electrical", aliases: ["kaic"] },
   { code: "OHM", name: "ohm", symbol: "Ω", category: "electrical", aliases: ["ohms"] },
   { code: "F56", name: "ohm per kilometre", symbol: "Ω/km", category: "electrical", aliases: ["ohm/km"] },
   { code: "HTZ", name: "hertz", symbol: "Hz", category: "electrical", aliases: [] },
 
   { code: "WTT", name: "watt", symbol: "W", category: "power & energy", aliases: ["watts"] },
   { code: "KWT", name: "kilowatt", symbol: "kW", category: "power & energy", aliases: [] },
+  { code: "MAW", name: "megawatt", symbol: "MW", category: "power & energy", aliases: [], caseSensitive: true },
+  { code: "D46", name: "volt-ampere", symbol: "V·A", category: "power & energy", aliases: ["va"] },
   { code: "KVA", name: "kilovolt-ampere", symbol: "kV·A", category: "power & energy", aliases: ["kva"] },
   { code: "KVR", name: "kilovar", symbol: "kvar", category: "power & energy", aliases: ["kvar"] },
   { code: "KWH", name: "kilowatt hour", symbol: "kW·h", category: "power & energy", aliases: ["kwh"] },
+  { code: "MWH", name: "megawatt hour", symbol: "MW·h", category: "power & energy", aliases: [] },
   { code: "BHP", name: "brake horse power", symbol: "BHP", category: "power & energy", aliases: ["hp", "horsepower"], note: "745.7 W. Metric horsepower (735.5 W) is HJ." },
   { code: "2I", name: "BTU (IT) per hour", symbol: "BtuIT/h", category: "power & energy", aliases: ["btu/h", "btu/hr", "btuh"] },
 
@@ -112,6 +120,7 @@ export const UOM_CODES: UomCode[] = [
 
   { code: "LUM", name: "lumen", symbol: "lm", category: "light", aliases: ["lumens"] },
   { code: "LUX", name: "lux", symbol: "lx", category: "light", aliases: [] },
+  { code: "CDL", name: "candela", symbol: "cd", category: "light", aliases: [] },
   { code: "P27", name: "footcandle", symbol: "ftc", category: "light", aliases: ["fc", "foot-candle", "foot candle"] },
 
   { code: "HUR", name: "hour", symbol: "h", category: "other", aliases: ["hr", "hrs", "hours"] },
@@ -121,18 +130,20 @@ export const UOM_CODES: UomCode[] = [
 const norm = (s: string) => s.trim().toLowerCase().replace(/\s+/g, " ");
 
 /**
- * Find a unit by code, name, symbol or common alias. Codes win over aliases, so "CS" is the
- * case package and "C" is hundred. Returns undefined when nothing matches.
+ * Find a unit by code, name, symbol or common alias. A symbol exactly as written comes first, so
+ * "lm" is lumen though LM is the code for linear metre. Then codes win over aliases, so "CS" is
+ * the case package and "C" is hundred. Returns undefined when nothing matches.
  */
 export function lookupUom(raw: string): UomCode | undefined {
   const s = norm(raw);
   if (s === "") return undefined;
-  // Case decides the one clash that matters: SI "m" is metre, pricing "M" is thousand.
+  // Case decides this clash too: SI "m" is metre, pricing "M" is thousand.
   if (raw.trim() === "M") return UOM_CODES.find((u) => u.code === "MIL");
   return (
+    UOM_CODES.find((u) => u.symbol === raw.trim()) ??
     UOM_CODES.find((u) => u.code.toLowerCase() === s) ??
     UOM_CODES.find((u) => u.code.startsWith("X") && u.code.slice(1).toLowerCase() === s) ??
-    UOM_CODES.find((u) => norm(u.name) === s || (u.symbol && norm(u.symbol) === s)) ??
+    UOM_CODES.find((u) => norm(u.name) === s || (u.symbol && !u.caseSensitive && norm(u.symbol) === s)) ??
     UOM_CODES.find((u) => u.aliases.some((a) => norm(a) === s))
   );
 }
@@ -162,6 +173,9 @@ const RULES: Rule[] = [
   { units: ["in", "in.", "inch", "inches", '"', "″"], to: "mm", code: "MMT", convert: (n) => n * MM_PER_IN, from: "in" },
   { units: ["ft", "ft.", "feet", "foot", "'", "′"], to: "m", code: "MTR", convert: (n) => n * M_PER_FT, from: "ft" },
   { units: ["yd", "yds", "yard", "yards"], to: "m", code: "MTR", convert: (n) => n * 0.9144, from: "yd" },
+  { units: ["mft", "m ft"], to: "m", code: "MTR", convert: (n) => n * 1000 * M_PER_FT, from: "M ft" },
+  // A mil is 0.001 in: insulation and jacket thickness.
+  { units: ["mil", "mils"], to: "mm", code: "MMT", convert: (n) => (n * MM_PER_IN) / 1000, from: "mil" },
   { units: ["sq in", "in2", "in²", "square inch", "square inches"], to: "mm²", code: "MMK", convert: (n) => n * MM_PER_IN ** 2, from: "in²" },
   { units: ["sq ft", "ft2", "ft²", "square foot", "square feet"], to: "m²", code: "MTK", convert: (n) => n * 0.09290304, from: "ft²" },
   { units: ["cu in", "in3", "in³", "cubic inch", "cubic inches"], to: "cm³", code: "CMQ", convert: (n) => n * CM3_PER_IN3, from: "in³" },
@@ -186,6 +200,18 @@ const RULES: Rule[] = [
   { units: ["kw"], to: "kW", code: "KWT", convert: (n) => n, from: "kW" },
   { units: ["w", "watt", "watts"], to: "W", code: "WTT", convert: (n) => n, from: "W" },
   { units: ["lx", "lux"], to: "lx", code: "LUX", convert: (n) => n, from: "lx" },
+  { units: ["lm", "lumen", "lumens"], to: "lm", code: "LUM", convert: (n) => n, from: "lm" },
+  { units: ["k", "kelvin"], to: "K", code: "KEL", convert: (n) => n, from: "K" },
+  { units: ["v", "volt", "volts", "vac", "vdc"], to: "V", code: "VLT", convert: (n) => n, from: "V" },
+  { units: ["kv"], to: "V", code: "VLT", convert: (n) => n * 1000, from: "kV" },
+  { units: ["a", "amp", "amps", "ampere", "amperes"], to: "A", code: "AMP", convert: (n) => n, from: "A" },
+  { units: ["ma"], to: "mA", code: "4K", convert: (n) => n, from: "mA" },
+  { units: ["ka", "kaic"], to: "kA", code: "B22", convert: (n) => n, from: "kA" },
+  { units: ["hz", "hertz"], to: "Hz", code: "HTZ", convert: (n) => n, from: "Hz" },
+  { units: ["ohm", "ohms", "ω"], to: "Ω", code: "OHM", convert: (n) => n, from: "Ω" },
+  { units: ["va"], to: "V·A", code: "D46", convert: (n) => n, from: "VA" },
+  { units: ["kva"], to: "kV·A", code: "KVA", convert: (n) => n, from: "kVA" },
+  { units: ["kvar"], to: "kvar", code: "KVR", convert: (n) => n, from: "kvar" },
 ];
 
 const AWG_HINT = /(awg|kcmil|mcm|^#\s*\d)|^\d\/0$/i;
@@ -211,6 +237,8 @@ export function toMetric(raw: string): MetricValue | { error: string } {
   const [, minus, num, unitRaw] = m;
   const unit = unitRaw.toLowerCase().replace(/\.$/, "").trim();
   if (unit === "") return { error: t("No unit: add one, like 12 AWG, 3/4 in or 75 ft") };
+  // Units are matched in lower case, which would turn pricing's M into metres.
+  if (unitRaw.trim() === "M") return { error: t('"M" could be a thousand or a metre: write m for metres') };
   const rule = RULES.find((r) => r.units.includes(unit));
   if (!rule) return { error: t('Unknown unit "{unit}"', { unit: unitRaw }) };
 

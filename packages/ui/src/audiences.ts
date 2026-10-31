@@ -38,7 +38,7 @@ export const AUDIENCES: Audience[] = [
     id: "electrician",
     label: "Electrician",
     description: "On the job: voltage drop, wire and conduit sizes, fractions, torque, how much wire to buy.",
-    tools: ["vdrop", "awg", "mm2", "conduit", "fraction", "ohm", "volts", "load", "reels", "torque"],
+    tools: ["vdrop", "awg", "mm2", "conduit", "box-fill", "fraction", "ohm", "volts", "load", "reels", "torque"],
   },
   {
     id: "engineer",

@@ -12,8 +12,12 @@ export const MM_PER_IN = 25.4;
 
 /** Mechanical horsepower (550 ft·lbf/s). Output power only: says nothing about motor current. */
 export const W_PER_HP = 745.69987158227022;
+/** Metric horsepower (PS, CV): 75 kgf·m/s. */
+export const W_PER_METRIC_HP = 735.49875;
 /** International Table BTU. */
 export const BTUH_PER_W = 3.412141633127942;
+/** A ton of cooling is 12,000 BTU/h by definition. */
+export const BTUH_PER_TON = 12000;
 /** 1 fc = 1 lm/ft² = 1 / 0.09290304 lx. */
 export const LUX_PER_FC = 1 / 0.09290304;
 /** 1 lbf·in = 4.4482216152605 N × 0.0254 m. */
@@ -32,6 +36,31 @@ export function parseInches(raw: string): number | undefined {
   const m = /^(?:(\d+)[\s-]+)?(\d+)\/(\d+)$/.exec(s);
   if (m) return Number(m[3]) === 0 ? undefined : Number(m[1] ?? 0) + Number(m[2]) / Number(m[3]);
   return /^(\d+(\.\d*)?|\.\d+)$/.test(s) ? Number(s) : undefined;
+}
+
+/**
+ * Feet from a length as plans and tapes write it: 12'-6", 12' 6 1/2", 12 ft 6 in, 6", 12'.
+ * Undefined for anything without a foot or inch mark, so a plain number stays a plain number.
+ */
+export function parseFeetInches(raw: string): number | undefined {
+  const s = raw
+    .trim()
+    .toLowerCase()
+    .replace(/′|\s*\b(feet|foot|ft)\b\.?/g, "'")
+    .replace(/″|\s*\b(inches|inch|in)\b\.?/g, '"');
+  if (!/['"]/.test(s)) return undefined;
+  const [feetPart, inchPart] = s.includes("'") ? s.split("'", 2) : ["0", s];
+  if (!/^\d+(\.\d+)?$/.test(feetPart)) return undefined;
+  const rest = inchPart.replace(/^[\s-]+/, "");
+  const inches = rest === "" ? 0 : parseInches(rest);
+  return inches === undefined ? undefined : Number(feetPart) + inches / 12;
+}
+
+/** Feet written the same way, to the nearest 1/16": 12.5 -> 12'-6". */
+export function feetInchesLabel(feet: number): string {
+  const sixteenths = Math.round(feet * 12 * 16);
+  const wholeFeet = Math.floor(sixteenths / (12 * 16));
+  return `${wholeFeet}'-${toFraction((sixteenths - wholeFeet * 12 * 16) / 16, 16).label.replace("-", " ")}`;
 }
 
 /** Nearest fraction with the given denominator, reduced: 1.71875 -> 1-23/32 inches. */

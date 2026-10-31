@@ -21,7 +21,7 @@ export const pf: Converter = {
     { kind: "number", id: "kw", label: "Real power", suffix: "kW", placeholder: "100" },
     { kind: "number", id: "pf1", label: "Present power factor", placeholder: typed(0.8) },
     { kind: "number", id: "pf2", label: "Target power factor", value: typed(0.95) },
-    { ...voltsField("Volts (for current)"), optional: true, advanced: true },
+    { ...voltsField("Volts (for current)"), value: undefined, optional: true, advanced: true },
     phaseField("3", true),
   ],
   compute(v) {

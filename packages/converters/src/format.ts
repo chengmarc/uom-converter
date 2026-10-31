@@ -47,6 +47,13 @@ export const amount = (n: number, digits: number, unit: string) => ({ value: `${
 export const moneyAmount = (n: number, copyDigits = 5) => ({ value: money(n), copy: plain(n, copyDigits) });
 
 /**
+ * Text that holds numbers among other things ("50/7,5", "1,5 mm2") with a dot for the decimal
+ * mark, for the parsers in @uom/core, which don't know the region. As in parseNumber, a dot beside
+ * a decimal comma separates thousands.
+ */
+export const dotDecimal = (raw: string) => (style.decimalComma && raw.includes(",") ? raw.replace(/\./g, "").replace(/,/g, ".") : raw);
+
+/**
  * Accepts "1,250.50" / "1.250,50" (per the region), "$0.45", "12 €", and "-40" when `signed`.
  * A dot is always read as a decimal point when there's no comma, since spreadsheets and UK
  * users write 1.5 everywhere. Where the decimal mark is a dot, a comma must separate thousands (a

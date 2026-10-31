@@ -1,6 +1,6 @@
-import { CONDUIT_TRADE_SIZES, conduitSize, KNOCKOUT_PUNCH_IN } from "@uom/core/conduit";
+import { CONDUIT_TRADE_SIZES, conduitSize, euConduitSize, KNOCKOUT_PUNCH_IN } from "@uom/core/conduit";
 import { MM_PER_IN } from "@uom/core/units";
-import { fmt, plain } from "./format";
+import { dotDecimal, fmt, plain } from "./format";
 import type { Converter, Example, Row } from "./model";
 import { t } from "@uom/i18n";
 
@@ -12,7 +12,7 @@ export const conduit: Converter = {
     v.region === "eu"
       ? "North American inch trade size ↔ metric designator, with the typical knockout punch diameter."
       : "Inch trade size ↔ metric designator (CEC / NEC), with the typical knockout punch diameter.",
-  empty: 'Enter a trade size in either system: 1-1/4", 1.25, 35 or M35.',
+  empty: 'Enter a trade size in either system: 1-1/4", 1.25 or 35.',
   examples: (): Example[] => [
     { label: '1/2"', set: { size: '1/2"' } },
     { label: '1-1/4"', set: { size: '1-1/4"' } },
@@ -26,7 +26,20 @@ export const conduit: Converter = {
   compute(v) {
     const raw = v.str("size");
     if (raw === "") return undefined;
-    const c = conduitSize(raw);
+    // In Europe an M size is an outside diameter, which only looks like a designator: M16 isn't 1/2".
+    const eu = v.region === "eu" ? euConduitSize(raw) : undefined;
+    if (eu && "error" in eu) return { error: t("{error}.", { error: eu.error }), fields: ["size"] };
+    if (eu) {
+      return {
+        heading: t("European size M{n}", { n: eu.size }),
+        rows: [
+          { label: "Clearance hole, typical", detail: "check the gland maker's data", value: `${fmt(eu.holeMm, 1, 1)} mm`, copy: plain(eu.holeMm, 1) },
+          { label: "Inch trade size", detail: "M sizes are outside diameters, not trade sizes", value: t("No equivalent"), copy: "" },
+        ],
+        formula: ["European sizes are outside diameters (EN 61386), with EN 60423 threads.", "Clearance hole = thread diameter + 0.5 mm, typically."],
+      };
+    }
+    const c = conduitSize(dotDecimal(raw));
     if ("error" in c) return { error: t("{error}.", { error: c.error }), fields: ["size"] };
     const ko = KNOCKOUT_PUNCH_IN[c.inch];
     // Answer in the system the user didn't type.

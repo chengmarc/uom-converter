@@ -1,8 +1,8 @@
-import { conductorInfo, NA_BUILDING_SIZES } from "@uom/core/conductors";
+import { conductorInfo, NA_WIRE_SIZES } from "@uom/core/conductors";
 import { amount, fmt, plain } from "./format";
 import type { Converter } from "./model";
 import { crossSections } from "./visual";
-import { metalField, readMetal, weightRows, WIRE_FORMULA } from "./wire";
+import { AREA_NOTE, metalField, readMetal, weightRows, WIRE_FORMULA } from "./wire";
 import { t } from "@uom/i18n";
 
 export const awg: Converter = {
@@ -11,6 +11,7 @@ export const awg: Converter = {
   title: "AWG / kcmil → mm²",
   blurb: "North American wire size to metric area and the matching IEC 60228 size.",
   empty: "Enter a wire size, like 12, 1/0 or 250 kcmil.",
+  note: AREA_NOTE,
   examples: () => ["12 AWG", "4/0 AWG", "250 kcmil"].map((s) => ({ label: s, set: { size: s } })),
   fields: [
     {
@@ -18,7 +19,7 @@ export const awg: Converter = {
       id: "size",
       label: "Wire size",
       placeholder: "12, 1/0, 250 kcmil",
-      list: NA_BUILDING_SIZES.map((s) => s.label),
+      list: NA_WIRE_SIZES.map((s) => s.label),
     },
     metalField,
   ],
@@ -32,7 +33,6 @@ export const awg: Converter = {
       heading: t("{value} equals", { value: c.label }),
       rows: [
         { label: "Cross-section", ...amount(c.areaMm2, 3, " mm²") },
-        { group: "Metric wire size (IEC)", label: "Nearest size", ...amount(c.nearestMetricMm2, 2, " mm²") },
         {
           group: "Metric wire size (IEC)",
           label: "Smallest size at least as big",
@@ -40,6 +40,7 @@ export const awg: Converter = {
           copy: next === undefined ? "" : plain(next, 2),
           status: next === undefined ? "warn" : undefined,
         },
+        { group: "Metric wire size (IEC)", label: "Nearest size", ...amount(c.nearestMetricMm2, 2, " mm²") },
         { group: "Area", label: "Thousand circular mils", ...amount(c.areaKcmil, 2, " kcmil") },
         ...(c.solidDiameterMm === undefined
           ? []

@@ -41,7 +41,7 @@ Get prices right
 Clean up product data
 • Turn units as a supplier file writes them (EA, ft, box, lbs) into UN/ECE codes for BMEcat, ETIM and e-invoicing.
 • Turn spec values into metric for ETIM and price quantities into unit prices, and build pack, case and pallet quantities with their GTIN-14s.
-• Convert length, fractions of an inch, temperature, power, light level, torque, weight and box fill volume.
+• Convert length, fractions of an inch, temperature, power, light level, torque and weight.
 
 Trust every answer
 • Every converter opens on a worked example, so you see what it does before you type anything.

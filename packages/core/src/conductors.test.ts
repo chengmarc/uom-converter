@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { conductorInfo, conductorKgPerKm, conductorOhmsPerKm, kcmilToMm2, kgPerKmToLbPerKft, metricToNorthAmerican, NA_BUILDING_SIZES, parseConductor, smallestSizeForDrop, voltageDrop, type ConductorInfo } from "./conductors";
+import { buildingSizesFor, conductorImpedance, conductorInfo, conductorKgPerKm, conductorOhmsPerKm, kcmilToMm2, kgPerKmToLbPerKft, metricSizesFor, metricToNorthAmerican, NA_BUILDING_SIZES, parseConductor, smallestSizeForDrop, voltageDrop, type ConductorInfo } from "./conductors";
 
 const info = (s: string) => conductorInfo(s) as ConductorInfo;
 
@@ -29,6 +29,16 @@ describe("conductor sizes", () => {
     expect(parseConductor("350 kcmil")).toMatchObject({ kcmil: 350 });
     expect(parseConductor("5/0")).toHaveProperty("error");
     expect(parseConductor("wire")).toHaveProperty("error");
+    expect(parseConductor("0 kcmil")).toHaveProperty("error");
+  });
+
+  it("keeps control and fixture wire out of the building sizes", () => {
+    expect(NA_BUILDING_SIZES[0].label).toBe("14 AWG");
+    expect(buildingSizesFor("Al")[0].label).toBe("12 AWG");
+    expect(NA_BUILDING_SIZES.map((s) => s.label)).toContain("700 kcmil");
+    expect(NA_BUILDING_SIZES.at(-1)?.label).toBe("2000 kcmil");
+    expect(metricSizesFor("Cu")[0]).toBe(1.5);
+    expect(metricSizesFor("Al")[0]).toBe(10);
   });
 
   it("finds metric neighbours", () => {
@@ -55,26 +65,84 @@ describe("conductor weight", () => {
 });
 
 describe("conductor resistance and voltage drop", () => {
-  it("matches NEC Chapter 9 Table 8 (solid, uncoated copper, 75 °C)", () => {
-    const perKft = (awg: string) => conductorOhmsPerKm(info(awg).areaMm2, "Cu") * 0.3048;
-    expect(perKft("12")).toBeCloseTo(1.93, 2);
-    expect(perKft("14")).toBeCloseTo(3.07, 2);
-    expect(perKft("10")).toBeCloseTo(1.21, 2);
+  /** Ω per 1,000 ft, as NEC Chapter 9 prints them. */
+  const dcPerKft = (size: string, metal: "Cu" | "Al" = "Cu") => conductorOhmsPerKm(info(size).areaMm2, metal, "na") * 0.3048;
+  const inConduit = (size: string, raceway: "steel" | "nonmetallic") => {
+    const { r, x } = conductorImpedance({ areaMm2: info(size).areaMm2, metal: "Cu", system: "na", raceway, hz: 60 });
+    return { r: r * 0.3048, x: x * 0.3048 };
+  };
+  const setup = { metal: "Cu" as const, system: "na" as const, raceway: "steel" as const, hz: 60 as const };
+
+  it("matches NEC Chapter 9 Table 8 (stranded, 75 °C)", () => {
+    expect(dcPerKft("12") / 1.98).toBeCloseTo(1, 1);
+    expect(dcPerKft("10") / 1.24).toBeCloseTo(1, 1);
+    expect(dcPerKft("1/0") / 0.122).toBeCloseTo(1, 1);
+    expect(dcPerKft("500 kcmil") / 0.0258).toBeCloseTo(1, 1);
+    expect(dcPerKft("4/0", "Al") / 0.1).toBeCloseTo(1, 1);
+  });
+
+  it("uses the IEC 60228 limit for metric sizes, not their nominal area", () => {
+    const at20 = (r75: number, alpha: number) => r75 / (1 + alpha * 55);
+    expect(at20(conductorOhmsPerKm(2.5, "Cu", "iec"), 0.00393)).toBeCloseTo(7.41, 2);
+    expect(at20(conductorOhmsPerKm(25, "Al", "iec"), 0.00403)).toBeCloseTo(1.2, 2);
+    // An area IEC doesn't list still gets a resistance.
+    expect(conductorOhmsPerKm(3, "Cu", "iec")).toBeGreaterThan(conductorOhmsPerKm(4, "Cu", "iec"));
+  });
+
+  it("matches NEC Chapter 9 Table 9 (steel conduit, 60 Hz)", () => {
+    expect(inConduit("12", "steel").x).toBeCloseTo(0.068, 3);
+    expect(inConduit("1/0", "steel").x).toBeCloseTo(0.055, 3);
+    expect(inConduit("500 kcmil", "steel").x).toBeCloseTo(0.048, 3);
+    expect(inConduit("250 kcmil", "steel").r).toBeCloseTo(0.054, 3);
+    expect(inConduit("500 kcmil", "steel").r).toBeCloseTo(0.029, 3);
+  });
+
+  it("matches NEC Chapter 9 Table 9 (PVC conduit)", () => {
+    expect(inConduit("500 kcmil", "nonmetallic").x).toBeCloseTo(0.039, 3);
+    expect(inConduit("500 kcmil", "nonmetallic").r).toBeCloseTo(0.027, 3);
+  });
+
+  it("scales reactance with frequency", () => {
+    const at = (hz: 50 | 60) => conductorImpedance({ ...setup, areaMm2: 120, hz }).x;
+    expect(at(50) / at(60)).toBeCloseTo(50 / 60);
+  });
+
+  it("reads Table 9 between rows and holds past its ends", () => {
+    const x = (size: string) => inConduit(size, "steel").x;
+    expect(x("700 kcmil")).toBeCloseTo(0.048, 3);
+    expect(x("2000 kcmil")).toBe(x("1000 kcmil"));
+    expect(x("18")).toBe(x("14"));
   });
 
   it("works out single- and three-phase drop", () => {
-    // 12 AWG Cu, 100 ft one way, 16 A at 120 V single-phase: 2 × 16 × 1.9316 Ω/kft × 0.1 kft ≈ 6.18 V.
-    const one = voltageDrop({ areaMm2: info("12").areaMm2, metal: "Cu", lengthM: 30.48, amps: 16, volts: 120, phase: 1 });
-    expect(one.volts).toBeCloseTo(6.18, 2);
-    expect(one.percent).toBeCloseTo(5.15, 2);
-    const three = voltageDrop({ areaMm2: 35, metal: "Cu", lengthM: 50, amps: 100, volts: 400, phase: 3 });
-    expect(three.volts).toBeCloseTo(Math.sqrt(3) * 100 * (conductorOhmsPerKm(35, "Cu") / 1000) * 50, 6);
+    // 500 kcmil in steel, PF 0.85: Z = 0.050 Ω/kft (Table 9's effective Z).
+    const feeder = { ...setup, areaMm2: info("500 kcmil").areaMm2, pf: 0.85, lengthM: 91.44, amps: 380, volts: 480, phase: 3 as const };
+    expect(voltageDrop(feeder).volts).toBeCloseTo(Math.sqrt(3) * 380 * 0.05 * 0.3, 0);
+    const one = voltageDrop({ ...feeder, phase: 1 });
+    expect(one.volts / voltageDrop(feeder).volts).toBeCloseTo(2 / Math.sqrt(3));
+  });
+
+  it("shares the drop between parallel sets", () => {
+    const run = { ...setup, areaMm2: info("500 kcmil").areaMm2, lengthM: 100, amps: 800, volts: 480, phase: 3 as const };
+    expect(voltageDrop({ ...run, sets: 2 }).volts).toBeCloseTo(voltageDrop(run).volts / 2);
+  });
+
+  it("gives the most any power factor could when none is set", () => {
+    const run = { ...setup, areaMm2: info("500 kcmil").areaMm2, lengthM: 100, amps: 100, volts: 480, phase: 3 as const };
+    const worst = voltageDrop(run).volts;
+    for (const pf of [0.5, 0.7, 0.85, 0.95, 1]) expect(voltageDrop({ ...run, pf }).volts).toBeLessThan(worst);
+  });
+
+  it("stops a bigger wire curing a drop that reactance sets", () => {
+    const run = { ...setup, pf: 0.85, lengthM: 152.4, amps: 450, volts: 208, phase: 3 as const };
+    expect(smallestSizeForDrop(NA_BUILDING_SIZES, (s) => s.areaMm2, 3, run)).toBeUndefined();
+    expect(smallestSizeForDrop(NA_BUILDING_SIZES, (s) => s.areaMm2, 3, { ...run, sets: 3 })).toBeDefined();
   });
 
   it("finds the smallest size for a target drop", () => {
-    const run = { metal: "Cu" as const, lengthM: 30.48, amps: 16, volts: 120, phase: 1 as const };
+    const run = { ...setup, lengthM: 30.48, amps: 16, volts: 120, phase: 1 as const };
     const size = smallestSizeForDrop(NA_BUILDING_SIZES, (s) => s.areaMm2, 3, run);
-    expect(size?.label).toBe("8 AWG"); // 10 AWG gives 3.26%, 8 AWG 2.05%
+    expect(size?.label).toBe("8 AWG"); // 10 AWG gives 3.3%, 8 AWG 2.1%
     expect(smallestSizeForDrop(["14"], (s) => info(s).areaMm2, 3, run)).toBeUndefined();
   });
 });

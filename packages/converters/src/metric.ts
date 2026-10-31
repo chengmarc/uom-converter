@@ -1,5 +1,5 @@
 import { toMetric } from "@uom/core/uom";
-import { amount } from "./format";
+import { amount, dotDecimal } from "./format";
 import type { Converter } from "./model";
 import { t } from "@uom/i18n";
 
@@ -15,7 +15,7 @@ export const metricSpec: Converter = {
   compute(v) {
     const raw = v.str("spec");
     if (raw === "") return undefined;
-    const r = toMetric(raw);
+    const r = toMetric(dotDecimal(raw));
     if ("error" in r) return { error: t("{error}.", { error: r.error }), fields: ["spec"] };
     return {
       heading: t("{value} equals", { value: r.readAs }),
@@ -24,7 +24,7 @@ export const metricSpec: Converter = {
         { label: "Unit", value: r.unit },
         { label: "UN/ECE code", value: r.code },
       ],
-      formula: ["Wire sizes become cross-section in mm² from the AWG definition.", "Exact factors: 1 in = 25.4 mm, 1 ft = 0.3048 m, 1 lb = 0.45359237 kg, 1 lbf·in = 0.113 N·m."],
+      formula: ["Wire sizes become cross-section in mm² from the AWG definition.", "Exact factors: 1 in = 25.4 mm, 1 ft = 0.3048 m, 1 lb = 0.45359237 kg. Rounded: 1 lbf·in ≈ 0.113 N·m."],
     };
   },
 };

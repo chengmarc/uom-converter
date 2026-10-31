@@ -66,7 +66,7 @@ describe("translations", () => {
   // above can't see. Chinese makes it obvious, since no word in a translation is in Latin letters.
   it("shows no English in any converter's result, in any region", () => {
     setCatalogue(zh);
-    const names = /\b(kcmil|kvar|arccos|GTIN|ASTM|SSCC|Greenlee|American|Fittings|BMEcat|ETIM|Peppol|Excel)\b/g;
+    const names = /\b(kcmil|kvar|arccos|GTIN|ASTM|ANSI|SSCC|Greenlee|American|Fittings|BMEcat|ETIM|Peppol|Excel)\b/g;
     const leaks = new Set<string>();
     for (const region of REGIONS) {
       setNumberStyle(region.number);

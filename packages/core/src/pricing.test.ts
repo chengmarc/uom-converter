@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { convertPrice, discountToMultiplier, marginToMarkup, markupToMargin, multiplierToDiscount, sellFromCostAtMargin, suspectUomMismatch, unitPrice, unitsToOrder } from "./pricing";
+import { convertPrice, discountToMultiplier, marginToMarkup, markupToMargin, multiplierToDiscount, reelsForPulls, sellFromCostAtMargin, suspectUomMismatch, unitPrice, unitsToOrder } from "./pricing";
+import { FT_PER_M, LB_PER_KG } from "./units";
 
 describe("pricing UOM", () => {
   it("converts between E, C and M", () => {
@@ -11,6 +12,18 @@ describe("pricing UOM", () => {
     expect(suspectUomMismatch(1.25, 125)).toBe(100);
     expect(suspectUomMismatch(450, 0.46)).toBe(1000);
     expect(suspectUomMismatch(10, 12)).toBeUndefined();
+  });
+
+  it("allows for a real price gap on top of a power of ten", () => {
+    expect(suspectUomMismatch(1, 112)).toBe(100);
+    expect(suspectUomMismatch(1, 89)).toBe(100);
+  });
+
+  it("spots unit and pack ratios as well as powers of ten", () => {
+    expect(suspectUomMismatch(1, 3.28)).toBe(FT_PER_M);
+    expect(suspectUomMismatch(5, 11.02)).toBe(LB_PER_KG);
+    expect(suspectUomMismatch(10, 120)).toBe(12);
+    expect(suspectUomMismatch(1, 25)).toBe(25);
   });
 });
 
@@ -41,6 +54,22 @@ describe("packs and put-ups", () => {
     expect(unitsToOrder(300, 100)).toEqual({ units: 3, total: 300, over: 0 });
     expect(unitsToOrder(0.3, 0.1)).toMatchObject({ units: 3 });
     expect(unitsToOrder(0, 100)).toEqual({ units: 0, total: 0, over: 0 });
+  });
+});
+
+describe("reels for pulls", () => {
+  it("takes each pull whole from one reel", () => {
+    expect(reelsForPulls(300, 3, 500)).toMatchObject({ units: 3, perReel: 1, total: 900, over: 600 });
+    expect(reelsForPulls(60, 5, 75)).toMatchObject({ units: 5, perReel: 1 });
+  });
+
+  it("fits several pulls on a reel when they fit", () => {
+    expect(reelsForPulls(200, 3, 500)).toMatchObject({ units: 2, perReel: 2, over: 400, lastUsed: 0.4 });
+    expect(reelsForPulls(100, 5, 500)).toMatchObject({ units: 1, perReel: 5, over: 0, lastUsed: 1 });
+  });
+
+  it("has no answer when a pull is longer than a reel", () => {
+    expect(reelsForPulls(600, 1, 500)).toBeUndefined();
   });
 });
 

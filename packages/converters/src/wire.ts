@@ -34,3 +34,6 @@ export const WIRE_FORMULA = [
   "1 kcmil = 1,000 circular mils = 0.5067 mm².",
   "Weight = area × density: copper 8.89 g/cm³, aluminum 2.705 g/cm³. Bare solid metal; stranding adds about 2%, insulation not included.",
 ];
+
+/** The same warning on both directions of the size conversion. Declared here so the scan finds it. */
+export const AREA_NOTE = t("A match by area isn't a match by ampacity: each code sets its own ratings. “Nearest” can be smaller than the size you started with, so never substitute down.");
