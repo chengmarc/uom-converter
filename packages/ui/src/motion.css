@@ -1,0 +1,45 @@
+/* How things move in every app: quick to start and slow to settle. Motion marks a moment (a converter
+   opening, an example landing), so nothing here runs while someone types: results redraw on every
+   keystroke, and moving them would flicker. `.landing` is set only by picking an example (converter.ts).
+   Every landing is done within 400 ms, when the Store screenshots are taken. */
+
+:root { --motion-ease: cubic-bezier(0.2, 0.8, 0.2, 1); }
+
+@keyframes page-in { from { opacity: 0; transform: translateY(4px); } }
+@keyframes piece-in { from { opacity: 0; transform: translateY(6px) scale(0.97); } }
+@keyframes pop-in { from { opacity: 0; transform: scale(0.6); } }
+@keyframes grow-in { from { transform: scaleX(0); } }
+
+/* A converter opening. An animation restarts when an element comes back from `hidden`. */
+.converter > * { animation: page-in 280ms var(--motion-ease) backwards; }
+details[open] > :not(summary) { animation: page-in 200ms var(--motion-ease) backwards; }
+
+/* An example landing: the answer, then its diagram, then the rows one after another. */
+.landing .to-body > :not(.rows),
+.landing .rows > * { animation: piece-in 240ms var(--motion-ease) backwards; }
+.landing .to-body > :nth-child(2) { animation-delay: 40ms; }
+.landing .rows > :nth-child(1) { animation-delay: 60ms; }
+.landing .rows > :nth-child(2) { animation-delay: 80ms; }
+.landing .rows > :nth-child(3) { animation-delay: 100ms; }
+.landing .rows > :nth-child(n + 4) { animation-delay: 120ms; }
+
+.viz-fill { transform-box: fill-box; transform-origin: left; }
+.viz-wire, .viz-pack, .viz-pack-used { transform-box: fill-box; transform-origin: center; }
+.landing .viz-fill { animation: grow-in 300ms var(--motion-ease) 40ms backwards; }
+.landing .viz-wire,
+.landing .viz-pack,
+.landing .viz-pack-used { animation: pop-in 240ms var(--motion-ease) 40ms backwards; }
+
+/* A press answers at once. */
+.example:active,
+.answer:active,
+.row:active { transform: scale(0.98); transition: transform 80ms var(--motion-ease); }
+.segmented span { transition: background-color 140ms var(--motion-ease), color 140ms var(--motion-ease); }
+
+/* The website's home page: a topic's photo leans in on hover. */
+.category-strip img { transition: transform 400ms var(--motion-ease); }
+.category-strip a:hover img { transform: scale(1.04); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

@@ -182,6 +182,7 @@ export function renderConverter(conv: Converter, region: Region, heading: "h1" |
   };
 
   function fill(set: Record<string, string>) {
+    to.classList.add("landing"); // motion.css: an example lands; typing after it doesn't.
     for (const [id, value] of Object.entries(set)) {
       const f = conv.fields.find((x) => x.id === id);
       if (!f) throw new Error(`Example for ${conv.id} sets unknown field ${id}`);
@@ -202,7 +203,10 @@ export function renderConverter(conv: Converter, region: Region, heading: "h1" |
   }
 
   // Typing after picking an example means it's no longer that example.
-  panel.addEventListener("input", () => exampleButtons.forEach((b) => b.setAttribute("aria-pressed", "false")));
+  panel.addEventListener("input", () => {
+    exampleButtons.forEach((b) => b.setAttribute("aria-pressed", "false"));
+    to.classList.remove("landing");
+  });
   panel.addEventListener("input", update);
   panel.addEventListener("change", update);
   // Open on a worked answer rather than an empty form; the first click in a field selects its

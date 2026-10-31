@@ -9,6 +9,9 @@ match the release tags (`v<version>`).
 
 ### Added
 
+- gentle motion: a converter eases in as it opens, a picked example's answer lands piece by piece,
+  and buttons respond to a press. Nothing moves while you type, and it all follows the system's
+  reduced-motion setting
 - voltage drop takes the load's power factor, the raceway and parallel sets
 - transformer fault current takes the motor load, and adds what motors feed into a fault
 - wire coils and reels take an allowance for terminations

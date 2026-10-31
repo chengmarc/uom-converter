@@ -1,3 +1,5 @@
+@import "./motion.css";
+
 /* The parts of a converter's diagrams (visuals.ts), the same in every app. Each app's stylesheet
    @imports this, and frames the diagram itself in its own .visual. */
 
