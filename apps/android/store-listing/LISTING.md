@@ -8,12 +8,12 @@ package is `com.chengmarc.uomconverter`; the bundle is built and signed as
 
 ## Release
 
-- **Release name:** `<version> (<versionCode>)`, e.g. `1.2.0 (10200)`. Not shown to users.
-- **Release notes** (500 characters or fewer per language). For 1.2.0:
+- **Release name:** `<version> (<versionCode>)`, e.g. `1.3.0 (10300)`. Not shown to users.
+- **Release notes** (500 characters or fewer per language). For 1.3.0:
 
   ```
   <en-US>
-  Now in Spanish, German and French: the app opens in your phone's language, and Settings changes it. The language is separate from the region, which still sets units, number formats and voltages. In the US and Canada, a number with a comma that doesn't separate thousands, such as "7,4", is now an error instead of being read as 74.
+  New: conductor ampacity, motor full-load amps, conduit fill, box fill, house service size, transformer and generator sizing, EV charger and PV string tools, and more. Voltage drop now counts reactance and checks the wire can carry the load. Choose light or dark in Settings. Topics are clearer, with new estimator and inspector roles, and small animations. Plus many fixes.
   </en-US>
   ```
 
