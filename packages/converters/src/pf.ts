@@ -1,4 +1,4 @@
-import { kvaToAmps, pfCorrectionKvar } from "@uom/core/electrical";
+import { capacitorRatedKvar, kvaToAmps, pfCorrectionKvar } from "@uom/core/electrical";
 import { amount, fmt, typed } from "./format";
 import type { Converter, Example, Row } from "./model";
 import { isNum, invalid } from "./checks";
@@ -23,18 +23,21 @@ export const pf: Converter = {
     { kind: "number", id: "pf2", label: "Target power factor", value: typed(0.95) },
     { ...voltsField("Volts (for current)"), value: undefined, optional: true, advanced: true },
     phaseField("3", true),
+    { kind: "number", id: "capVolts", label: "Capacitor rated voltage", suffix: "V", optional: true, advanced: true },
   ],
   compute(v) {
     const kw = v.num("kw");
     const pf1 = v.num("pf1");
     const pf2 = v.num("pf2");
     const volts = v.num("volts");
+    const capVolts = v.num("capVolts");
     const pfBad = (p: number | undefined) => Number.isNaN(p) || (isNum(p) && (p <= 0 || p > 1));
     const bad = invalid([
       ["kw", Number.isNaN(kw) || kw === 0],
       ["pf1", pfBad(pf1)],
       ["pf2", !isNum(pf2) || pfBad(pf2)],
       ["volts", Number.isNaN(volts) || volts === 0],
+      ["capVolts", Number.isNaN(capVolts) || capVolts === 0],
     ]);
     if (bad.length) return { error: "Enter numbers; power factors are between 0 and 1.", fields: bad };
     if (kw === undefined || pf1 === undefined) return undefined;
@@ -47,6 +50,9 @@ export const pf: Converter = {
       { label: "Capacitor needed", ...amount(kvar, 1, " kvar") },
       { group: "Before → after", label: "Apparent power", detail: t("{pct}% less", { pct: fmt(((kva1 - kva2) / kva1) * 100, 1) }), value: `${fmt(kva1, 1)} → ${fmt(kva2, 1)} kVA`, status: "good" },
     ];
+    if (volts !== undefined && capVolts !== undefined) {
+      rows.push({ label: "Capacitor to buy", detail: t("{rated} V rating on {volts} V", { rated: fmt(capVolts, 1), volts: fmt(volts, 1) }), ...amount(capacitorRatedKvar(kvar, volts, capVolts), 1, " kvar") });
+    }
     if (volts !== undefined) {
       const phase = readPhase(v);
       const a1 = kvaToAmps(kva1, volts, phase);
@@ -56,7 +62,7 @@ export const pf: Converter = {
     return {
       heading: t("{kw} kW from PF {from} to {to}", { kw: fmt(kw, 2), from: fmt(pf1, 3), to: fmt(pf2!, 3) }),
       rows,
-      formula: ["kvar = kW × (tan φ₁ − tan φ₂), where φ = arccos(power factor).", "kVA = kW ÷ power factor."],
+      formula: ["kvar = kW × (tan φ₁ − tan φ₂), where φ = arccos(power factor).", "kVA = kW ÷ power factor.", "A capacitor's kvar follows the square of the voltage: on 480 V, a 600 V unit gives 64% of its rating."],
     };
   },
 };

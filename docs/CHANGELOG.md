@@ -23,6 +23,13 @@ match the release tags (`v<version>`).
 - Ohm's law gives what a resistive load does on another voltage
 - the power converter has metric horsepower and tons of cooling
 - the length converter takes feet and inches as plans write them, such as 12'-6", and shows them
+- conductor ampacity: the NEC and CEC tables, derated for heat and bundling, and held to the terminals
+- motor full-load amps: horsepower to table current, with the wire, breaker, fuses and overload setting
+- conduit fill: the smallest EMT for a mix of wires, or how full a size would be
+- metal surcharge: what a copper or aluminum move adds to wire
+- fault current down a run, by the point-to-point method, against the equipment's rating
+- transformer sizing, generator and UPS sizing, house service size, lighting layout, EV charger circuit and PV string voltage
+- power factor correction gives the capacitor to buy for one rated at another voltage
 
 ### Changed
 
@@ -30,8 +37,8 @@ match the release tags (`v<version>`).
   reads about twice what it did, and a bigger wire no longer appears to cure a drop that
   reactance sets. North American sizes use stranded values
 - metric sizes use their IEC 60228 resistance limit, which reads 5-7% higher than nominal area
-- voltage drop's size row says it covers voltage drop only, and never suggests a size a circuit
-  can't be run in, such as 18 AWG, or 14 AWG in aluminum
+- voltage drop's size for AWG and kcmil also has to carry the load, and never one a circuit can't
+  be run in, such as 18 AWG, or 14 AWG in aluminum. Metric sizes are marked as voltage drop only
 - in Canada, a drop over 3% is shown as over the limit, as CEC Rule 8-102 sets it
 - transformer fault current leads with a worst case that allows for the 10% impedance tolerance.
   On single-phase it also gives line-to-neutral at a centre-tapped secondary

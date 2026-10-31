@@ -17,7 +17,7 @@ describe("search", () => {
 
   it("finds a converter by its description", () => {
     // "Metal price" says copper only in its description.
-    expect(ids("copper")).toEqual(["metal"]);
+    expect(ids("copper")).toContain("metal");
   });
 
   it("lists name matches before description matches", () => {
@@ -29,6 +29,9 @@ describe("search", () => {
 
   it("lists the audience's converters first, in the audience's order", () => {
     // Wire price comes first in Everything, but isn't on the electrician's list.
-    expect(ids("wire", electrician).slice(0, 6)).toEqual(["awg", "mm2", "conduit", "box-fill", "reels", "wire-price"]);
+    const wire = ids("wire", electrician);
+    expect(wire.indexOf("ampacity")).toBeLessThan(wire.indexOf("awg"));
+    expect(wire.indexOf("awg")).toBeLessThan(wire.indexOf("conduit"));
+    expect(wire.indexOf("reels")).toBeLessThan(wire.indexOf("wire-price"));
   });
 });

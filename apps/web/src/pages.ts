@@ -46,6 +46,61 @@ export const PAGES: Record<string, Page> = {
     title: "Wire Reels and Coils Calculator",
     description: "How many coils or reels of wire a run needs, counting every conductor pulled. Three wires pulled 200 ft is 600 ft of wire.",
   },
+  surcharge: {
+    slug: "copper-surcharge-calculator",
+    title: "Copper and Aluminum Wire Surcharge Calculator",
+    description: "What a copper or aluminum price move adds to wire: pounds of metal per M ft × (spot − base), per M ft, per foot and per metre.",
+  },
+  ampacity: {
+    slug: "wire-ampacity-calculator",
+    title: "Wire Ampacity Calculator: NEC and CEC Derating",
+    description: "What a wire can really carry: NEC Table 310.16 ampacity, derated for ambient temperature and bundling, and held to its terminal rating.",
+  },
+  "motor-fla": {
+    slug: "motor-full-load-amps-calculator",
+    title: "Motor Full-Load Amps Calculator (hp to Amps)",
+    description: "Horsepower to code-table full-load amps, with the wire size, breaker, fuse and overload setting for a single motor.",
+  },
+  "conduit-fill": {
+    slug: "conduit-fill-calculator",
+    title: "Conduit Fill Calculator (EMT)",
+    description: "The smallest EMT for a mix of wire sizes, or how full a size would be, from NEC Chapter 9 Tables 4 and 5.",
+  },
+  "service-load": {
+    slug: "house-service-size-calculator",
+    title: "House Service Size Calculator: NEC and CEC",
+    description: "The calculated load of a single dwelling and the service it needs, by the NEC 220.82 optional method or CEC Rule 8-200.",
+  },
+  transformer: {
+    slug: "transformer-sizing-calculator",
+    title: "Transformer Sizing and Protection Calculator",
+    description: "Primary and secondary amps, the next common kVA size, and the overcurrent protection allowed by the NEC or CEC.",
+  },
+  generator: {
+    slug: "generator-ups-sizing-calculator",
+    title: "Generator and UPS Sizing Calculator",
+    description: "Size a generator or UPS against both kW and kVA, with the largest motor start and spare capacity.",
+  },
+  "fault-run": {
+    slug: "point-to-point-fault-current-calculator",
+    title: "Point-to-Point Fault Current Calculator",
+    description: "Fault current left at the end of a feeder, by the point-to-point method, checked against the equipment's interrupting rating.",
+  },
+  lighting: {
+    slug: "lighting-layout-calculator",
+    title: "Lighting Layout Calculator (Lumen Method)",
+    description: "How many fixtures a room needs for a target light level in foot-candles or lux, by the lumen method.",
+  },
+  "ev-charger": {
+    slug: "ev-charger-circuit-calculator",
+    title: "EV Charger Circuit Calculator",
+    description: "The breaker and wire size for an EV charger, as a continuous load at 125%, with the charging power.",
+  },
+  "pv-string": {
+    slug: "pv-string-voltage-calculator",
+    title: "PV String Voltage Calculator",
+    description: "A solar string's voltage on the coldest day against the system limit, with the most modules in series and the circuit current.",
+  },
   awg: {
     slug: "awg-to-mm2",
     title: "AWG and kcmil to mm² Converter",

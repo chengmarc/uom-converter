@@ -5,10 +5,21 @@ import { multiplier } from "./multiplier";
 import { margin } from "./margin";
 import { packs } from "./packs";
 import { reels } from "./reels";
+import { surcharge } from "./surcharge";
 import { awg } from "./awg";
 import { mm2 } from "./mm2";
 import { conduit } from "./conduit";
 import { boxFillConverter } from "./box-fill";
+import { ampacity } from "./ampacity";
+import { conduitFillConverter } from "./conduit-fill";
+import { faultRun } from "./fault-run";
+import { transformer } from "./transformer";
+import { generator } from "./generator";
+import { serviceLoad } from "./service-load";
+import { lighting } from "./lighting";
+import { evCharger } from "./ev-charger";
+import { pvString } from "./pv-string";
+import { motorFla } from "./motor-fla";
 import { load } from "./load";
 import { vdrop } from "./vdrop";
 import { pf } from "./pf";
@@ -39,18 +50,29 @@ export const TOOLS: Converter[] = [
   margin,
   packs,
   reels,
+  surcharge,
   awg,
   mm2,
+  ampacity,
   conduit,
+  conduitFillConverter,
   boxFillConverter,
   load,
   vdrop,
+  serviceLoad,
+  transformer,
+  generator,
   pf,
   fault,
+  faultRun,
+  motorFla,
   motor,
   volts,
   ohm,
   energy,
+  lighting,
+  evCharger,
+  pvString,
   fraction,
   length,
   temperature,

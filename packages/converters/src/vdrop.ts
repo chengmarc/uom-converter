@@ -1,3 +1,4 @@
+import { smallestSizeForAmps } from "@uom/core/ampacity";
 import { buildingSizesFor, conductorImpedance, conductorInfo, METRIC_SIZES_MM2, metricSizesFor, NA_WIRE_SIZES, type Raceway, smallestSizeForDrop, voltageDrop } from "@uom/core/conductors";
 import type { Region } from "@uom/core/region";
 import { ftToM } from "@uom/core/units";
@@ -137,9 +138,12 @@ export const vdrop: Converter = {
     const run = { ...setup, pf, sets: sets!, lengthM, amps, volts: volts!, phase };
     const d = voltageDrop({ ...run, areaMm2 });
     const { r, x } = conductorImpedance({ ...setup, areaMm2 });
+    // North American sizes also have to carry the load; IEC ampacity isn't in here yet.
+    const forAmps = sys === "na" ? smallestSizeForAmps(amps / sets!, { metal, insulation: 75, ambientC: 30, conductors: 3, code: v.region === "ca" ? "cec" : "nec" }) : undefined;
+    const naSizes = buildingSizesFor(metal);
     const fit =
       sys === "na"
-        ? smallestSizeForDrop(buildingSizesFor(metal), (s) => s.areaMm2, target!, run)
+        ? forAmps && smallestSizeForDrop(naSizes.slice(naSizes.indexOf(forAmps)), (s) => s.areaMm2, target!, run)
         : smallestSizeForDrop(metricSizesFor(metal), (m) => m, target!, run);
     const fitLabel =
       fit === undefined
@@ -159,10 +163,13 @@ export const vdrop: Converter = {
         { label: "Drop in volts", ...amount(d.volts, 2, " V") },
         { label: "Voltage at the load", ...amount(d.atLoad, 1, " V") },
         {
-          label: "Smallest size for voltage drop only",
-          detail: fit === undefined ? "add parallel sets, or shorten the run" : t("not an ampacity check: confirm it's rated for {amps} A", { amps: fmt(amps, 2) }),
+          label: sys === "na" ? "Smallest size for this run" : "Smallest size for voltage drop only",
+          detail:
+            fit === undefined ? "add parallel sets, or shorten the run"
+            : sys === "na" ? t("carries {amps} A at 75 °C in 30 °C, and meets your {pct}% target. Check it for your terminals and derating.", { amps: fmt(amps / sets!, 2), pct })
+            : t("not an ampacity check: confirm it's rated for {amps} A", { amps: fmt(amps, 2) }),
           value: fitLabel,
-          status: "warn",
+          status: sys === "na" && fit !== undefined ? undefined : "warn",
         },
       ],
       visual: gauge({

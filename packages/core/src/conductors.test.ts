@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildingSizesFor, conductorImpedance, conductorInfo, conductorKgPerKm, conductorOhmsPerKm, kcmilToMm2, kgPerKmToLbPerKft, metricSizesFor, metricToNorthAmerican, NA_BUILDING_SIZES, parseConductor, smallestSizeForDrop, voltageDrop, type ConductorInfo } from "./conductors";
+import { buildingSizesFor, conductorImpedance, conductorInfo, faultAtEndOfRun, conductorKgPerKm, conductorOhmsPerKm, kcmilToMm2, kgPerKmToLbPerKft, metricSizesFor, metricToNorthAmerican, NA_BUILDING_SIZES, parseConductor, smallestSizeForDrop, voltageDrop, type ConductorInfo } from "./conductors";
 
 const info = (s: string) => conductorInfo(s) as ConductorInfo;
 
@@ -137,6 +137,20 @@ describe("conductor resistance and voltage drop", () => {
     const run = { ...setup, pf: 0.85, lengthM: 152.4, amps: 450, volts: 208, phase: 3 as const };
     expect(smallestSizeForDrop(NA_BUILDING_SIZES, (s) => s.areaMm2, 3, run)).toBeUndefined();
     expect(smallestSizeForDrop(NA_BUILDING_SIZES, (s) => s.areaMm2, 3, { ...run, sets: 3 })).toBeDefined();
+  });
+
+  it("reads resistance colder when asked", () => {
+    const at = (tempC?: number) => conductorImpedance({ ...setup, areaMm2: info("500 kcmil").areaMm2, tempC }).r;
+    expect(at(20) / at()).toBeCloseTo(1 / (1 + 0.00393 * 55));
+  });
+
+  it("works out fault current at the end of a run", () => {
+    const run = { ...setup, areaMm2: info("500 kcmil").areaMm2, lengthM: 30.48, faultAmps: 20000, volts: 480, phase: 3 as const, sets: 1 };
+    const r = faultAtEndOfRun(run);
+    expect(r.multiplier).toBeCloseTo(1 / (1 + r.f));
+    expect(r.faultAmps).toBeLessThan(20000);
+    expect(faultAtEndOfRun({ ...run, sets: 2 }).faultAmps).toBeGreaterThan(r.faultAmps);
+    expect(faultAtEndOfRun({ ...run, lengthM: 300 }).faultAmps).toBeLessThan(r.faultAmps);
   });
 
   it("finds the smallest size for a target drop", () => {

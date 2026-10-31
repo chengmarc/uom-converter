@@ -94,9 +94,19 @@ describe("voltage drop", () => {
     expect(drop({ len: "3000", amps: "400" }).rows[3]).toMatchObject({ value: "Over 2000 kcmil", detail: "add parallel sets, or shorten the run", status: "warn" });
   });
 
-  it("says a size for drop alone is no ampacity check", () => {
+  it("won't suggest a wire that can't carry the load, however short the run", () => {
     const row = drop({ len: "60", size: "3/0", amps: "150", volts: "600", phase: "3" }, "ca").rows[3];
-    expect(row).toMatchObject({ label: "Smallest size for voltage drop only", detail: "not an ampacity check: confirm it's rated for 150 A", status: "warn" });
+    expect(row).toMatchObject({ label: "Smallest size for this run", value: "1/0 AWG" });
+    expect(drop({ size: "12", len: "10", amps: "40", volts: "240" }).rows[3].value).toBe("8 AWG");
+  });
+
+  it("shares the load between parallel sets when it picks a size", () => {
+    expect(drop({ size: "500 kcmil", len: "10", amps: "600", volts: "480", phase: "3", sets: "2" }).rows[3].value).toBe("350 kcmil");
+  });
+
+  it("says when a metric size is for voltage drop alone", () => {
+    const row = drop({ size: "2.5", len: "5", amps: "63", volts: "400", phase: "3", sys: "mm2" }, "eu").rows[3];
+    expect(row).toMatchObject({ label: "Smallest size for voltage drop only", status: "warn" });
   });
 
   it("never suggests a size a circuit can't be run in", () => {
@@ -140,6 +150,171 @@ describe("line and neutral voltage", () => {
     expect(answer("volts", { v: "400", from: "ll" }, "eu")!.rows[1]).toMatchObject({ label: "Standard system", value: "230/400 V" });
     expect(answer("volts", { v: "400", from: "ln" }, "eu")!.rows[1]).toMatchObject({ value: "400/690 V" });
     expect(answer("volts", { v: "208", from: "ln" })!.rows).toHaveLength(1);
+  });
+});
+
+describe("conductor ampacity", () => {
+  it("holds a 90 °C wire to its terminals", () => {
+    expect(answer("ampacity", { size: "6", ambient: "30", count: "3" })!.rows[0]).toMatchObject({ value: "55 A", detail: "held to its 60 °C terminals" });
+  });
+
+  it("checks a load", () => {
+    expect(answer("ampacity", { size: "500 kcmil", insulation: "75", load: "400" })!.rows[0]).toMatchObject({ status: "bad" });
+    expect(answer("ampacity", { size: "500 kcmil", insulation: "75", load: "380" })!.rows[0]).toMatchObject({ status: "good" });
+  });
+
+  it("refuses a setup with no rating", () => {
+    expect(output("ampacity", { size: "14", metal: "Al" })).toMatchObject({ fields: ["size", "ambient", "insulation"] });
+    expect(output("ampacity", { size: "12", insulation: "60", ambient: "60" })).toMatchObject({ fields: ["size", "ambient", "insulation"] });
+  });
+});
+
+describe("motor full-load amps", () => {
+  it("gives the table current and the circuit", () => {
+    const rows = answer("motor-fla", { hp: "10", volts: "460", phase: "3" })!.rows;
+    expect(rows[0].value).toBe("14 A");
+    expect(rows[2].value).toBe("14 AWG");
+    expect(rows.find((r) => r.label === "Inverse-time breaker")?.value).toBe("35 A");
+  });
+
+  it("refuses what the tables don't have", () => {
+    expect(output("motor-fla", { hp: "15", volts: "230", phase: "1" })).toMatchObject({ fields: ["hp", "volts", "phase"] });
+  });
+
+  it("sets overloads from the nameplate", () => {
+    expect(answer("motor-fla", { hp: "10", volts: "460", phase: "3", nameplate: "13" })!.rows.at(-1)).toMatchObject({ value: "16.25 A" });
+    expect(answer("motor-fla", { hp: "10", volts: "460", phase: "3", nameplate: "13", sf: "low" })!.rows.at(-1)).toMatchObject({ value: "14.95 A" });
+  });
+});
+
+describe("metal surcharge", () => {
+  it("multiplies the metal in the wire by the move", () => {
+    // 12 AWG copper: 19.77 lb/M ft bare, 20.16 with stranding, × $1.50.
+    expect(answer("surcharge", { size: "12", metal: "Cu", spot: "4.5", base: "3" })!.rows[0]).toMatchObject({ label: "Surcharge per M ft", value: "$30.2419" });
+  });
+
+  it("calls it a credit under the base", () => {
+    expect(answer("surcharge", { size: "12", metal: "Cu", spot: "2.5", base: "3" })!.rows[0].label).toBe("Credit per M ft");
+  });
+});
+
+describe("conduit fill", () => {
+  it("finds the smallest EMT for the published example", () => {
+    expect(answer("conduit-fill", { s1: "12", n1: "3", s2: "10", n2: "4", s3: "8", n3: "8" })!.rows[0]).toMatchObject({ label: "Smallest EMT", value: '1-1/4" (35)' });
+  });
+
+  it("checks a chosen size", () => {
+    expect(answer("conduit-fill", { s1: "12", n1: "3", s2: "10", n2: "4", s3: "8", n3: "8", conduit: "1" })!.rows[0]).toMatchObject({ label: "Over the fill limit", status: "bad" });
+  });
+
+  it("refuses a size it has no area for", () => {
+    expect(output("conduit-fill", { s1: "600 kcmil", n1: "3" })).toMatchObject({ fields: ["s1"] });
+  });
+});
+
+describe("fault current down a run", () => {
+  const set = { start: "23.2", size: "500 kcmil", len: "100", volts: "480", lenUnit: "ft", metal: "Cu" };
+
+  it("falls along the run", () => {
+    const kA = Number.parseFloat(answer("fault-run", set)!.rows[0].value);
+    expect(kA).toBeLessThan(23.2);
+    expect(kA).toBeGreaterThan(10);
+  });
+
+  it("checks the equipment's rating", () => {
+    expect(answer("fault-run", { ...set, rating: "10" })!.rows[0]).toMatchObject({ status: "bad" });
+    expect(answer("fault-run", { ...set, rating: "65" })!.rows[0]).toMatchObject({ status: "good" });
+  });
+});
+
+describe("transformer sizing", () => {
+  it("gives both currents and the NEC's protection", () => {
+    const rows = answer("transformer", { kva: "75", primary: "480", secondary: "208", phase: "3" })!.rows;
+    expect(rows[0].value).toBe("90.2 A");
+    expect(rows[1].value).toBe("208.2 A");
+    expect(rows.find((r) => r.label === "Primary device, primary protection only")?.value).toBe("125 A");
+  });
+
+  it("uses the CEC's own rule in Canada", () => {
+    const rows = answer("transformer", { kva: "75", primary: "600", secondary: "208", phase: "3" }, "ca")!.rows;
+    expect(rows.find((r) => r.label === "Primary device")?.value).toBe("100 A");
+  });
+
+  it("finds the next common size", () => {
+    expect(answer("transformer", { kva: "60", primary: "480", secondary: "208", phase: "3" })!.rows[2]).toMatchObject({ value: "75 kVA" });
+  });
+});
+
+describe("generator and UPS sizing", () => {
+  it("is limited by whichever of kW and kVA runs out first", () => {
+    const row = answer("generator", { kw: "100", pf: "0.9", margin: "0" })!.rows[0];
+    expect(row.value).toBe("125 kVA / 100 kW");
+  });
+
+  it("shows current only for a voltage someone entered", () => {
+    expect(answer("generator", { kw: "100", pf: "0.85" })!.rows.map((r) => r.label)).not.toContain("Set current at this size");
+    expect(answer("generator", { kw: "100", pf: "0.85", volts: "480" })!.rows.map((r) => r.label)).toContain("Set current at this size");
+  });
+
+  it("allows for a motor start and spare capacity", () => {
+    expect(answer("generator", { kw: "80", pf: "0.9", start: "60", margin: "0" })!.rows[0].value).toBe("148.9 kVA / 119.1 kW");
+    expect(answer("generator", { kw: "100", pf: "0.9" })!.rows[0].value).toBe("150 kVA / 120 kW");
+  });
+});
+
+describe("house service size", () => {
+  it("matches the NEC's published dwelling", () => {
+    const rows = answer("service-load", { area: "1500", other: "22600", heat: "10000", ac: "3910" })!.rows;
+    expect(rows[1].value).toBe("25,140 W");
+    expect(rows[0]).toMatchObject({ value: "110 A", detail: "104.8 A calculated" });
+  });
+
+  it("uses CEC Rule 8-200 in Canada", () => {
+    const rows = answer("service-load", { area: "269", range: "11000", ac: "6000", hot: "8000", ev: "7200", other: "9500" }, "ca")!.rows;
+    expect(rows[1].value).toBe("36,575 W");
+    expect(rows[0].value).toBe("175 A");
+  });
+});
+
+describe("lighting layout", () => {
+  it("rounds fixtures up, and shows what that gives", () => {
+    const rows = answer("lighting", { area: "2000", level: "50", lumens: "5000", units: "imperial" })!.rows;
+    expect(rows[0]).toMatchObject({ value: "42", detail: "41.67 before rounding up" });
+    expect(rows[1].value).toBe("50.4 fc");
+  });
+
+  it("works in lux", () => {
+    expect(answer("lighting", { area: "200", level: "500", lumens: "5000", units: "metric" }, "eu")!.rows[0].value).toBe("42");
+  });
+});
+
+describe("EV charger circuit", () => {
+  it("sizes a 32 A charger on a 40 A circuit", () => {
+    const rows = answer("ev-charger", { amps: "32", volts: "240", phase: "1" })!.rows;
+    expect(rows[0].value).toBe("40 A");
+    expect(rows[1].value).toBe("8 AWG");
+    expect(rows[2].value).toBe("7.7 kW");
+  });
+});
+
+describe("PV string voltage", () => {
+  const set = { voc: "49.5", count: "12", coef: "-0.27", low: "-20", limit: "600" };
+
+  it("flags a string over the limit in the cold", () => {
+    expect(answer("pv-string", set)!.rows[0]).toMatchObject({ value: "666.2 V", status: "bad" });
+    expect(answer("pv-string", { ...set, count: "10" })!.rows[0]).toMatchObject({ status: "good" });
+    expect(answer("pv-string", set)!.rows[1].value).toBe("10");
+  });
+
+  it("refuses a positive coefficient", () => {
+    expect(output("pv-string", { ...set, coef: "0.27" })).toMatchObject({ fields: ["coef"] });
+  });
+});
+
+describe("a capacitor off its rated voltage", () => {
+  it("shows the rating to buy", () => {
+    const rows = answer("pf", { kw: "100", pf1: "0.8", volts: "480", capVolts: "600" })!.rows;
+    expect(rows.find((r) => r.label === "Capacitor to buy")).toMatchObject({ value: "65.8 kvar" });
   });
 });
 

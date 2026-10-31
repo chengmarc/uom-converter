@@ -139,7 +139,7 @@ const RESISTIVITY_20C: Record<Metal, { rho: number; alpha: number }> = {
 type SizeSystem = "na" | "iec";
 
 /** Stranded conductors run about 2% over solid: the lay makes each strand longer (NEC Chapter 9 Table 8). */
-const STRANDING = 1.02;
+export const STRANDING = 1.02;
 
 /**
  * IEC 60228 maximum DC resistance at 20 °C, Ω/km: class 2 stranded, plain copper and aluminum (class 2
@@ -231,12 +231,15 @@ interface ConductorSetup {
   system: SizeSystem;
   raceway: Raceway;
   hz: 50 | 60;
+  /** Conductor temperature, °C; 75 unless set. Fault studies use a cold conductor, which lets more through. */
+  tempC?: number;
 }
 
-/** AC resistance and reactance, Ω/km at 75 °C. Reactance scales with frequency. */
-export function conductorImpedance({ areaMm2, metal, system, raceway, hz }: ConductorSetup): { r: number; x: number } {
+/** AC resistance and reactance, Ω/km. Reactance scales with frequency. */
+export function conductorImpedance({ areaMm2, metal, system, raceway, hz, tempC = 75 }: ConductorSetup): { r: number; x: number } {
+  const { alpha } = RESISTIVITY_20C[metal];
   return {
-    r: conductorOhmsPerKm(areaMm2, metal, system) * readTable9(areaMm2, (row) => row.ac[metal][raceway]),
+    r: (conductorOhmsPerKm(areaMm2, metal, system) * readTable9(areaMm2, (row) => row.ac[metal][raceway]) * (1 + alpha * (tempC - 20))) / (1 + alpha * (75 - 20)),
     x: readTable9(areaMm2, (row) => row.x[raceway]) * (hz / 60),
   };
 }
@@ -264,6 +267,27 @@ export function voltageDrop(i: VoltageDropInput): { volts: number; percent: numb
   const k = i.phase === 3 ? Math.sqrt(3) : 2;
   const volts = (k * i.amps * (z / 1000) * i.lengthM) / (i.sets ?? 1);
   return { volts, percent: (volts / i.volts) * 100, atLoad: i.volts - volts };
+}
+
+interface FaultRun extends ConductorSetup {
+  lengthM: number;
+  faultAmps: number;
+  volts: number;
+  phase: Phase;
+  sets: number;
+}
+
+/**
+ * Fault current at the far end of a run, by the point-to-point method: f = k × L × I ÷ (C × n × E)
+ * and M = 1 ÷ (1 + f), where 1/C is the conductor's impedance. Taken at 20 °C, since the highest
+ * fault current flows through a cold conductor.
+ */
+export function faultAtEndOfRun(i: FaultRun) {
+  const { r, x } = conductorImpedance({ ...i, tempC: 20 });
+  const k = i.phase === 3 ? Math.sqrt(3) : 2;
+  const f = (k * i.lengthM * (Math.hypot(r, x) / 1000) * i.faultAmps) / (i.sets * i.volts);
+  const multiplier = 1 / (1 + f);
+  return { f, multiplier, faultAmps: i.faultAmps * multiplier };
 }
 
 /** Smallest size from a list (smallest first) that keeps the drop at or under `maxPercent`. Says nothing about ampacity. */

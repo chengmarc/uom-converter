@@ -56,6 +56,11 @@ export const METRES_PER_PRICE_UNIT: Record<LengthPriceUnit, number> = {
   km: 1000,
 };
 
+// ---------- Metal surcharge ----------
+
+/** What a metal price over base adds per M ft of wire. Negative below base: a credit. */
+export const metalSurcharge = (lbPerMft: number, spotPerLb: number, basePerLb: number) => lbPerMft * (spotPerLb - basePerLb);
+
 // ---------- List × multiplier ----------
 
 /**

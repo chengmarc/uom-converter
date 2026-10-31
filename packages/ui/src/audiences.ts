@@ -26,7 +26,7 @@ export const AUDIENCES: Audience[] = [
     id: "distributor",
     label: "Distributor",
     description: "Purchasing, pricing and inside sales: price units, multipliers, margins, metal prices.",
-    tools: ["price", "wire-price", "multiplier", "margin", "mixup", "price-qty", "packs", "reels", "metal"],
+    tools: ["price", "wire-price", "multiplier", "margin", "mixup", "price-qty", "packs", "reels", "metal", "surcharge"],
   },
   {
     id: "counter",
@@ -38,13 +38,13 @@ export const AUDIENCES: Audience[] = [
     id: "electrician",
     label: "Electrician",
     description: "On the job: voltage drop, wire and conduit sizes, fractions, torque, how much wire to buy.",
-    tools: ["vdrop", "awg", "mm2", "conduit", "box-fill", "fraction", "ohm", "volts", "load", "reels", "torque"],
+    tools: ["vdrop", "ampacity", "motor-fla", "conduit-fill", "box-fill", "service-load", "ev-charger", "awg", "mm2", "conduit", "fraction", "ohm", "volts", "load", "reels", "torque"],
   },
   {
     id: "engineer",
     label: "Engineer",
     description: "Design checks: loads, voltage drop, power factor correction, fault current, motors.",
-    tools: ["load", "vdrop", "pf", "fault", "motor", "volts", "ohm", "awg", "mm2", "energy"],
+    tools: ["load", "vdrop", "ampacity", "motor-fla", "transformer", "generator", "pf", "fault", "fault-run", "service-load", "lighting", "pv-string", "motor", "volts", "ohm", "awg", "mm2", "energy"],
   },
   {
     id: "pim",

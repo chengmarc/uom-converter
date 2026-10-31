@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ampsToKva, energyUse, highLegVolts, kvaToAmps, lineToLine, lineToNeutral, motorSlip, ohmsLaw, pfCorrectionKvar, polesForRpm, readingBand, resistiveAt, supplyRange, syncSpeedRpm, transformerFaultAmps, wyeSystem } from "./electrical";
+import { ampsToKva, capacitorRatedKvar, cecTransformerPrimary, energyUse, highLegVolts, kvaToAmps, lineToLine, lineToNeutral, motorSlip, necTransformerProtection, nextTransformerKva, ohmsLaw, pfCorrectionKvar, polesForRpm, pvCircuitAmps, pvStringVolts, readingBand, resistiveAt, supplyRange, syncSpeedRpm, transformerFaultAmps, wyeSystem } from "./electrical";
 
 describe("load", () => {
   it("converts kVA and amps", () => {
@@ -97,6 +97,52 @@ describe("power factor correction", () => {
   it("sizes the capacitor", () => {
     expect(pfCorrectionKvar(100, 0.8, 0.95)).toBeCloseTo(42.13, 2);
     expect(pfCorrectionKvar(100, 0.9, 0.9)).toBeCloseTo(0);
+  });
+});
+
+describe("capacitors off their rated voltage", () => {
+  it("follow the square of the voltage: a 600 V unit on 480 V gives 64%", () => {
+    expect(capacitorRatedKvar(64, 480, 600)).toBeCloseTo(100);
+    expect(capacitorRatedKvar(50, 480, 480)).toBe(50);
+  });
+});
+
+describe("PV strings", () => {
+  it("rise in the cold, by the data sheet's coefficient", () => {
+    const s = pvStringVolts(50, 10, -0.3, -15, 600);
+    expect(s.coldVoc).toBeCloseTo(56);
+    expect(s.stringVolts).toBeCloseTo(560);
+    expect(s.maxModules).toBe(10);
+  });
+
+  it("carry 125% of Isc, and 156% in the conductors", () => {
+    const c = pvCircuitAmps(10, 2);
+    expect(c.circuit).toBe(25);
+    expect(c.ampacity).toBe(31.25);
+  });
+});
+
+describe("transformers", () => {
+  it("find the next common size", () => {
+    expect(nextTransformerKva(60, 3)).toBe(75);
+    expect(nextTransformerKva(75, 3)).toBe(75);
+    expect(nextTransformerKva(2000, 3)).toBeUndefined();
+  });
+
+  it("follow NEC Table 450.3(B) on the primary", () => {
+    expect(necTransformerProtection(41.67, 100).primaryOnly).toBe(60);
+    expect(necTransformerProtection(5, 10).primaryOnly).toBeUndefined(); // 8.35 A: under the smallest rating listed
+  });
+
+  it("go up a size at 125%, and down at 167% and 250%", () => {
+    const p = necTransformerProtection(90.2, 208.2);
+    expect(p.primaryOnly).toBe(125);
+    expect(p.primaryWithSecondary).toBe(225);
+    expect(p.secondary).toBe(300);
+  });
+
+  it("take the CEC's 125%, next size up", () => {
+    expect(cecTransformerPrimary(72.2)).toBe(100);
   });
 });
 

@@ -1,6 +1,7 @@
 // Electrical formulas: load (kVA, kW, amps), line and neutral voltage, Ohm's law, energy cost,
 // power factor correction, motors and transformer fault current.
 
+import { ratingAtLeast, ratingAtMost } from "./ratings";
 import type { Region } from "./region";
 import { t } from "@uom/i18n";
 
@@ -144,6 +145,29 @@ export function pfCorrectionKvar(kw: number, fromPf: number, toPf: number): numb
   return kw * (Math.tan(Math.acos(fromPf)) - Math.tan(Math.acos(toPf)));
 }
 
+/**
+ * What a capacitor gives off its rated voltage: kvar follows the square of the voltage, so a 600 V
+ * unit on 480 V gives 64%. Returns the rated kvar to buy for `kvar` at `volts`.
+ */
+export const capacitorRatedKvar = (kvar: number, volts: number, ratedVolts: number) => kvar * (ratedVolts / volts) ** 2;
+
+// ---------- Photovoltaics ----------
+
+/**
+ * A string's voltage on the coldest day (NEC 690.7): Voc rises as temperature falls below the
+ * 25 °C it's rated at. `coefficient` is the data sheet's %/°C, a negative number.
+ */
+export function pvStringVolts(voc: number, modules: number, coefficient: number, lowC: number, limit: number) {
+  const coldVoc = voc * (1 + (coefficient / 100) * (lowC - 25));
+  return { coldVoc, stringVolts: coldVoc * modules, maxModules: Math.floor(limit / coldVoc + 1e-9) };
+}
+
+/** NEC 690.8: maximum circuit current is 125% of Isc, and conductors carry 125% of that again, 156% in all. */
+export function pvCircuitAmps(isc: number, strings: number) {
+  const circuit = isc * strings * 1.25;
+  return { circuit, ampacity: circuit * 1.25 };
+}
+
 // ---------- Motors ----------
 
 /** Synchronous speed, r/min: 120 × f ÷ poles. */
@@ -160,6 +184,37 @@ export function polesForRpm(hz: number, ratedRpm: number): number | undefined {
 }
 
 // ---------- Transformer fault current ----------
+
+// ---------- Transformers ----------
+
+/** Dry-type sizes commonly stocked, kVA. */
+const TRANSFORMER_KVA: Record<Phase, number[]> = {
+  1: [1, 1.5, 2, 3, 5, 7.5, 10, 15, 25, 37.5, 50, 75, 100, 167],
+  3: [3, 6, 9, 15, 30, 45, 75, 112.5, 150, 225, 300, 500, 750, 1000],
+};
+
+/** The next common size up. Undefined past the end of the list. */
+export const nextTransformerKva = (kva: number, phase: Phase) => TRANSFORMER_KVA[phase].find((k) => k >= kva);
+
+/** Standard ratings for a percentage: the next size up where the code allows it, the next down where it doesn't. */
+const device = (amps: number, roundUp: boolean) => (roundUp ? ratingAtLeast(amps) : ratingAtMost(amps));
+
+/**
+ * Overcurrent protection for a transformer of 600 V or less. NEC Table 450.3(B), primary only:
+ * 125% from 9 A (next size up), 167% from 2 A, 300% under that (neither rounded up). With secondary
+ * protection, the primary may reach 250% and the secondary sits at 125%, or 167% under 9 A.
+ */
+export function necTransformerProtection(primaryAmps: number, secondaryAmps: number) {
+  const primaryOnly = primaryAmps >= 9 ? device(primaryAmps * 1.25, true) : primaryAmps >= 2 ? device(primaryAmps * 1.67, false) : device(primaryAmps * 3, false);
+  return {
+    primaryOnly,
+    primaryWithSecondary: device(primaryAmps * 2.5, false),
+    secondary: secondaryAmps >= 9 ? device(secondaryAmps * 1.25, true) : device(secondaryAmps * 1.67, false),
+  };
+}
+
+/** A dry-type transformer of 750 V or less under the CEC: the primary at 125%, the next size up where it falls between. */
+export const cecTransformerPrimary = (primaryAmps: number) => device(primaryAmps * 1.25, true);
 
 /** Real impedance can sit this far under the nameplate: ±10% is the UL 1561 tolerance from 25 kVA up. */
 const Z_TOLERANCE = 0.9;
