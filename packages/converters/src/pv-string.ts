@@ -6,7 +6,7 @@ import { t } from "@uom/i18n";
 
 export const pvString: Converter = {
   id: "pv-string",
-  topic: "Electrical",
+  topic: "Lighting, EV & solar",
   title: "PV string voltage",
   blurb: "A cold morning raises a string's voltage. Check it against the system limit, and size the circuit current.",
   empty: "Enter the module's Voc and how many are in the string.",

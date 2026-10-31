@@ -7,7 +7,7 @@ import { t } from "@uom/i18n";
 
 export const fault: Converter = {
   id: "fault",
-  topic: "Electrical",
+  topic: "Equipment",
   title: "Transformer fault current",
   blurb: "Full-load current and the maximum fault current at a transformer's secondary terminals, from kVA and nameplate impedance.",
   empty: "Enter the transformer kVA and its impedance (%Z).",

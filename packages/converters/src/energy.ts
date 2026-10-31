@@ -7,7 +7,7 @@ import { t } from "@uom/i18n";
 
 export const energy: Converter = {
   id: "energy",
-  topic: "Electrical",
+  topic: "Power & loads",
   title: "Energy cost",
   blurb: "What a load costs to run, and what a retrofit saves.",
   empty: "Enter the load in watts and the hours it runs per day.",

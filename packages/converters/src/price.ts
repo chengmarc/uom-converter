@@ -14,7 +14,7 @@ const headingFor = (uom: PriceUom, price: string) =>
 
 export const price: Converter = {
   id: "price",
-  topic: "Pricing",
+  topic: "Pricing & ordering",
   title: "Price per E / C / M",
   blurb: "Distributor price units: E is per each, C is per 100, M is per 1,000. Wire is usually priced per M feet.",
   empty: "Enter a price to see it per each, per 100 and per 1,000.",

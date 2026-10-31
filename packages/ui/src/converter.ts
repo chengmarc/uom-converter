@@ -74,7 +74,7 @@ export function renderConverter(conv: Converter, region: Region, heading: "h1" |
       const fs = el("fieldset", "field");
       fs.append(el("legend", "label", t(f.label)));
       const seg = el("div", "segmented");
-      seg.style.setProperty("--n", String(f.options.length));
+      seg.style.setProperty("--n", String(f.columns ?? f.options.length));
       const initial = f.value === undefined ? f.options[0].value : dyn(f.value, values);
       for (const o of f.options) {
         const lab = el("label");

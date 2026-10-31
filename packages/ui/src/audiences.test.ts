@@ -16,6 +16,12 @@ describe("audiences", () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
+  it("point an estimator at quantities and an inspector at code checks first", () => {
+    const first = (id: string) => AUDIENCES.find((a) => a.id === id)!.tools[0];
+    expect(first("estimator")).toBe("reels");
+    expect(first("inspector")).toBe("box-fill");
+  });
+
   // Each audience opens on its first converter, so it has to have one.
   it("each have a converter to open on", () => {
     for (const a of AUDIENCES) expect(a.tools.length, a.id).toBeGreaterThan(0);

@@ -12,7 +12,7 @@ const codeOf = (v: Values): WiringCode => (v.region === "ca" ? "cec" : "nec");
 
 export const evCharger: Converter = {
   id: "ev-charger",
-  topic: "Electrical",
+  topic: "Lighting, EV & solar",
   title: "EV charger circuit",
   blurb: "The breaker and wire for a charger, treated as a continuous load at 125%.",
   empty: "Enter the charger's rated current.",

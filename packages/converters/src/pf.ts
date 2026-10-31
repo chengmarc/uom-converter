@@ -7,7 +7,7 @@ import { t } from "@uom/i18n";
 
 export const pf: Converter = {
   id: "pf",
-  topic: "Electrical",
+  topic: "Equipment",
   title: "Power factor correction",
   blurb: "Capacitor kvar needed to raise a load's power factor, and what it does to kVA and current.",
   empty: "Enter the load in kW and its present power factor.",

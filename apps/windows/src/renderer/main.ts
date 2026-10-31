@@ -4,7 +4,7 @@
 import "@fontsource-variable/inter/opsz.css";
 import type { Region } from "@uom/core/region";
 import { ALL_AUDIENCES, EVERYTHING, type Audience } from "@uom/ui/audiences";
-import { byId, TOOLS } from "@uom/converters";
+import { byId, TOOLS, TOPICS } from "@uom/converters";
 import { icon, settingsIcon } from "@uom/ui/icons";
 import { REGIONS } from "@uom/converters/regions";
 import type { Converter, Topic } from "@uom/converters/model";
@@ -94,8 +94,8 @@ function buildNav() {
     if (!found.length) sidebar.append(el("p", "sidebar-hint", t("No converter matches.")));
   } else {
     const visible = audience.tools.map((id) => byId.get(id)!);
-    // Groups in order of their first tool, tools in the audience's priority order.
-    const groups = [...new Set(visible.map((c) => c.topic))];
+    // Groups in every app's topic order, tools in the audience's priority order.
+    const groups = TOPICS.filter((topic) => visible.some((c) => c.topic === topic));
     sidebar.replaceChildren(...groups.map((g) => navGroup(t(g), visible.filter((c) => c.topic === g), g)));
     sidebar.append(el("p", "sidebar-hint", t("Click any result to copy it.")));
   }
@@ -103,7 +103,7 @@ function buildNav() {
 
   // The narrow-window picker always lists the audience's converters.
   picker.replaceChildren();
-  for (const g of [...new Set(audience.tools.map((id) => byId.get(id)!.topic))]) {
+  for (const g of TOPICS.filter((topic) => audience.tools.some((id) => byId.get(id)!.topic === topic))) {
     const og = Object.assign(document.createElement("optgroup"), { label: t(g) });
     for (const id of audience.tools.filter((id) => byId.get(id)!.topic === g)) {
       og.append(Object.assign(document.createElement("option"), { value: id, textContent: t(byId.get(id)!.title) }));

@@ -7,7 +7,7 @@ import { t } from "@uom/i18n";
 
 export const packs: Converter = {
   id: "packs",
-  topic: "Pricing",
+  topic: "Pricing & ordering",
   title: "Boxes & packs",
   blurb: "How many packs to order for a quantity, and price per each ↔ per pack.",
   empty: "Enter a quantity and pack size, or a price and pack size.",

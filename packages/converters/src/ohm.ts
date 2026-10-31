@@ -18,7 +18,7 @@ function shown(n: number, f: (typeof OHM_FIELDS)[number]) {
 
 export const ohm: Converter = {
   id: "ohm",
-  topic: "Electrical",
+  topic: "Power & loads",
   title: "Ohm's law",
   blurb: "Enter any two of volts, amps, ohms and watts to get the other two, and what a heater gives on another voltage.",
   empty: "Fill in any two boxes.",

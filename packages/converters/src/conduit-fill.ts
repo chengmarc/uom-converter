@@ -34,6 +34,7 @@ export const conduitFillConverter: Converter = {
       kind: "choice",
       id: "conduit",
       label: "Check this EMT size",
+      columns: 3,
       options: [{ value: "", label: "Find the smallest" }, ...EMT_SIZES.map((c) => ({ value: c.inch, label: `${c.inch}" (${c.metric})` }))],
     },
     {

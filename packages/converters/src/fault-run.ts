@@ -12,7 +12,7 @@ const lengthUnit = (v: Values) => v.str("lenUnit") as "ft" | "m";
 
 export const faultRun: Converter = {
   id: "fault-run",
-  topic: "Electrical",
+  topic: "Equipment",
   title: "Fault current down a run",
   blurb: "How much fault current is left at the end of a feeder, checked against the equipment's interrupting rating.",
   empty: "Enter the fault current at the start, the wire and the length.",

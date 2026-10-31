@@ -9,7 +9,7 @@ const amps = (a: number | undefined) => (a === undefined ? { value: t("Under 15 
 
 export const transformer: Converter = {
   id: "transformer",
-  topic: "Electrical",
+  topic: "Equipment",
   title: "Transformer sizing",
   blurb: "Primary and secondary amps, the next common size, and the overcurrent protection allowed.",
   empty: "Enter the kVA and both voltages.",

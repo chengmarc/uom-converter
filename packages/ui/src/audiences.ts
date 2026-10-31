@@ -5,7 +5,7 @@
 import { TOOLS } from "@uom/converters";
 
 /** "all" is the Everything view. Each id has an icon in icons.ts. */
-export type AudienceId = "all" | "supplier" | "distributor" | "counter" | "electrician" | "engineer" | "pim";
+export type AudienceId = "all" | "supplier" | "distributor" | "counter" | "estimator" | "electrician" | "inspector" | "engineer" | "pim";
 
 export interface Audience {
   id: AudienceId;
@@ -35,10 +35,22 @@ export const AUDIENCES: Audience[] = [
     tools: ["price", "packs", "reels", "multiplier", "margin", "awg", "mm2", "conduit", "fraction"],
   },
   {
+    id: "estimator",
+    label: "Estimator",
+    description: "Pricing a job: wire and material quantities, net prices, metal surcharges, margins and service sizes.",
+    tools: ["reels", "packs", "wire-price", "price", "multiplier", "margin", "surcharge", "metal", "conduit-fill", "box-fill", "service-load", "vdrop"],
+  },
+  {
     id: "electrician",
     label: "Electrician",
     description: "On the job: voltage drop, wire and conduit sizes, fractions, torque, how much wire to buy.",
     tools: ["vdrop", "ampacity", "motor-fla", "conduit-fill", "box-fill", "service-load", "ev-charger", "awg", "mm2", "conduit", "fraction", "ohm", "volts", "load", "reels", "torque"],
+  },
+  {
+    id: "inspector",
+    label: "Inspector",
+    description: "Checking an installation against the code: fill, ampacity, service size, voltage drop, motors, EV and solar.",
+    tools: ["box-fill", "conduit-fill", "ampacity", "service-load", "vdrop", "motor-fla", "transformer", "fault-run", "ev-charger", "pv-string", "volts", "torque"],
   },
   {
     id: "engineer",
@@ -48,7 +60,7 @@ export const AUDIENCES: Audience[] = [
   },
   {
     id: "pim",
-    label: "PIM / data",
+    label: "Product data",
     description: "Product information teams: UOM codes, metric spec values for ETIM, price quantities, packaging.",
     tools: ["uom-codes", "metric", "price-qty", "price", "wire-price", "mixup", "packaging", "packs"],
   },

@@ -24,12 +24,13 @@ export function llmsTxt(converters: { page: Page; topic?: Topic }[], regions: st
     `# ${NAME}`,
     `> ${HOME.description}`,
     [
-      `${NAME} is a free website with ${converters.length} converters and calculators for people who buy, sell, specify and install electrical products: suppliers, distributors, counter staff, electricians, engineers and product data (PIM) teams.`,
+      `${NAME} is a free website with ${converters.length} converters and calculators for people who buy, sell, specify and install electrical products: suppliers, distributors, counter staff, estimators, electricians, inspectors, engineers and product data (PIM) teams.`,
       `Every converter has its own page. The region picked in the page header sets the units, codes and frequency the converters use: ${regions.join(", ")}. The HTML of each page shows the converter with a worked example in US units and how it's calculated; every answer is worked out in the visitor's browser, with no account and nothing sent anywhere.`,
       `The home page, ${SITE_URL}, lists every converter.`,
     ].join("\n\n"),
     // Each topic's page first: it lists the converters under it.
-    ...[...topics].map(([topic, pages]) => {
+    ...(Object.keys(TOPIC_PAGES) as Topic[]).filter((t) => topics.has(t)).map((topic) => {
+      const pages = topics.get(topic)!;
       const hub = TOPIC_PAGES[topic];
       return `## ${topic}\n\n${[hub, ...pages].map((p) => item(p.title, SITE_URL + p.slug, p.description)).join("\n")}`;
     }),

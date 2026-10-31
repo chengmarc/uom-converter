@@ -35,8 +35,8 @@ const TILES = [
 const TARGET_SIZES = [16, 24, 32, 48, 256];
 
 /**
- * The layout's design size (main.cjs MIN_SIZE), rendered at 2× for sharp Store images: both the captures of the app
- * and the screenshots made from them (shots.html, which lists the shots).
+ * A 16:9 laptop screen, rendered at 2× for sharp Store images: both the captures of the app and the screenshots made
+ * from them (shots.html, which lists the shots). Smaller than the window's MIN_SIZE, as on a laptop that can't fit it.
  */
 const SHOT_SIZE = { width: 1366, height: 768, scale: 2 };
 

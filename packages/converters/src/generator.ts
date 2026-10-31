@@ -10,7 +10,7 @@ const GENERATOR_PF = 0.8;
 
 export const generator: Converter = {
   id: "generator",
-  topic: "Electrical",
+  topic: "Equipment",
   title: "Generator & UPS sizing",
   blurb: "A set is limited by both kW and kVA. Check the load against each, and the largest motor start.",
   empty: "Enter the load in kW and its power factor.",

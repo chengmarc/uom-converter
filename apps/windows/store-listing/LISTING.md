@@ -75,7 +75,7 @@ Catch prices loaded in the wrong unit before they reach a quote
 Work out how many boxes, packs, coils or reels to order
 Match conduit trade sizes to metric designators and knockout punch sizes
 Turn supplier units like EA, ft or box into UN/ECE codes for ETIM and BMEcat
-See the converters your role uses first: supplier, distributor, counter, electrician, engineer, PIM
+See the converters your role uses first: supplier, distributor, counter, estimator, electrician, inspector, engineer, product data
 Get US, Canadian or European voltages, units, currency and number format by default
 See the formula and source behind every answer
 Copy any result with one click, and find a converter with Ctrl+F
@@ -92,7 +92,7 @@ Upload in this order (the first is shown first); each names one need, met in the
 3. `store-listing/desktop/screenshot-3-price-units.png`: price per C or M, to price each
 4. `store-listing/desktop/screenshot-4-kva-amps.png`: kVA to amps (Engineer, Europe)
 5. `store-listing/desktop/screenshot-5-reels.png`: how many reels for this job (Counter staff, Canada)
-6. `store-listing/desktop/screenshot-6-uom-codes.png`: units in a supplier file to UN/ECE codes (PIM / data, Europe)
+6. `store-listing/desktop/screenshot-6-uom-codes.png`: units in a supplier file to UN/ECE codes (product data, Europe)
 
 ### Store logos
 

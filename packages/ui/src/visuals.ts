@@ -71,6 +71,7 @@ function crossSections(items: Section[]): Element {
   const colW = 100;
   const W = colW * items.length;
   const parts: Element[] = [];
+  const noted = items.some((i) => i.note);
   items.forEach((it, i) => {
     const r = Math.max(2.5, (maxD / 2) * Math.sqrt(it.areaMm2 / maxArea));
     const cx = colW * i + colW / 2;
@@ -79,8 +80,9 @@ function crossSections(items: Section[]): Element {
       text(cx, maxD + 30, it.label, "viz-text strong"),
       text(cx, maxD + 46, t(it.sub)),
     );
+    if (it.note) parts.push(text(cx, maxD + 62, it.note));
   });
-  return svg(W, maxD + 52, t("Cross-sections to scale: {items}", { items: items.map((i) => `${i.label} (${t(i.sub)})`).join(", ") }), ...parts);
+  return svg(W, maxD + (noted ? 68 : 52), t("Cross-sections to scale: {items}", { items: items.map((i) => `${i.label} (${[t(i.sub), i.note].filter(Boolean).join(", ")})`).join(", ") }), ...parts);
 }
 
 // ---------- Ruler ----------

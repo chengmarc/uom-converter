@@ -28,7 +28,7 @@ const limitSource = (region: Region) =>
 
 export const volts: Converter = {
   id: "volts",
-  topic: "Electrical",
+  topic: "Power & loads",
   title: "Line ↔ neutral voltage",
   blurb: "Three-phase systems: line-to-neutral = line-to-line ÷ √3. Check a meter reading against the limits for its nominal voltage.",
   empty: "Enter a voltage, like 208 or 347.",
@@ -72,6 +72,7 @@ export const volts: Converter = {
       id: "system",
       label: "System",
       advanced: true,
+      columns: 1,
       options: [
         { value: "wye", label: "Wye (star)" },
         { value: "split", label: "Single-phase 120/240 V" },

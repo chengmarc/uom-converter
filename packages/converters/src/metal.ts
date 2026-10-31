@@ -4,7 +4,7 @@ import { linear, unitConverter } from "./unit-converter";
 
 export const metal = unitConverter({
   id: "metal",
-  topic: "Units",
+  topic: "Pricing & ordering",
   title: "Metal price",
   blurb: "Copper and aluminum prices per pound ↔ per kilogram, for surcharges.",
   defaultUnit: { eu: "kg" },

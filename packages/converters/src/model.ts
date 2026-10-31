@@ -38,7 +38,14 @@ type Field =
       signed?: boolean;
       optional?: boolean;
     })
-  | (FieldBase & { kind: "choice"; label: string; options: { value: string; label: string }[]; value?: Dyn<string> });
+  | (FieldBase & {
+      kind: "choice";
+      label: string;
+      options: { value: string; label: string }[];
+      value?: Dyn<string>;
+      /** Options per row, where they won't all fit on one. Unset, they share a single row. */
+      columns?: number;
+    });
 
 export type { Status };
 
@@ -98,7 +105,7 @@ export interface Table {
 }
 
 /** The sidebar sections. Each has an icon in icons.ts. */
-export type Topic = "Pricing" | "Wire & conduit" | "Electrical" | "Units" | "Product data";
+export type Topic = "Power & loads" | "Wire & conduit" | "Equipment" | "Lighting, EV & solar" | "Pricing & ordering" | "Units" | "Product data";
 
 export interface Converter {
   id: string;

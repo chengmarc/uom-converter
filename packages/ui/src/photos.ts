@@ -15,9 +15,11 @@ import { el } from "./dom";
  * square. Typed, so a new topic can't ship without them; photos.test.ts checks the files are there.
  */
 export const TOPIC_SLOTS: Record<Topic, string> = {
-  Pricing: "pricing",
+  "Power & loads": "power-and-loads",
   "Wire & conduit": "wire-and-conduit",
-  Electrical: "electrical",
+  Equipment: "equipment",
+  "Lighting, EV & solar": "lighting-ev-solar",
+  "Pricing & ordering": "pricing",
   Units: "units",
   "Product data": "product-data",
 };

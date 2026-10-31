@@ -32,8 +32,8 @@ const titleBarOverlay = () => ({ color: ACRYLIC ? "#00000000" : frame().chrome, 
 
 // ---------- Window size and position, kept between runs ----------
 
-/** The smallest window the layout is designed for (a 1366 × 768 laptop screen). */
-const MIN_SIZE = { width: 1366, height: 768 };
+/** The window's size when it first opens, and the smallest it goes. */
+const MIN_SIZE = { width: 1400, height: 860 };
 
 const stateFile = () => path.join(app.getPath("userData"), "window-state.json");
 
@@ -85,8 +85,8 @@ function createWindow() {
   const win = new BrowserWindow({
     ...state?.bounds,
     // A saved size from before the minimum grows to meet it.
-    width: Math.max(minWidth, state?.bounds.width ?? MIN_SIZE.width),
-    height: Math.max(minHeight, state?.bounds.height ?? Math.min(860, workArea.height)),
+    width: Math.max(minWidth, state?.bounds.width ?? minWidth),
+    height: Math.max(minHeight, state?.bounds.height ?? minHeight),
     minWidth,
     minHeight,
     title: app.name, // productName in package.json

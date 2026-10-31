@@ -13,7 +13,7 @@ const LOAD_UNITS = [
 
 export const load: Converter = {
   id: "load",
-  topic: "Electrical",
+  topic: "Power & loads",
   title: "kVA · kW · amps",
   blurb: "Transformer, generator and UPS sizing. Three-phase uses line-to-line volts.",
   empty: "Enter a value in kVA, kW or amps. From kW, also enter the power factor.",

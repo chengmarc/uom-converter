@@ -7,6 +7,8 @@ export type Status = "good" | "warn" | "bad";
 export interface Section {
   label: string;
   sub: string;
+  /** A line under `sub`, for what won't fit beside it in a narrow column. */
+  note?: string;
   areaMm2: number;
   kind: "input" | "match" | "other";
 }

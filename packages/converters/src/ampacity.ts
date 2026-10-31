@@ -53,6 +53,7 @@ export const ampacity: Converter = {
       id: "terminal",
       label: "Terminal rating",
       advanced: true,
+      columns: 2,
       options: [
         { value: "auto", label: "Usual for the size" },
         { value: "60", label: "60 °C" },

@@ -9,7 +9,7 @@ import { t } from "@uom/i18n";
 
 export const surcharge: Converter = {
   id: "surcharge",
-  topic: "Pricing",
+  topic: "Pricing & ordering",
   title: "Metal surcharge",
   blurb: "What a copper or aluminum move adds to wire: pounds of metal per M ft × (spot − base).",
   empty: "Enter the wire size, spot price and base price.",

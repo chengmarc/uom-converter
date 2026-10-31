@@ -34,8 +34,8 @@ export const mm2: Converter = {
       ],
       visual: crossSections([
         { label: `${fmt(a, 2)} mm²`, sub: "entered", areaMm2: a, kind: "input" },
-        { label: na.nearest.label, sub: t("nearest · {area} mm²", { area: fmt(na.nearest.areaMm2, 2) }), areaMm2: na.nearest.areaMm2, kind: "match" },
-        ...(next && next !== na.nearest ? [{ label: next.label, sub: t("next larger · {area} mm²", { area: fmt(next.areaMm2, 2) }), areaMm2: next.areaMm2, kind: "other" as const }] : []),
+        { label: na.nearest.label, sub: "nearest", note: `${fmt(na.nearest.areaMm2, 2)} mm²`, areaMm2: na.nearest.areaMm2, kind: "match" },
+        ...(next && next !== na.nearest ? [{ label: next.label, sub: "next larger", note: `${fmt(next.areaMm2, 2)} mm²`, areaMm2: next.areaMm2, kind: "other" as const }] : []),
       ]),
       formula: WIRE_FORMULA,
     };

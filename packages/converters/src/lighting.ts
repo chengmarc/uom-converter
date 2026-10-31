@@ -8,7 +8,7 @@ const metric = (v: Values) => v.str("units") === "metric";
 
 export const lighting: Converter = {
   id: "lighting",
-  topic: "Electrical",
+  topic: "Lighting, EV & solar",
   title: "Lighting layout",
   blurb: "How many fixtures a room needs for a target light level, by the lumen method.",
   empty: "Enter the room area, the target level and the lumens per fixture.",

@@ -6,7 +6,7 @@ import { t } from "@uom/i18n";
 
 export const multiplier: Converter = {
   id: "multiplier",
-  topic: "Pricing",
+  topic: "Pricing & ordering",
   title: "List × multiplier",
   blurb: 'Net price from list price. Discounts can be chained: "50/10" is 50% off, then 10% off that.',
   empty: "Enter a multiplier or a discount.",

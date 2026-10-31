@@ -23,6 +23,7 @@ match the release tags (`v<version>`).
 - Ohm's law gives what a resistive load does on another voltage
 - the power converter has metric horsepower and tons of cooling
 - the length converter takes feet and inches as plans write them, such as 12'-6", and shows them
+- estimator and inspector roles, each with the converters that role uses first
 - conductor ampacity: the NEC and CEC tables, derated for heat and bundling, and held to the terminals
 - motor full-load amps: horsepower to table current, with the wire, breaker, fuses and overload setting
 - conduit fill: the smallest EMT for a mix of wires, or how full a size would be
@@ -33,6 +34,11 @@ match the release tags (`v<version>`).
 
 ### Changed
 
+- seven topics in one order on every app: Power & loads, Wire & conduit, Equipment, Lighting, EV &
+  solar, Pricing & ordering, Units and Product data. Voltage drop moves to Wire & conduit and metal
+  price to Pricing & ordering. The website's electrical page moves to power-and-loads, and its old
+  address redirects there
+- the Windows app opens at 1400 × 860, which is also its smallest size, or the size of the screen if that's smaller
 - voltage drop uses AC resistance and reactance, not DC resistance alone: a 500 kcmil feeder
   reads about twice what it did, and a bigger wire no longer appears to cure a drop that
   reactance sets. North American sizes use stranded values
@@ -51,6 +57,8 @@ match the release tags (`v<version>`).
 
 ### Fixed
 
+- long labels on choice buttons wrap instead of being cut off, and the captions under the mm² to
+  AWG cross-sections no longer run into each other
 - wire coils and reels count whole pulls: three 300 ft pulls need three 500 ft spools, not two
 - line and neutral voltage names a standard system only for the side measured, so 400 V
   line-to-neutral is no longer shown as 230/400 V

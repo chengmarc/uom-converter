@@ -10,7 +10,7 @@ const reelUnit = (v: Values) => v.str("unit") as "ft" | "m";
 
 export const reels: Converter = {
   id: "reels",
-  topic: "Pricing",
+  topic: "Pricing & ordering",
   title: "Wire coils & reels",
   blurb: "Coils or reels needed to cover a run. Three wires pulled 200 ft is 600 ft of wire.",
   empty: "Enter the run length and the coil or reel length.",

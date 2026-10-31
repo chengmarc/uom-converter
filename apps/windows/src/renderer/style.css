@@ -340,15 +340,16 @@ input[aria-invalid="true"] { color: var(--danger); }
 .segmented label { position: relative; }
 .segmented input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
 .segmented span {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  box-sizing: border-box;
   padding: 0.5rem 0.4rem;
   border-radius: 5px;
   text-align: center;
   color: var(--muted);
   font-size: 0.95rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 .segmented input:checked + span { background: var(--surface); color: var(--text); font-weight: 600; box-shadow: var(--lifted); }
 .segmented input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 1px; }

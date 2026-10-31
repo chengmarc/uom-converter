@@ -86,7 +86,7 @@ a { color: var(--accent); }
 /* ---------- Home ---------- */
 
 /* The topics' photos side by side, each square, with its name on a bar. */
-.category-strip ul { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); margin: 0; padding: 0; list-style: none; }
+.category-strip ul { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); margin: 0; padding: 0; list-style: none; }
 .category-strip li { min-width: 0; }
 .category-strip a { position: relative; display: block; aspect-ratio: 1; overflow: hidden; background: var(--brand); color: var(--brand-ink); text-decoration: none; }
 .category-strip li + li a { border-left: 2px solid #ffffff; }
@@ -94,7 +94,7 @@ a { color: var(--accent); }
 .category-strip span { position: absolute; left: 0; right: 0; bottom: 0; padding: 0.5rem 0.75rem; background: rgb(var(--brand-rgb) / 0.85); font-weight: 700; font-size: 0.95rem; }
 .category-strip a:hover span { background: var(--accent); text-decoration: underline; }
 @media (max-width: 640px) {
-  .category-strip ul { grid-template-columns: repeat(5, 9rem); overflow-x: auto; }
+  .category-strip ul { grid-auto-columns: 9rem; overflow-x: auto; }
 }
 
 .home-intro { padding-block: 1.75rem 0; }
@@ -374,15 +374,16 @@ input[aria-invalid="true"] { color: var(--danger); }
 .segmented label { position: relative; }
 .segmented input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
 .segmented span {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  box-sizing: border-box;
   padding: 0.5rem 0.4rem;
   border-radius: 2px;
   text-align: center;
   color: var(--muted);
   font-size: 0.95rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 .segmented input:checked + span { background: var(--surface); color: var(--text); font-weight: 600; box-shadow: var(--lifted); }
 .segmented input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 1px; }

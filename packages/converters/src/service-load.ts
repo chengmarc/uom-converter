@@ -10,7 +10,7 @@ const LOADS = ["range", "ac", "heat", "hot", "ev", "other"];
 
 export const serviceLoad: Converter = {
   id: "service-load",
-  topic: "Electrical",
+  topic: "Power & loads",
   title: "House service size",
   blurb: "The calculated load of a single dwelling and the service it needs, by the NEC optional method or CEC Rule 8-200.",
   empty: "Enter the living area and the fixed loads.",

@@ -13,6 +13,10 @@ describe("site pages", () => {
     expect(Object.keys(TOPIC_PAGES).sort()).toEqual([...TOPICS].sort());
   });
 
+  it("list the topics in the converters' order", () => {
+    expect(Object.keys(TOPIC_PAGES)).toEqual(TOPICS);
+  });
+
   it("have unique, address-safe slugs", () => {
     const slugs = ALL.map((p) => p.slug);
     expect(new Set(slugs).size).toBe(slugs.length);
@@ -36,7 +40,7 @@ describe("site pages", () => {
     expect(idFromPath("/voltage-drop-calculator/extra", "/")).toBeUndefined();
     expect(idFromPath("/elsewhere/voltage-drop-calculator", "/uom-converter/")).toBeUndefined();
     expect(topicFromPath("/wire-and-conduit", "/")).toBe("Wire & conduit");
-    expect(topicFromPath("/electrical.html", "/")).toBe("Electrical");
+    expect(topicFromPath("/power-and-loads.html", "/")).toBe("Power & loads");
     expect(topicFromPath("/voltage-drop-calculator", "/")).toBeUndefined();
     expect(idFromPath("/electrical", "/")).toBeUndefined();
   });

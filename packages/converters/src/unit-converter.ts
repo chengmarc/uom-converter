@@ -70,6 +70,7 @@ export function unitConverter(opts: {
         kind: "choice",
         id: "unit",
         label: "Unit",
+        columns: opts.units.length > 5 ? 3 : undefined,
         options: opts.units.map((u) => ({ value: u.key, label: u.symbol })),
         value: (v) => opts.defaultUnit?.[v.region] ?? opts.units[0].key,
       },

@@ -27,6 +27,15 @@ describe("converters", () => {
     });
   }
 
+  // Options share a row unless a field sets columns, and too many leave no room for their labels.
+  it("keep to six options on a row", () => {
+    for (const t of TOOLS) {
+      for (const f of t.fields) {
+        if (f.kind === "choice") expect(f.columns ?? f.options.length, `${t.id}.${f.id}`).toBeLessThanOrEqual(6);
+      }
+    }
+  });
+
   // Converters are shared by every app, so they must work with no page at all (tests run in
   // Node, with no DOM): every worked example gives an answer, and diagrams and tables are data.
   for (const r of REGIONS) {

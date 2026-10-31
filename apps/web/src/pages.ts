@@ -244,35 +244,55 @@ export interface TopicPage extends Page {
 
 /** By topic, in the order the converters list them. pages.test.ts checks every topic has one. */
 export const TOPIC_PAGES: Record<Topic, TopicPage> = {
-  Pricing: {
-    slug: "pricing",
-    photo: "Shelves and stands of packaged electrical supplies on a supplier's sales floor.",
-    title: "Electrical Pricing: E/C/M, Multiplier and Margin Tools",
+  "Power & loads": {
+    slug: "power-and-loads",
+    photo: "Rows of insulators and busbars in an electrical substation.",
+    title: "Power and Load Calculators: kVA, kW, Amps, Ohm's Law",
     description:
-      "Calculators for electrical distribution pricing: E/C/M price units, wire price per foot or metre, list × multiplier, margin and markup, packs and reels.",
-    heading: "Pricing calculators",
+      "Calculators for supply and load: kVA, kW and amps, line-to-neutral voltage and meter readings, Ohm's law, house service size and energy cost.",
+    heading: "Power and load calculators",
     intro:
-      "Electrical distributors quote prices per each (E), per 100 (C) or per 1,000 (M), and wire is usually priced per M feet. These calculators convert between those units, work out net prices from list price and multiplier, and turn margin into markup. They also count the boxes, packs, coils and reels an order needs.",
+      "Calculators for what a circuit supplies and what it carries: kVA, kW and amps on single- and three-phase systems, line-to-neutral voltage and whether a meter reading is in range, Ohm's law, the service a house needs, and what a load costs to run. Each shows how it's calculated.",
   },
   "Wire & conduit": {
     slug: "wire-and-conduit",
     photo: "Large coils of bare copper wire on a factory floor.",
-    title: "Wire Size and Conduit Converters: AWG, mm², Trade Size",
+    title: "Wire and Conduit Tools: Voltage Drop, Ampacity, Fill",
     description:
-      "Convert AWG and kcmil wire sizes to mm² and back, and conduit trade sizes to metric designators with their knockout punch sizes.",
-    heading: "Wire size and conduit converters",
+      "Voltage drop, conductor ampacity, AWG and kcmil to mm², conduit trade sizes and knockouts, conduit fill and box fill.",
+    heading: "Wire and conduit tools",
     intro:
-      "North America sizes wire in AWG and kcmil; most of the world uses mm² (IEC 60228). These converters match one to the other, with the conductor's area, diameter and weight. Conduit inch trade sizes pair with metric designators, each with its typical knockout punch size.",
+      "Check a run and choose its wire: voltage drop, ampacity with derating, and AWG and kcmil matched to mm² (IEC 60228). For the raceway, conduit trade sizes and metric designators with their knockout punch sizes, conduit fill, and the box volume your wires and devices need.",
   },
-  Electrical: {
-    slug: "electrical",
+  Equipment: {
+    slug: "equipment",
     photo: "Gloved hands testing an open control panel with a clamp meter, beside rows of contactors and coloured wiring.",
-    title: "Electrical Calculators: Voltage Drop, kVA, Ohm's Law",
+    title: "Electrical Equipment Calculators: Motors, Transformers",
     description:
-      "Electrical calculators: kVA and amps, voltage drop, power factor, transformer fault current, motor slip, line-to-neutral voltage, Ohm's law, energy cost.",
-    heading: "Electrical calculators",
+      "Motor full-load amps, speed and slip, transformer and generator sizing, power factor correction, and fault current at a transformer and down a run.",
+    heading: "Equipment calculators",
     intro:
-      "Calculators for sizing and checking circuits and equipment: kVA, kW and amps on single- and three-phase systems, voltage drop and the wire size that keeps it within limits, power factor correction, transformer fault current, motor speed and slip, line-to-neutral voltage, Ohm's law and running cost. Each shows how it's calculated.",
+      "Calculators for the machines on a system: motor full-load amps with the wire and protection for a single motor, motor speed and slip, transformer and generator sizing, power factor correction, and the fault current at a transformer and at the end of a feeder.",
+  },
+  "Lighting, EV & solar": {
+    slug: "lighting-ev-solar",
+    photo: "Rows of high-bay lights along a warehouse roof.",
+    title: "Lighting, EV Charger and Solar Calculators",
+    description:
+      "How many fixtures a room needs by the lumen method, the breaker and wire for an EV charger, and a PV string's voltage on the coldest day.",
+    heading: "Lighting, EV and solar calculators",
+    intro:
+      "Calculators for three common kinds of job: how many fixtures a room needs for a target light level, the breaker and wire for an EV charger as a continuous load, and a solar string's voltage on the coldest day against the system limit.",
+  },
+  "Pricing & ordering": {
+    slug: "pricing",
+    photo: "Shelves and stands of packaged electrical supplies on a supplier's sales floor.",
+    title: "Electrical Pricing and Ordering: E/C/M, Multiplier",
+    description:
+      "Electrical pricing and ordering: E/C/M price units, wire price per foot or metre, list × multiplier, margin, metal prices and surcharges, packs and reels.",
+    heading: "Pricing and ordering calculators",
+    intro:
+      "Electrical distributors quote prices per each (E), per 100 (C) or per 1,000 (M), and wire is usually priced per M feet. These calculators convert between those units, work out net prices from list price and multiplier, and turn margin into markup. They also convert copper and aluminum prices, work out metal surcharges, and count the boxes, packs, coils and reels an order needs.",
   },
   Units: {
     slug: "units",
@@ -282,7 +302,7 @@ export const TOPIC_PAGES: Record<Topic, TopicPage> = {
       "Unit converters for the electrical trade: feet to metres, inch fractions to mm, °C to °F, hp to kW, foot-candles to lux, torque and weight.",
     heading: "Unit converters",
     intro:
-      "Conversions between US customary and metric units, with the values the trade uses: 60, 75 and 90 °C insulation ratings, lug and breaker torque, and copper and aluminum prices per pound or kilogram. Most have a table of common values.",
+      "Conversions between US customary and metric units, with the values the trade uses: 60, 75 and 90 °C insulation ratings and lug and breaker torque. Most have a table of common values.",
   },
   "Product data": {
     slug: "product-data",

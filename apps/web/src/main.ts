@@ -161,7 +161,7 @@ function categoryStrip(): HTMLElement {
   const list = el("ul");
   for (const t of TOPICS) {
     const a = link(topicPath(t), "");
-    const img = photo(`${TOPIC_SLOTS[t]}-thumb`, "(max-width: 640px) 9rem, 20vw", "");
+    const img = photo(`${TOPIC_SLOTS[t]}-thumb`, "(max-width: 640px) 9rem, 15vw", "");
     if (img) {
       img.setAttribute("fetchpriority", "high");
       a.append(img);

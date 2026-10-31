@@ -21,14 +21,14 @@ describe("search", () => {
   });
 
   it("lists name matches before description matches", () => {
-    // Price per E/C/M is the first converter, but says wire only in its description ("Wire is
-    // usually priced per M feet"); conduit, much later, is under "Wire & conduit".
+    // Price per E/C/M says wire only in its description ("Wire is usually priced per M feet");
+    // conduit is under "Wire & conduit".
     const found = ids("wire");
     expect(found.indexOf("conduit")).toBeLessThan(found.indexOf("price"));
   });
 
   it("lists the audience's converters first, in the audience's order", () => {
-    // Wire price comes first in Everything, but isn't on the electrician's list.
+    // Wire price isn't on the electrician's list, so it comes after everything that is.
     const wire = ids("wire", electrician);
     expect(wire.indexOf("ampacity")).toBeLessThan(wire.indexOf("awg"));
     expect(wire.indexOf("awg")).toBeLessThan(wire.indexOf("conduit"));

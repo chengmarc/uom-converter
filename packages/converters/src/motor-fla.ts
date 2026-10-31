@@ -8,7 +8,7 @@ import { t } from "@uom/i18n";
 
 export const motorFla: Converter = {
   id: "motor-fla",
-  topic: "Electrical",
+  topic: "Equipment",
   title: "Motor full-load amps",
   blurb: "Horsepower to code-table amps, with the wire and overcurrent protection for a single motor.",
   empty: "Choose the horsepower and voltage.",
@@ -34,7 +34,8 @@ export const motorFla: Converter = {
       id: "hp",
       label: "Horsepower",
       value: "5",
-      options: MOTOR_HP.map((hp) => ({ value: hp, label: `${hp} hp` })),
+      columns: 5,
+      options: MOTOR_HP.map((hp) => ({ value: hp, label: hp })),
     },
     voltsField("Motor voltage"),
     phaseField("3"),

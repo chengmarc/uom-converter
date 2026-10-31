@@ -10,7 +10,7 @@ const IMPLAUSIBLE_SLIP = 0.15;
 
 export const motor: Converter = {
   id: "motor",
-  topic: "Electrical",
+  topic: "Equipment",
   title: "Motor speed & slip",
   blurb: "Synchronous speed from frequency and poles, slip from the nameplate speed, and the same motor on the other frequency.",
   empty: "Enter the poles, the nameplate speed, or both.",

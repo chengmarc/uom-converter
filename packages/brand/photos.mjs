@@ -27,7 +27,7 @@ const SLOTS = {
   // thin slice of the banner's middle. Banners are cut 6:1 around the slice worth seeing (rows of
   // stock, of wiring, of tools, of labels) and written up to the photo's own width; under the
   // band's navy, a photo stretched past that doesn't show it. Squares go up to their crop's size:
-  // the home page's strip shows them at a fifth of the window.
+  // the home page's strip shows them side by side across the window.
   //
   // A supplier's sales floor: the shelves below the signs on the back wall (makers' names, deals,
   // "circuit breakers"), the blue bins and the packs on the stands.
@@ -38,8 +38,14 @@ const SLOTS = {
   "wire-and-conduit-banner": { from: "cat-wire-conduits.jpg", crop: { left: 1950, top: 850, width: 3600, height: 600 }, widths: [800, 1200, 2048] },
   "wire-and-conduit-thumb": { from: "cat-wire-conduits.jpg", crop: { left: 2600, top: 1300, width: 2200, height: 2200 }, widths: [240, 480, 820] },
   // A clamp meter on a panel: the meter, the gloves and the row of contactors.
-  "electrical-banner": { from: "cat-electrical.jpg", crop: { left: 0, top: 400, width: 1920, height: 320 }, widths: [800, 1200, 1920] },
-  "electrical-thumb": { from: "cat-electrical.jpg", crop: { left: 250, top: 200, width: 1000, height: 1000 }, widths: [240, 480, 1000] },
+  "equipment-banner": { from: "cat-electrical.jpg", crop: { left: 0, top: 400, width: 1920, height: 320 }, widths: [800, 1200, 1920] },
+  "equipment-thumb": { from: "cat-electrical.jpg", crop: { left: 250, top: 200, width: 1000, height: 1000 }, widths: [240, 480, 1000] },
+  // A substation: the rows of insulators running away down the middle.
+  "power-and-loads-banner": { from: "base2.jpg", crop: { left: 0, top: 480, width: 2400, height: 400 }, widths: [800, 1200, 2048] },
+  "power-and-loads-thumb": { from: "base2.jpg", crop: { left: 500, top: 280, width: 1000, height: 1000 }, widths: [240, 480, 1000] },
+  // The rows of high-bay lights along a warehouse roof, above the racking.
+  "lighting-ev-solar-banner": { from: "warehouse-1.jpg", crop: { left: 0, top: 60, width: 1800, height: 300 }, widths: [800, 1200, 1800] },
+  "lighting-ev-solar-thumb": { from: "warehouse-1.jpg", crop: { left: 820, top: 30, width: 640, height: 640 }, widths: [240, 480, 640] },
   // Tools on a black pegboard, above the drills and batteries with their maker's name: the racks
   // of red-held wrenches, the hammer and the hanging spanners for the banner; the racks, pliers
   // and screwdrivers on the left for the square.

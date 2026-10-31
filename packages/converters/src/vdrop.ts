@@ -26,7 +26,7 @@ const dropLimit = (region: Region, target: number) => (region === "ca" ? 3 : Mat
 
 export const vdrop: Converter = {
   id: "vdrop",
-  topic: "Electrical",
+  topic: "Wire & conduit",
   title: "Voltage drop",
   blurb: "Voltage drop on a run, and the smallest wire that keeps it within your target.",
   empty: "Enter the wire size, run length and load current.",
