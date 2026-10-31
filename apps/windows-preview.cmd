@@ -1,6 +1,6 @@
 @echo off
 rem Double-click: the Windows app's live preview, in its own window. Close the app to stop it.
-cd /d "%~dp0"
+cd /d "%~dp0windows"
 if not exist ..\..\node_modules (
   echo Installing packages first...
   call npm install || goto :failed

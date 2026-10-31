@@ -1,6 +1,6 @@
 // The emulator with the app on it: starts the emulator if it isn't running (and either way gives it
 // this computer's proxy: sdk.cjs), builds the app and installs it, then leaves the home screen up,
-// the app in the drawer. `npm run emulator` (or emulator.cmd).
+// the app in the drawer. `npm run emulator` (or apps/android-preview.cmd).
 
 const { execFileSync, spawnSync } = require("node:child_process");
 const path = require("node:path");

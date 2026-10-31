@@ -20,7 +20,7 @@ Commands run from the repo root:
 ```
 npm run android:dev       # live preview on an emulator (started if need be) or a USB phone
 npm run android:run       # build, install and open on the running emulator or phone
-npm run android:emulator  # open the emulator with the app installed (or apps/android/emulator.cmd)
+npm run android:emulator  # open the emulator with the app installed (or apps/android-preview.cmd)
 npm run android:apk       # debug .apk, apps/android/dist/UOM-Converter-debug.apk
 npm run android:aab       # release .aab for Google Play, signed with the upload key (below), into apps/android/dist/
 npm run android:sync      # build the page and copy it into the native project
