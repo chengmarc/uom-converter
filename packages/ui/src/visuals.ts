@@ -28,7 +28,7 @@ const NS = "http://www.w3.org/2000/svg";
 
 type Attrs = Record<string, string | number>;
 
-function s(tag: string, attrs: Attrs = {}, ...children: (Element | string)[]): Element {
+function s(tag: string, attrs: Attrs, ...children: (Element | string)[]): Element {
   const e = document.createElementNS(NS, tag);
   for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, String(v));
   for (const c of children) e.append(c);

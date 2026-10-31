@@ -9,13 +9,7 @@ import { t } from "@uom/i18n";
 
 type GtinKind = "GTIN-8" | "UPC-E" | "UPC-A" | "EAN-13" | "GTIN-14";
 
-interface GtinOptions {
-  /** How to read 8-digit codes starting with 0 or 1. North America: usually UPC-E. */
-  eightDigit?: "upc-e" | "gtin-8";
-}
-
 interface GtinResult {
-  input: string;
   valid: boolean;
   kind?: GtinKind;
   gtin14?: string;
@@ -87,8 +81,8 @@ export function makePackGtin14(itemGtin: string, indicator: number): string {
 
 const SCIENTIFIC = /^\d(\.\d+)?e\+?\d+$/i;
 
-export function parseGtin(raw: string, opts: GtinOptions = {}): GtinResult {
-  const r: GtinResult = { input: raw, valid: false, errors: [], warnings: [], notes: [] };
+export function parseGtin(raw: string): GtinResult {
+  const r: GtinResult = { valid: false, errors: [], warnings: [], notes: [] };
   let s = raw.trim();
 
   if (SCIENTIFIC.test(s)) {
@@ -116,7 +110,8 @@ export function parseGtin(raw: string, opts: GtinOptions = {}): GtinResult {
   let kind: GtinKind;
   let normalized = s;
 
-  if (s.length === 8 && /^[01]/.test(s) && (opts.eightDigit ?? "upc-e") === "upc-e") {
+  // 8 digits starting with 0 or 1 are usually UPC-E in North America.
+  if (s.length === 8 && /^[01]/.test(s)) {
     kind = "UPC-E";
     normalized = expandUpcE(s);
     r.notes.push(`UPC-E expanded to UPC-A ${normalized}`);

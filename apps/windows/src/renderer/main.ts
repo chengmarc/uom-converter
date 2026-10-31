@@ -44,7 +44,7 @@ const landing = routeId();
 if (landing && !audience.tools.includes(landing)) audience = EVERYTHING;
 let region: Region = chosenRegion(params);
 
-function chip(label: string, pressed: boolean, onClick: () => void, opts: { title?: string; icon?: string; detail?: string } = {}) {
+function chip(label: string, pressed: boolean, onClick: () => void, opts: { title?: string; icon?: string; detail?: string }) {
   const b = Object.assign(document.createElement("button"), { type: "button" });
   const i = opts.icon ? icon(opts.icon) : undefined;
   if (i) b.append(i);

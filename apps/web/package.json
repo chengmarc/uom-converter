@@ -16,7 +16,6 @@
     "@uom/converters": "*",
     "@uom/core": "*",
     "@uom/ui": "*",
-    "happy-dom": "20.14.5",
     "wrangler": "^4.149.0"
   }
 }

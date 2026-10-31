@@ -3,10 +3,10 @@ import { money, moneyAmount, typed } from "./format";
 import type { Converter, Example } from "./model";
 import { t } from "@uom/i18n";
 
-const PRICE_UNITS: { uom: PriceUom; name: string; short: string }[] = [
-  { uom: "E", name: "Per each (E)", short: "each" },
-  { uom: "C", name: "Per 100 (C)", short: "per C" },
-  { uom: "M", name: "Per 1,000 (M)", short: "per M" },
+const PRICE_UNITS: { uom: PriceUom; name: string }[] = [
+  { uom: "E", name: "Per each (E)" },
+  { uom: "C", name: "Per 100 (C)" },
+  { uom: "M", name: "Per 1,000 (M)" },
 ];
 
 const headingFor = (uom: PriceUom, price: string) =>

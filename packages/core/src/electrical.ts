@@ -43,7 +43,7 @@ export function wyeSystem(volts: number, region?: Region): [number, number] | un
 
 // ---------- Ohm's law ----------
 
-export interface Electrical {
+interface Electrical {
   volts: number;
   amps: number;
   ohms: number;

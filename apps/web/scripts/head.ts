@@ -82,7 +82,7 @@ function app(page: Page, url: string): object {
 }
 
 /** The page's own head: title, description, canonical address, share preview, structured data and app manifest. */
-function head(page: Page, kind: Kind, drawn: Drawn, leaf: string, noindex = false): string {
+function head(page: Page, kind: Kind, drawn: Drawn, leaf: string, noindex: boolean): string {
   const url = SITE_URL + page.slug;
   const title = esc(`${page.title} | ${NAME}`);
   const description = esc(page.description);

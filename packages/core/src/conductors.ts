@@ -131,10 +131,10 @@ const RESISTIVITY_20C: Record<Metal, { rho: number; alpha: number }> = {
   Al: { rho: 0.028264, alpha: 0.00403 },
 };
 
-/** DC resistance per km of a solid conductor at a temperature (default 75 °C, a usual design value). */
-export function conductorOhmsPerKm(areaMm2: number, metal: Metal, tempC = 75): number {
+/** DC resistance per km of a solid conductor at 75 °C, a usual design value. */
+export function conductorOhmsPerKm(areaMm2: number, metal: Metal): number {
   const { rho, alpha } = RESISTIVITY_20C[metal];
-  return ((rho * (1 + alpha * (tempC - 20))) / areaMm2) * 1000;
+  return ((rho * (1 + alpha * (75 - 20))) / areaMm2) * 1000;
 }
 
 interface VoltageDropInput {
@@ -145,7 +145,6 @@ interface VoltageDropInput {
   amps: number;
   volts: number;
   phase: Phase;
-  tempC?: number;
 }
 
 /**
@@ -153,7 +152,7 @@ interface VoltageDropInput {
  * volts). Ignores reactance, so it reads a little low for large conductors on AC.
  */
 export function voltageDrop(i: VoltageDropInput): { volts: number; percent: number; atLoad: number } {
-  const ohmsPerM = conductorOhmsPerKm(i.areaMm2, i.metal, i.tempC) / 1000;
+  const ohmsPerM = conductorOhmsPerKm(i.areaMm2, i.metal) / 1000;
   const k = i.phase === 3 ? Math.sqrt(3) : 2;
   const volts = k * i.amps * ohmsPerM * i.lengthM;
   return { volts, percent: (volts / i.volts) * 100, atLoad: i.volts - volts };

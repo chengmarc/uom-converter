@@ -56,7 +56,7 @@ describe("conductor weight", () => {
 
 describe("conductor resistance and voltage drop", () => {
   it("matches NEC Chapter 9 Table 8 (solid, uncoated copper, 75 °C)", () => {
-    const perKft = (awg: string, metal: "Cu" | "Al" = "Cu") => conductorOhmsPerKm(info(awg).areaMm2, metal) * 0.3048;
+    const perKft = (awg: string) => conductorOhmsPerKm(info(awg).areaMm2, "Cu") * 0.3048;
     expect(perKft("12")).toBeCloseTo(1.93, 2);
     expect(perKft("14")).toBeCloseTo(3.07, 2);
     expect(perKft("10")).toBeCloseTo(1.21, 2);

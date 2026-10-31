@@ -6,7 +6,7 @@ import { dyn, type Converter, type Dyn, type Table, type Topic, type Values } fr
 import type { Visual } from "./visual";
 import { t } from "@uom/i18n";
 
-export interface Unit {
+interface Unit {
   key: string;
   /** Full name for result rows, e.g. "Metres". */
   name: string;

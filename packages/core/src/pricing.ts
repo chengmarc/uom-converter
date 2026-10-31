@@ -22,10 +22,10 @@ export function convertPrice(price: number, from: PriceUom, to: PriceUom): numbe
  * If one is ~10x, ~100x, or ~1000x the other, it's almost always a UOM mix-up
  * (a per-C price loaded as per-each, and so on). Returns the suspected factor.
  */
-export function suspectUomMismatch(a: number, b: number, tolerance = 0.05): number | undefined {
+export function suspectUomMismatch(a: number, b: number): number | undefined {
   if (a <= 0 || b <= 0) return undefined;
   const ratio = Math.max(a, b) / Math.min(a, b);
-  return [10, 100, 1000].find((f) => Math.abs(ratio / f - 1) <= tolerance);
+  return [10, 100, 1000].find((f) => Math.abs(ratio / f - 1) <= 0.05);
 }
 
 // ---------- Price per length ----------
