@@ -539,6 +539,7 @@ const zh: Catalogue = {
   "About": "关于",
   "Converter": "换算工具",
   "Find a converter": "查找换算工具",
+  "Ctrl F": "Ctrl F",
   "one (unit)": "一（单位）",
   "count": "计数",
   "The generic count unit in many EDI and e-invoicing profiles.": "许多 EDI 和电子发票规范中的通用计数单位。",

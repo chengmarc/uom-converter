@@ -35,6 +35,8 @@ match the release tags (`v<version>`).
 
 ### Fixed
 
+- the Windows app's search box fits its prompt in Spanish and French, and its shortcut hint says Strg F in German
+- in the Android app, long German names hyphenate on the home screen, where they were cut mid-word
 - the Windows Store screenshots show the app at its real size. Rendering them after the Android images
   left the app at half size
 
@@ -97,6 +99,7 @@ match the release tags (`v<version>`).
 
 ### Fixed
 
+- the Windows app's search box fits its prompt in Spanish and French, and its shortcut hint says Strg F in German
 - long labels on choice buttons wrap instead of being cut off, and the captions under the mm² to
   AWG cross-sections no longer run into each other
 - wire coils and reels count whole pulls: three 300 ft pulls need three 500 ft spools, not two
@@ -125,6 +128,7 @@ match the release tags (`v<version>`).
 
 ### Fixed
 
+- the Windows app's search box fits its prompt in Spanish and French, and its shortcut hint says Strg F in German
 - in the US and Canada, a number with a comma that doesn't separate thousands, such as
   "7,4", is an error instead of being read as 74
 
@@ -140,6 +144,7 @@ match the release tags (`v<version>`).
 
 ### Fixed
 
+- the Windows app's search box fits its prompt in Spanish and French, and its shortcut hint says Strg F in German
 - the E/C/M price heading reads "per 1,000 (M)" instead of "per 1,000 (m)", which looked
   like metres
 

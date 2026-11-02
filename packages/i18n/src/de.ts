@@ -539,6 +539,7 @@ const de: Catalogue = {
   "About": "Über",
   "Converter": "Umrechner",
   "Find a converter": "Umrechner finden",
+  "Ctrl F": "Strg F",
   "one (unit)": "eins (Einheit)",
   "count": "Anzahl",
   "The generic count unit in many EDI and e-invoicing profiles.": "Die allgemeine Zähleinheit in vielen EDI- und E-Rechnungsprofilen.",

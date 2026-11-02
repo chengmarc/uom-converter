@@ -539,6 +539,7 @@ const ja: Catalogue = {
   "About": "情報",
   "Converter": "換算ツール",
   "Find a converter": "換算ツールを検索",
+  "Ctrl F": "Ctrl F",
   "one (unit)": "1（単位）",
   "count": "個数",
   "The generic count unit in many EDI and e-invoicing profiles.": "多くの EDI・電子インボイス仕様で使われる汎用の個数単位です。",

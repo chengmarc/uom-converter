@@ -31,6 +31,12 @@ const DEVICES = {
 /** The screenshots' layout size, rendered at 3× for 1080 × 1920 (9:16). */
 const SHOT = { width: 360, height: 640, scale: 3 };
 
+/**
+ * Where a phone hyphenates the longest card titles (hyphens: auto in the app's style.css). Electron has no hyphenation
+ * dictionary, so its captures would cut them mid-word: they get these breaks, as soft hyphens, to show what a phone shows.
+ */
+const HYPHENATED = ["Spannungs-fall", "Hausan-schluss-größe", "Strombe-lastbarkeit", "Blindleistungs-kompensation", "Transforma-torauslegung", "Beleuch-tungsplanung", "Beleuch-tungsstärke", "Verpa-ckungsebenen", "Spezifi-kationswert", "Dimension-nement"];
+
 protocol.registerSchemesAsPrivileged([{ scheme: "app", privileges: { standard: true, secure: true, supportFetchAPI: true } }]);
 
 function offscreen(width, height, scale = 1) {
@@ -86,6 +92,7 @@ async function captureApp(language, region, name, device, { audience, recent = [
   await load(`app://uom/index.html${hash}`);
   // A phone draws no scrollbar; Chromium on the desktop does.
   await win.webContents.insertCSS("::-webkit-scrollbar { display: none; }");
+  await win.webContents.executeJavaScript(`for (const word of ${JSON.stringify(HYPHENATED)}) for (const e of document.querySelectorAll(".card-title")) e.textContent = e.textContent.replace(word.replaceAll("-", ""), word.replaceAll("-", "\u00ad"));`);
   // By element, not by pixels: text wraps differently in each language. Under the app bar, which stays put. Room below
   // the page, out of the shot, lets a short page scroll as far as a long one.
   const scroll = device === "phone" && scrollTo
