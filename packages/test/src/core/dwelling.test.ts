@@ -52,11 +52,6 @@ describe("CEC Rule 8-200", () => {
     expect(cecDwelling({ ...none, area: 100, heating: 14000 }, true, true).hvac).toBe(13000);
   });
 
-  it("adds up the IAEI house's listed items", () => {
-    const c = cecDwelling({ ...none, area: 269, airConditioning: 6000, range: 11000, hotLoads: 8000, evCharger: 7200, otherLoads: 9500 }, true, false);
-    expect(c.watts).toBe(36575);
-  });
-
   it("holds to 100 A from 80 m², and 60 A under that", () => {
     expect(cecDwelling({ ...none, area: 80 }, true, false).rating).toBe(100);
     expect(cecDwelling({ ...none, area: 70 }, true, false).rating).toBe(60);

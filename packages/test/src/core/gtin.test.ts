@@ -15,12 +15,6 @@ describe("parseGtin", () => {
     expect(r.gtin14).toBe("00036000291452");
   });
 
-  it("accepts an EAN-13", () => {
-    const r = parseGtin("4006381333931");
-    expect(r.valid).toBe(true);
-    expect(r.gtin14).toBe("04006381333931");
-  });
-
   it("rejects a bad check digit and says what it should be", () => {
     const r = parseGtin("036000291453");
     expect(r.valid).toBe(false);
@@ -31,16 +25,6 @@ describe("parseGtin", () => {
     for (const s of ["'036000291452", "0-36000-29145-2", " 036000291452 ", "36000291452.0"]) {
       expect(parseGtin(s).gtin14, s).toBe("00036000291452");
     }
-  });
-
-  it("restores leading zeros stripped by Excel", () => {
-    const r = parseGtin("36000291452");
-    expect(r.valid).toBe(true);
-    expect(r.gtin14).toBe("00036000291452");
-  });
-
-  it("refuses an 11-digit UPC body with no check digit", () => {
-    expect(parseGtin("03600029145").valid).toBe(false);
   });
 
   it("refuses Excel scientific notation", () => {

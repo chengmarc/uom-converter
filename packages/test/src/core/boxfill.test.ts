@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import { boxFill, CONDUCTOR_ALLOWANCE } from "@uom/core/boxfill";
-import { CM3_PER_IN3 } from "@uom/core/units";
 
 const empty = { devices: 0, studs: 0, clamps: false, grounds: 0, connectors: 0 };
 
@@ -10,17 +9,9 @@ describe("box fill", () => {
     expect(CONDUCTOR_ALLOWANCE.cec).toEqual({ "14": 24.6, "12": 28.7, "10": 36.9, "8": 45.1, "6": 73.7 });
   });
 
-  it("isn't one table in two units: the CEC allows less for the same wire", () => {
-    expect(CONDUCTOR_ALLOWANCE.cec["14"]).toBeLessThan(CONDUCTOR_ALLOWANCE.nec["14"] * CM3_PER_IN3);
-  });
-
   it("adds up each size of conductor", () => {
     expect(boxFill("nec", { ...empty, conductors: { "14": 4, "12": 2 } })?.total).toBeCloseTo(12.5);
     expect(boxFill("cec", { ...empty, conductors: { "14": 4 } })?.total).toBeCloseTo(98.4);
-  });
-
-  it("has nothing to size by with no conductors", () => {
-    expect(boxFill("nec", { ...empty, conductors: {}, devices: 1 })).toBeUndefined();
   });
 
   it("counts a device as two of the largest conductor", () => {

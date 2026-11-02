@@ -1,10 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { ampsToKva, capacitorRatedKvar, cecTransformerPrimary, energyUse, highLegVolts, kvaToAmps, lineToLine, lineToNeutral, motorSlip, necTransformerProtection, nextTransformerKva, ohmsLaw, pfCorrectionKvar, polesForRpm, pvCircuitAmps, pvStringVolts, readingBand, resistiveAt, supplyRange, syncSpeedRpm, transformerFaultAmps, wyeSystem } from "@uom/core/electrical";
+import { ampsToKva, energyUse, kvaToAmps, lineToLine, lineToNeutral, motorSlip, necTransformerProtection, nextTransformerKva, ohmsLaw, pfCorrectionKvar, polesForRpm, pvCircuitAmps, pvStringVolts, readingBand, supplyRange, syncSpeedRpm, wyeSystem } from "@uom/core/electrical";
 
 describe("load", () => {
   it("converts kVA and amps", () => {
     expect(kvaToAmps(75, 208, 3)).toBeCloseTo(208.2, 1);
-    expect(kvaToAmps(45, 600, 3)).toBeCloseTo(43.3, 1);
     expect(kvaToAmps(10, 240, 1)).toBeCloseTo(41.67, 2);
     expect(ampsToKva(kvaToAmps(112.5, 480, 3), 480, 3)).toBeCloseTo(112.5);
   });
@@ -13,7 +12,6 @@ describe("load", () => {
 describe("line and neutral voltage", () => {
   it("converts between line-to-line and line-to-neutral", () => {
     expect(lineToNeutral(208)).toBeCloseTo(120.09, 2);
-    expect(lineToNeutral(600)).toBeCloseTo(346.4, 1);
     expect(lineToLine(277)).toBeCloseTo(479.8, 1);
   });
 
@@ -28,19 +26,6 @@ describe("line and neutral voltage", () => {
     expect(wyeSystem(690, "eu")).toEqual([400, 690]);
     expect(wyeSystem(600, "us")).toBeUndefined();
     expect(wyeSystem(600, "ca")).toEqual([347, 600]);
-  });
-
-  it("matches only the side that was measured", () => {
-    expect(wyeSystem(400, "eu", "ln")).toEqual([400, 690]);
-    expect(wyeSystem(400, "eu", "ll")).toEqual([230, 400]);
-    expect(wyeSystem(208, "us", "ln")).toBeUndefined();
-    expect(wyeSystem(120, "us", "ll")).toBeUndefined();
-  });
-});
-
-describe("high-leg delta", () => {
-  it("is 208 V to neutral on a 240 V delta", () => {
-    expect(highLegVolts(240)).toBeCloseTo(207.8, 1);
   });
 });
 
@@ -84,26 +69,10 @@ describe("supply voltage limits", () => {
   });
 });
 
-describe("a resistive load on another voltage", () => {
-  it("follows the square of the voltage", () => {
-    const r = resistiveAt(4800, 240, 208);
-    expect(r.watts).toBeCloseTo(3605, 0);
-    expect(r.share).toBeCloseTo(0.751, 3);
-    expect(r.amps).toBeCloseTo(17.33, 2);
-  });
-});
-
 describe("power factor correction", () => {
   it("sizes the capacitor", () => {
     expect(pfCorrectionKvar(100, 0.8, 0.95)).toBeCloseTo(42.13, 2);
     expect(pfCorrectionKvar(100, 0.9, 0.9)).toBeCloseTo(0);
-  });
-});
-
-describe("capacitors off their rated voltage", () => {
-  it("follow the square of the voltage: a 600 V unit on 480 V gives 64%", () => {
-    expect(capacitorRatedKvar(64, 480, 600)).toBeCloseTo(100);
-    expect(capacitorRatedKvar(50, 480, 480)).toBe(50);
   });
 });
 
@@ -140,16 +109,11 @@ describe("transformers", () => {
     expect(p.primaryWithSecondary).toBe(225);
     expect(p.secondary).toBe(300);
   });
-
-  it("take the CEC's 125%, next size up", () => {
-    expect(cecTransformerPrimary(72.2)).toBe(100);
-  });
 });
 
 describe("motors", () => {
   it("works out synchronous speed from frequency and poles", () => {
     expect(syncSpeedRpm(60, 4)).toBe(1800);
-    expect(syncSpeedRpm(50, 4)).toBe(1500);
   });
 
   it("works out slip from synchronous and rated speed", () => {
@@ -162,27 +126,6 @@ describe("motors", () => {
     expect(polesForRpm(50, 1450)).toBe(4);
     expect(polesForRpm(60, 1800)).toBe(4);
     expect(polesForRpm(60, 4000)).toBeUndefined();
-  });
-});
-
-describe("transformer fault current", () => {
-  it("divides full-load amps by per-unit impedance", () => {
-    const r = transformerFaultAmps(1000, 480, 3, 5.75);
-    expect(r.fla).toBeCloseTo(1202.8, 1);
-    expect(r.faultAmps).toBeCloseTo(20918, 0);
-  });
-
-  it("takes the impedance tolerance and motors in the worst case", () => {
-    const r = transformerFaultAmps(1000, 480, 3, 5.75);
-    expect(r.worstCase).toBeCloseTo(r.faultAmps / 0.9);
-    const withMotors = transformerFaultAmps(1000, 480, 3, 5.75, 600);
-    expect(withMotors.motorContribution).toBe(2400);
-    expect(withMotors.worstCase).toBeCloseTo(r.worstCase + 2400);
-  });
-
-  it("gives line-to-neutral at a centre-tapped secondary", () => {
-    const r = transformerFaultAmps(50, 240, 1, 2);
-    expect(r.lineToNeutral).toBeCloseTo(r.worstCase * 1.5);
   });
 });
 

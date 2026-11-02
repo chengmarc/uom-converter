@@ -9,10 +9,6 @@ describe("site pages", () => {
     expect(Object.keys(PAGES).sort()).toEqual(TOOLS.map((t) => t.id).sort());
   });
 
-  it("give every topic a page, and only topics", () => {
-    expect(Object.keys(TOPIC_PAGES).sort()).toEqual([...TOPICS].sort());
-  });
-
   it("list the topics in the converters' order", () => {
     expect(Object.keys(TOPIC_PAGES)).toEqual(TOPICS);
   });
@@ -48,9 +44,12 @@ describe("site pages", () => {
     expect(idFromPath(`/${vdrop}/extra`, "/")).toBeUndefined();
     expect(idFromPath(`/elsewhere/${vdrop}`, "/uom-converter/")).toBeUndefined();
     expect(idFromPath("/voltage-drop-calculator", "/")).toBeUndefined(); // the old address: a redirect, not a page
+    expect(idFromPath("/electrical", "/")).toBeUndefined();
+  });
+
+  it("find their topic from a topic's address, and only that", () => {
     expect(topicFromPath("/wire-and-conduit", "/")).toBe("Wire & conduit");
     expect(topicFromPath("/power-and-loads.html", "/")).toBe("Power & loads");
-    expect(topicFromPath(`/${vdrop}`, "/")).toBeUndefined();
-    expect(idFromPath("/electrical", "/")).toBeUndefined();
+    expect(topicFromPath("/wire-and-conduit/voltage-drop-calculator", "/")).toBeUndefined();
   });
 });

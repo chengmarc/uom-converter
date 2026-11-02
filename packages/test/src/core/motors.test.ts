@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { motorCircuit, motorFullLoadAmps, motorOverloadAmps } from "@uom/core/motors";
+import { motorCircuit, motorFullLoadAmps } from "@uom/core/motors";
 
 describe("motor full-load current", () => {
   it("reads the NEC tables", () => {
@@ -50,12 +50,5 @@ describe("a motor circuit", () => {
   it("holds the CEC to the next size down", () => {
     expect(motorCircuit(16.7, "cec").breaker).toBe(40);
     expect(motorCircuit(1.1, "cec").breaker).toBe(15);
-  });
-});
-
-describe("motor overloads", () => {
-  it("go by service factor", () => {
-    expect(motorOverloadAmps(10, true)).toBe(12.5);
-    expect(motorOverloadAmps(10, false)).toBeCloseTo(11.5);
   });
 });

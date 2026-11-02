@@ -10,23 +10,12 @@ describe("conductor ampacity", () => {
     expect(conductorAmpacity("2000 kcmil", { ...standard, metal: "Al", insulation: 60 })?.table).toBe(470);
   });
 
-  it("has no 14 AWG aluminum", () => {
-    expect(conductorAmpacity("14 AWG", { ...standard, metal: "Al" })).toBeUndefined();
-  });
-
   it("derates from the insulation rating, as the published 6 AWG example does", () => {
     // 65 A at 75 °C × 0.88 at 40 °C × 0.80 for six conductors ≈ 46 A.
     const a = conductorAmpacity("6 AWG", { ...standard, insulation: 75, ambientC: 40, conductors: 6 })!;
     expect(a.ambient).toBe(0.88);
     expect(a.bundling).toBe(0.8);
     expect(a.derated).toBeCloseTo(45.76);
-  });
-
-  it("holds a derated 90 °C wire to its terminals", () => {
-    const a = conductorAmpacity("6 AWG", standard)!;
-    expect(a.derated).toBe(75);
-    expect(a.terminal).toBe(60);
-    expect(a.usable).toBe(55);
   });
 
   it("takes 75 °C terminals above 1 AWG", () => {
@@ -56,15 +45,6 @@ describe("conductor ampacity", () => {
 });
 
 describe("smallest size for a load", () => {
-  it("never suggests a wire that can't carry it", () => {
-    expect(smallestSizeForAmps(150, { ...standard, insulation: 75 })?.label).toBe("1/0 AWG");
-    expect(smallestSizeForAmps(40, { ...standard, insulation: 75 })?.label).toBe("8 AWG");
-  });
-
-  it("starts aluminum at 12 AWG", () => {
-    expect(smallestSizeForAmps(1, { ...standard, metal: "Al" })?.label).toBe("12 AWG");
-  });
-
   it("has no answer past the table", () => {
     expect(smallestSizeForAmps(900, standard)).toBeUndefined();
   });

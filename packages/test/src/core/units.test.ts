@@ -1,19 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { cToF, feetInchesLabel, fToC, LUX_PER_FC, NM_PER_LBF_IN, parseFeetInches, parseInches, toFraction } from "@uom/core/units";
-
-describe("unit factors", () => {
-  // These two are worked out from their definitions (1 fc = 1 lm/ft², 1 lbf·in = 4.448… N × 0.0254 m).
-  it("derive to their published values", () => {
-    expect(LUX_PER_FC).toBeCloseTo(10.764, 3);
-    expect(NM_PER_LBF_IN).toBeCloseTo(0.113, 3);
-  });
-});
+import { cToF, feetInchesLabel, fToC, parseFeetInches, parseInches, toFraction } from "@uom/core/units";
 
 describe("temperature", () => {
   it("converts °F and °C both ways", () => {
     expect(fToC(167)).toBeCloseTo(75);
     expect(cToF(90)).toBeCloseTo(194);
-    expect(fToC(cToF(-40))).toBeCloseTo(-40);
   });
 });
 

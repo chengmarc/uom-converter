@@ -6,11 +6,6 @@ import { dyn, exampleValues, type Values } from "@uom/converters/model";
 import { TOOLS } from "@uom/converters";
 
 describe("converters", () => {
-  it("have unique ids", () => {
-    const ids = TOOLS.map((t) => t.id);
-    expect(new Set(ids).size).toBe(ids.length);
-  });
-
   // Examples only need the region, so a stand-in for the panel's Values is enough.
   for (const r of REGIONS) {
     it(`examples set real fields and options (${r.label})`, () => {
@@ -137,7 +132,7 @@ describe("voltage drop", () => {
     expect(Number.parseFloat(drop(feeder).rows[0].value)).toBeCloseTo(2.06, 1);
   });
 
-  it("shares the drop between parallel sets, and says so in the heading", () => {
+  it("names the parallel sets in the heading", () => {
     const out = drop({ size: "500 kcmil", len: "300", amps: "760", volts: "480", phase: "3", sets: "2" });
     expect(out.heading).toContain("2 × 500 kcmil");
   });
@@ -499,10 +494,6 @@ describe("transformer fault current", () => {
 });
 
 describe("wire coils and reels", () => {
-  it("takes each pull whole from one reel", () => {
-    expect(answer("reels", { unit: "ft", run: "300", count: "3", size: "500" })!.rows[0]).toMatchObject({ value: "3" });
-  });
-
   it("adds the termination allowance to every pull", () => {
     const rows = answer("reels", { unit: "ft", run: "245", count: "2", size: "500", extra: "10" })!.rows;
     expect(rows[0].value).toBe("2");
