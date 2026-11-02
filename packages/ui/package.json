@@ -5,10 +5,10 @@
   "type": "module",
   "exports": {
     "./*": "./src/*.ts",
+    "./visuals": null,
     "./visuals.css": "./src/visuals.css"
   },
   "dependencies": {
-    "@uom/brand": "*",
     "@uom/converters": "*",
     "@uom/core": "*",
     "@uom/i18n": "*"

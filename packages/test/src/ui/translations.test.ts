@@ -7,7 +7,7 @@ import { HELD_LANGUAGES, LANGUAGES, setCatalogue, t } from "@uom/i18n";
 import { CATALOGUES } from "@uom/i18n/catalogues";
 import ja from "@uom/i18n/ja";
 import zh from "@uom/i18n/zh";
-import { messages, neutral } from "@uom/i18n/scan";
+import { messages, neutral } from "../scan";
 import { afterEach, describe, expect, it } from "vitest";
 
 /** The held languages too: they stay complete, ready to offer. */

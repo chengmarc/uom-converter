@@ -1,6 +1,6 @@
 // Finds every English string the apps show, by reading their source: t("…") calls anywhere, and the
 // fields a converter or a page declares as text, which the apps pass through t() as they draw them.
-// For the tests, in Node; @uom/test's ui/translations.test.ts checks each language against this list.
+// ui/translations.test.ts checks each language against this list.
 
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";

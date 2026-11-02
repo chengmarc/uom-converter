@@ -7,7 +7,6 @@
     ".": "./src/index.ts",
     "./catalogues": "./src/catalogues.ts",
     "./zh": "./src/zh.ts",
-    "./ja": "./src/ja.ts",
-    "./scan": "./src/scan.ts"
+    "./ja": "./src/ja.ts"
   }
 }

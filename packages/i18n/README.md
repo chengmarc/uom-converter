@@ -61,10 +61,10 @@ the Windows and Android apps import that, so the website's bundle has no transla
 language sets the words. Numbers keep the region's format in every language.
 
 **Trade terms are translated for the trade.** E/C/M, AWG and kcmil, the unit symbols and codes, and
-standards like NEC stay as they are. `neutral()` in `src/scan.ts` is the list of what needs no
+standards like NEC stay as they are. `neutral()` in `../test/src/scan.ts` is the list of what needs no
 translation.
 
-**Translations are English-keyed files, not a service.** `src/scan.ts` reads the source to find every
+**Translations are English-keyed files, not a service.** `../test/src/scan.ts` reads the source to find every
 string, and the tests check each language against that, including that placeholders match. A test
 also runs every converter in Chinese and fails on any English word that gets through, which catches
 text built without `t()`.
@@ -76,6 +76,6 @@ text built without `t()`.
 | `src/index.ts` | `t()`, `setCatalogue()`, `LANGUAGES`, `HELD_LANGUAGES`, `Language` |
 | `src/catalogues.ts` | `CATALOGUES`: the translations of every language on offer |
 | `src/zh.ts`, `ja.ts`, `es.ts`, `de.ts`, `fr.ts` | The translations, English → translated |
-| `src/scan.ts` | `messages()`: every string to translate, read from the source. For tests only |
 | `../ui/src/language.ts` | `chosenLanguage()`, `chooseLanguage()`, and translating an app's HTML |
+| `../test/src/scan.ts` | `messages()`: every string to translate, read from the source |
 | `../test/src/ui/translations.test.ts` | The checks on every language |
