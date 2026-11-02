@@ -1,5 +1,6 @@
 <!doctype html>
-<!-- Google Play's feature graphic (1024 × 500): render.cjs loads this page at that size. The icon, the name and who
+<!-- Google Play's feature graphic (1024 × 500): render.cjs loads this page at that size, once per language, named by
+     the hash (#de). The icon, the name and who
      it's for over @uom/brand's store look, as on the Windows app's box art. Play may crop the edges or lay its
      own buttons over the bottom, so everything sits in the middle. -->
 <html lang="en">
@@ -48,7 +49,13 @@
     <img src="../../../../packages/brand/app-icon.svg" alt="" />
     <div>
       <h1>UOM Converter</h1>
-      <p>For the <em>electrical</em> trade</p>
+      <p id="tagline"></p>
     </div>
+    <script src="captions.js"></script>
+    <script>
+      const language = location.hash.slice(1);
+      document.documentElement.lang = language;
+      document.getElementById("tagline").innerHTML = CAPTIONS[language].tagline;
+    </script>
   </body>
 </html>

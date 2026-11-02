@@ -40,8 +40,9 @@ their own, in `packages/converters/src/regions.ts`.
 4. **List it for the stores:** `appx.languages` and `nsis.installerLanguages` in
    `apps/windows/packaging/electron-builder.config.cjs`, and
    `apps/android/native/app/src/main/res/xml/locales_config.xml`.
-5. **Write its Windows Store listing:** `apps/windows/store-listing/localization/<id>.md`, and its
-   words in `apps/windows/store-listing/generator/captions.js`. `npm test` fails until both exist.
+5. **Write its store listings:** `store-listing/localization/<id>.md` and its words in
+   `store-listing/generator/captions.js`, in both `apps/windows/` and `apps/android/`. `npm test`
+   fails until they exist.
 
 ## Explanation
 

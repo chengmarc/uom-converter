@@ -1,9 +1,11 @@
 <!doctype html>
 <!-- Google Play's phone and tablet screenshots: render.cjs loads this page at 360 × 640 (rendered at 3×, so
-     1080 × 1920) once per shot and device, named by the hash (#home, #vdrop, …) and ?device= (phone, tablet-7,
-     tablet-10; ?width= is that device's screen width in CSS pixels). Each is the brand across the top, the need it
-     meets as the headline, and the real app below it on the device, cut off by the bottom edge: a capture of the
-     built page (build/shots/<device>/<name>.png) that render.cjs takes first, from each shot's settings below. -->
+     1080 × 1920) once per language, shot and device, named by the hash (#de.home, #fr.vdrop, …) and ?device= (phone,
+     tablet7, tablet10; ?width= is that device's screen width in CSS pixels, ?status= its status bar's height). A phone shot is the brand across the top,
+     the need it meets as the headline, and the real app below it on the device, cut off by the bottom edge. A tablet
+     shot is the app alone, filling the image: Google asks tablet screenshots to leave out text that isn't part of the
+     app, since Play can crop it. Both show a capture of the built page (build/shots/<language>/<device>/<name>.png) that
+     render.cjs takes first, from each shot's settings below. The words are in captions.js. -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -35,8 +37,7 @@
       .text { position: absolute; left: 26px; right: 26px; top: 146px; margin: 0; font-size: 13.5px; line-height: 1.4; font-weight: 450; color: rgba(255, 255, 255, 0.86); }
 
       /* The phone: the capture (393 CSS px wide, at 3×) shown 262 px wide in a slim black bezel with round corners,
-         run off the bottom edge. A tablet is wider, with squarer corners. A status bar is drawn over the page's top
-         inset (24 CSS px on the device, scaled as the capture is), as Android draws its own. */
+         run off the bottom edge. A status bar is drawn over the page's top inset, as Android draws its own. */
       .phone {
         position: absolute;
         left: 50%;
@@ -53,13 +54,41 @@
       }
       .screen { position: relative; overflow: hidden; border-radius: 26px 26px 0 0; }
       .screen > img { display: block; width: 262px; }
-      .tablet .phone { width: 318px; padding: 9px 9px 0; border-radius: 22px 22px 0 0; }
-      .tablet .screen { border-radius: 13px 13px 0 0; }
-      .tablet .screen > img { width: 300px; }
-      .status { position: absolute; left: 0; right: 0; top: 0; height: var(--status, 16px); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font-size: 9.5px; font-weight: 600; color: #1c1b19; }
-      .status i { display: flex; gap: 4px; }
-      .status b { width: 13px; height: 7px; border-radius: 2px; background: currentColor; }
-      .status b:first-child { width: 9px; border-radius: 1px 1px 2px 2px; clip-path: polygon(100% 0, 100% 100%, 0 100%); }
+      .tablet .brand, .tablet h1, .tablet .text { display: none; }
+      .tablet .phone { inset: 0; width: 360px; transform: none; padding: 0; border-radius: 0; box-shadow: none; background: none; }
+      .tablet .screen { border-radius: 0; }
+      .tablet .screen > img { width: 360px; }
+      /* Android's status bar as Google's system bars guide draws it, sized in dp at the scale the capture is shown (--dp),
+         in the app's text colour (--text in @uom/brand/tokens.css). Wi-Fi, signal and battery full, as Google asks. */
+      .status {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        height: var(--status);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 calc(16 * var(--dp));
+        font-size: calc(14 * var(--dp));
+        font-weight: 400;
+        color: #222831;
+      }
+      .status i { display: flex; align-items: center; gap: calc(1 * var(--dp)); }
+      .status svg { display: block; width: calc(16 * var(--dp)); height: calc(16 * var(--dp)); fill: currentColor; }
+      /* The punch-hole camera, in the middle of the status bar. Tablets keep theirs in the bezel. */
+      .status::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: calc(24 * var(--dp));
+        height: calc(24 * var(--dp));
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        background: #0d0f12;
+      }
+      .tablet .status::after { display: none; }
     </style>
   </head>
   <body>
@@ -68,67 +97,45 @@
     <p class="text" id="text"></p>
     <div class="phone"><div class="screen" id="screen"></div></div>
 
+    <script src="captions.js"></script>
     <script>
-      // Each shot, in upload order: the need it meets in the customer's words (the last phrase in the bolt colour),
-      // how the app meets it, and the app as it opens: `region` and `audience` as if picked in its settings and
-      // role filter, `recent` as if those converters were opened last, and `hash` the screen (none: the home
-      // screen; #<id>: that converter, on its first worked example). `scroll` scrolls a converter so its answer
-      // shows above the crop.
+      // Each shot, in upload order: the app as it opens: `region` and `audience` as if picked in its settings and role
+      // filter, `recent` as if those converters were opened last, and `hash` the screen (none: the home screen; #<id>:
+      // that converter, on its first worked example). `scrollTo` scrolls that part of the converter to the top on a
+      // phone, so its answer shows above the crop; a tablet shows the converter from its top. The words are in
+      // captions.js, under the same name.
       const SHOTS = {
-        home: {
-          title: "Every number on the job, <em>converted.</em>",
-          text: "Wire sizes, voltage drop, prices and unit codes, with the ones you use first.",
-          region: "us",
-          audience: "electrician",
-          recent: ["vdrop", "awg", "price"],
-          hash: "",
-        },
-        vdrop: {
-          title: "Will that wire carry the run? <em>Know first.</em>",
-          text: "See the drop, and the smallest wire that keeps it within your target.",
-          region: "us",
-          audience: "electrician",
-          hash: "#vdrop",
-          scroll: 700,
-        },
-        "price-units": {
-          title: "Per C, per M, <em>per each.</em>",
-          text: "Turn prices per 100 and per 1,000 into the price of one, and back.",
-          region: "us",
-          audience: "distributor",
-          hash: "#price",
-        },
-        awg: {
-          title: "AWG to mm², <em>and back.</em>",
-          text: "North American wire sizes to metric, with the nearest and next larger size.",
-          region: "ca",
-          audience: "electrician",
-          hash: "#awg",
-          scroll: 132,
-        },
-        "uom-codes": {
-          title: "Clean units in every <em>supplier file.</em>",
-          text: "Turn EA, ft, box or lbs into the UN/ECE codes BMEcat, ETIM and e-invoicing expect.",
-          region: "eu",
-          audience: "pim",
-          hash: "#uom-codes",
-        },
+        home: { region: "us", audience: "electrician", recent: ["vdrop", "awg", "price"], hash: "" },
+        vdrop: { region: "us", audience: "electrician", hash: "#vdrop", scrollTo: ".to" },
+        "price-units": { region: "us", audience: "distributor", hash: "#price" },
+        awg: { region: "ca", audience: "electrician", hash: "#awg", scrollTo: ".to" },
+        "uom-codes": { region: "eu", audience: "pim", hash: "#uom-codes" },
       };
 
-      const name = location.hash.slice(1);
+      // Material's Wi-Fi, signal and battery icons (Apache 2.0), on a 24 × 24 grid, in the order Android shows them.
+      const STATUS_ICONS = [
+        "M12.01 21.49L23.64 7c-.45-.34-4.93-4-11.64-4C5.28 3 .81 6.66.36 7l11.63 14.49.01.01.01-.01z",
+        "M2 22h20V2z",
+        "M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z",
+      ].map((d) => `<svg viewBox="0 0 24 24"><path d="${d}" /></svg>`).join("");
+
+      const [language, name] = location.hash.slice(1).split(".");
       if (name) {
-        const shot = SHOTS[name];
-        if (!shot) throw new Error("Unknown shot " + location.hash);
+        const words = CAPTIONS[language]?.shots[name];
+        if (!words) throw new Error("Unknown shot " + location.hash);
         const params = new URLSearchParams(location.search);
         const device = params.get("device") ?? "phone";
         const tablet = device.startsWith("tablet");
+        document.documentElement.lang = language;
         document.body.classList.toggle("tablet", tablet);
-        // The status bar's 24 CSS px on the device, at the size its capture is shown.
-        document.body.style.setProperty("--status", `${(24 * (tablet ? 300 : 262)) / Number(params.get("width") ?? 393)}px`);
-        document.getElementById("title").innerHTML = shot.title;
-        document.getElementById("text").textContent = shot.text;
+        // One dp on the device, at the size its capture is shown, and the status bar's height.
+        const dp = (tablet ? 360 : 262) / Number(params.get("width") ?? 393);
+        document.body.style.setProperty("--dp", `${dp}px`);
+        document.body.style.setProperty("--status", `${Number(params.get("status") ?? 40) * dp}px`);
+        document.getElementById("title").innerHTML = words.title;
+        document.getElementById("text").textContent = words.text;
         document.getElementById("screen").innerHTML =
-          `<img src="../../build/shots/${device}/${name}.png" alt="" />` + `<div class="status"><span>12:30</span><i><b></b><b></b></i></div>`;
+          `<img src="../../build/shots/${language}/${device}/${name}.png" alt="" />` + `<div class="status"><span>12:30</span><i>${STATUS_ICONS}</i></div>`;
       }
     </script>
   </body>

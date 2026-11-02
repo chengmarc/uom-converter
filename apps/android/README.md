@@ -72,7 +72,7 @@ npm run android:icons
 ```
 
 Redraws the launcher icons (`native/app/src/main/res/mipmap-*/`) and the Play icon
-(`store-listing/icon-512.png`) from `@uom/brand`'s `app-icon.svg` (`scripts/render-icons.cjs`).
+(`build/icon-512.png`) from `@uom/brand`'s `app-icon.svg` (`scripts/render-icons.cjs`).
 
 ### Refresh the Play listing images
 
@@ -81,12 +81,12 @@ npm run android:store
 ```
 
 Builds the page and runs `store-listing/generator/render.cjs`, which draws the feature graphic
-(`store-listing/feature-graphic.png`, from `store-listing/generator/feature.html`) and the phone screenshots
-for phones, 7-inch and 10-inch tablets (`store-listing/<device>/`, 1080 × 1920): each a caption
-over the real app at that device's size, as listed in `SHOTS` in `store-listing/generator/shots.html` with the
-region, role and screen it opens on. `scroll` scrolls a converter so its answer shows above the
-crop, the same on every device or set per device. Look them over before committing. Every other Play Console field
-is in [store-listing/LISTING.md](store-listing/LISTING.md), ready to paste.
+(from `store-listing/generator/feature.html`) and the screenshots for phones, 7-inch and 10-inch
+tablets, 1080 × 1920, in every language, into `dist/<language>/`, with the Play icon: on a phone a caption over the real
+app, and on a tablet the app alone, as listed in `SHOTS` in `store-listing/generator/shots.html` with the
+region, role and screen it opens on. `scrollTo` scrolls that part of a converter to the top on a phone, so
+its answer shows above the crop. Look them over before committing. Every other Play Console field
+is in [store-listing/SUBMISSION.md](store-listing/SUBMISSION.md), and each language's text in `store-listing/localization/`.
 
 ## Explanation
 
@@ -116,11 +116,12 @@ from it in `native/app/build.gradle` (1.2.3 is 10203).
 | `scripts/gradle.cjs` | Runs Gradle with them: the `run`, `apk` and `aab` scripts |
 | `scripts/dev.mjs`, `scripts/emulator.cjs` | `npm run android:dev`, `npm run android:emulator` |
 | `scripts/render-icons.cjs` | `npm run android:icons` |
-| `store-listing/icon-512.png` | The Play listing icon (rendered) |
-| `store-listing/generator/render.cjs` | `npm run android:store`: the feature graphic and phone screenshots |
+| `store-listing/generator/render.cjs` | `npm run android:store`: the feature graphic and screenshots, in every language |
 | `store-listing/generator/feature.html`, `store-listing/generator/shots.html` | Their designs, in `@uom/brand`'s `store.css` look |
-| `store-listing/feature-graphic.png`, `store-listing/<device>/` | The images to upload (rendered) |
-| `store-listing/LISTING.md` | Every Play Console field, ready to paste |
+| `store-listing/generator/captions.js` | The words on those images, per language |
+| `store-listing/SUBMISSION.md` | How to fill in Play Console, and what's entered once |
+| `store-listing/localization/` | Each language's Play listing text |
+| `dist/<language>/` | The images to upload (rendered, not in git) |
 | `store-listing/PRIVACY.md` | The privacy policy, whose address goes in the Play Console |
 | `dist/` | What ships: the `.aab` and the debug `.apk`, copied out of Gradle's build folder (not in git) |
-| `build/` | Intermediates, safe to delete: the built page (`web/`), store screenshot captures (not in git) |
+| `build/` | Intermediates, safe to delete: the built page (`web/`), the Play icon, store screenshot captures (not in git) |

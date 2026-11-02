@@ -1,10 +1,11 @@
-// Renders Google Play's listing images from the app's own sources, so they never drift from it:
-//   store-listing/feature-graphic.png  1024 × 500, from feature.html
-//   store-listing/<device>/            phone, 7-inch and 10-inch tablet screenshots, 1080 × 1920, in upload order:
-//                                      shots.html (which lists them and their captions) around captures of the built
-//                                      page at each device's size, taken into build/shots/<device>/
-// The icon is render-icons.cjs's (store-listing/icon-512.png). Run with `npm run android:store`, which builds
-// apps/android/build/web/ first.
+// Renders Google Play's listing images from the app's own sources, so they never drift from it, one folder per language
+// in dist/<language>/, in each language of captions.js:
+//   icon-512.png         render-icons.cjs's, the same in every language
+//   feature-graphic.png  1024 × 500, from feature.html
+//   <device>-<n>-<shot>.png   phone, tablet7 and tablet10 screenshots, 1080 × 1920, in upload order: shots.html (which
+//                        lists them) around captures of the built page at each device's size, taken into
+//                        build/shots/<language>/<device>/
+// Run with `npm run android:store`, which runs render-icons.cjs and builds apps/android/build/web/ first.
 
 const { app, BrowserWindow, nativeTheme, net, protocol } = require("electron");
 const fs = require("node:fs");
@@ -12,23 +13,23 @@ const path = require("node:path");
 const { pathToFileURL } = require("node:url");
 
 const ANDROID = path.join(__dirname, "..", "..");
-const LISTING = path.join(ANDROID, "store-listing");
+const DIST = path.join(ANDROID, "dist");
 const BUILD = path.join(ANDROID, "build");
 const PAGE = path.join(BUILD, "web");
 
 /**
  * Each device Play asks screenshots for, by its screen in CSS pixels: a common phone (393 × 852 at 3×, the
- * density of most phones today), and the usual 7-inch (600 × 960) and 10-inch (800 × 1280) tablets at 2×.
+ * density of most phones today), and 7-inch and 10-inch tablets at 2×. `status` is its status bar's height, which the
+ * page pads for through the inset Capacitor sets on a device. A tablet's capture is its whole screenshot, so
+ * it's 9:16, as Google asks, a little taller than a real tablet's 5:8.
  */
 const DEVICES = {
-  phone: { width: 393, height: 852, scale: 3 },
-  "tablet-7": { width: 600, height: 960, scale: 2 },
-  "tablet-10": { width: 800, height: 1280, scale: 2 },
+  phone: { width: 393, height: 852, scale: 3, status: 40 },
+  tablet7: { width: 612, height: 1088, scale: 2, status: 28 },
+  tablet10: { width: 810, height: 1440, scale: 2, status: 28 },
 };
 /** The screenshots' layout size, rendered at 3× for 1080 × 1920 (9:16). */
 const SHOT = { width: 360, height: 640, scale: 3 };
-/** The status bar's height the page pads for, as Capacitor reports it on a phone. */
-const STATUS_BAR = "24px";
 
 protocol.registerSchemesAsPrivileged([{ scheme: "app", privileges: { standard: true, secure: true, supportFetchAPI: true } }]);
 
@@ -64,11 +65,9 @@ async function renderPage(page, file, width, height, scale, query = {}) {
   win.destroy();
 }
 
-/** The built page as the app shows it on `device`, set up as the shot says. */
-async function captureApp(name, device, { region, audience, recent = [], hash, scroll = 0 }) {
+/** The built page as the app shows it on `device`, in `language` and `region`, set up as the shot says. */
+async function captureApp(language, region, name, device, { audience, recent = [], hash, scrollTo }) {
   const screen = DEVICES[device];
-  // A number scrolls the same on every device; { phone, "tablet-7", "tablet-10" } sets each.
-  const top = typeof scroll === "number" ? scroll : (scroll[device] ?? 0);
   // Windows keeps even an offscreen window within the screen's height: a taller screen is a window half the size,
   // at twice the density, with the page zoomed out to 50% so it still lays out at the device's CSS size.
   const half = screen.height > 1000 ? 2 : 1;
@@ -80,16 +79,21 @@ async function captureApp(name, device, { region, audience, recent = [], hash, s
   // The app keeps its choices in localStorage (@uom/ui/storage): set them, then open the screen afresh.
   await load("app://uom/index.html");
   await win.webContents.executeJavaScript(`localStorage.clear();
-    localStorage.setItem("uom.language", "en");
+    localStorage.setItem("uom.language", ${JSON.stringify(language)});
     localStorage.setItem("uom.region", ${JSON.stringify(region)});
     localStorage.setItem("uom.audience", ${JSON.stringify(audience)});
     localStorage.setItem("uom.recent", ${JSON.stringify(JSON.stringify(recent))});`);
   await load(`app://uom/index.html${hash}`);
   // A phone draws no scrollbar; Chromium on the desktop does.
   await win.webContents.insertCSS("::-webkit-scrollbar { display: none; }");
-  await win.webContents.executeJavaScript(`document.documentElement.style.setProperty("--safe-area-inset-top", "${STATUS_BAR}");
-    document.fonts.ready.then(() => new Promise((r) => setTimeout(r, 300))).then(() => window.scrollTo(0, ${top}))`);
-  await capture(win, path.join(BUILD, "shots", device, `${name}.png`), { width: screen.width * screen.scale, height: screen.height * screen.scale });
+  // By element, not by pixels: text wraps differently in each language. Under the app bar, which stays put. Room below
+  // the page, out of the shot, lets a short page scroll as far as a long one.
+  const scroll = device === "phone" && scrollTo
+    ? `document.querySelector("#content").style.paddingBottom = "100vh"; window.scrollTo(0, document.querySelector("${scrollTo}").getBoundingClientRect().top + scrollY - document.querySelector("#screen .appbar").offsetHeight - 12)`
+    : "";
+  await win.webContents.executeJavaScript(`document.documentElement.style.setProperty("--safe-area-inset-top", "${screen.status}px");
+    document.fonts.ready.then(() => new Promise((r) => setTimeout(r, 500))).then(() => { ${scroll} })`);
+  await capture(win, path.join(BUILD, "shots", language, device, `${name}.png`), { width: screen.width * screen.scale, height: screen.height * screen.scale });
   win.destroy();
 }
 
@@ -106,20 +110,28 @@ app.whenReady().then(async () => {
   });
   nativeTheme.themeSource = "light";
 
-  await renderPage("feature.html", path.join(LISTING, "feature-graphic.png"), 1024, 500, 1);
-
+  // The shots, in upload order, as shots.html lists them, and the languages, as captions.js lists them.
   const lister = offscreen(SHOT.width, SHOT.height);
   await lister.loadFile(path.join(__dirname, "shots.html"));
   const shots = Object.entries(await lister.webContents.executeJavaScript("SHOTS"));
+  const captions = await lister.webContents.executeJavaScript("CAPTIONS");
   lister.destroy();
 
   fs.rmSync(path.join(BUILD, "shots"), { recursive: true, force: true });
-  for (const [device, screen] of Object.entries(DEVICES)) {
-    fs.rmSync(path.join(LISTING, device), { recursive: true, force: true });
-    for (const [i, [name, shot]] of shots.entries()) {
-      await captureApp(name, device, shot);
-      const file = path.join(LISTING, device, `screenshot-${i + 1}-${name}.png`);
-      await renderPage(`shots.html#${name}`, file, SHOT.width, SHOT.height, SHOT.scale, { device, width: String(screen.width) });
+  for (const [language, { region }] of Object.entries(captions)) {
+    // Only the language's own folder, as dist/ also holds the .aab. Its contents, not the folder: Windows won't delete a
+    // folder that's open in Explorer.
+    const dir = path.join(DIST, language);
+    fs.mkdirSync(dir, { recursive: true });
+    for (const entry of fs.readdirSync(dir)) fs.rmSync(path.join(dir, entry), { recursive: true, force: true });
+    fs.copyFileSync(path.join(BUILD, "icon-512.png"), path.join(dir, "icon-512.png"));
+    await renderPage(`feature.html#${language}`, path.join(dir, "feature-graphic.png"), 1024, 500, 1);
+    for (const [device, screen] of Object.entries(DEVICES)) {
+      for (const [i, [name, shot]] of shots.entries()) {
+        await captureApp(language, region ?? shot.region, name, device, shot);
+        const file = path.join(dir, `${device}-${i + 1}-${name}.png`);
+        await renderPage(`shots.html#${language}.${name}`, file, SHOT.width, SHOT.height, SHOT.scale, { device, width: String(screen.width), status: String(screen.status) });
+      }
     }
   }
   app.quit();

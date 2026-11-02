@@ -9,11 +9,8 @@ packages/brand/rendered/*.png linguist-generated
 
 # apps/android/scripts/render-icons.cjs (`npm run android:icons`), from @uom/brand's app-icon.svg
 apps/android/native/app/src/main/res/mipmap-*/*.png linguist-generated
-apps/android/store-listing/icon-512.png linguist-generated
 
 # apps/android/store-listing/generator/render.cjs (`npm run android:store`), from @uom/brand's store look and the built app
-apps/android/store-listing/feature-graphic.png linguist-generated
-apps/android/store-listing/*/*.png linguist-generated
 
 # Written by `cap sync` (npm run android:sync), always with LF. Change Capacitor's plugins, not these.
 apps/android/native/app/capacitor.build.gradle eol=lf linguist-generated

@@ -4,7 +4,8 @@
 //                                            the arrows and bolt (each launcher cuts its own shape)
 //     ic_launcher_monochrome                 the glyph alone, for Android 13's themed icons
 //     ic_launcher, ic_launcher_round         whole icons for launchers without adaptive icons
-//   store-listing/icon-512.png               the Play listing icon (Play rounds the corners itself)
+//   build/icon-512.png                       the Play listing icon (Play rounds the corners itself), which
+//                                            store-listing/generator/render.cjs copies to each language's folder
 // Run with `npm run android:icons`.
 
 const { app, BrowserWindow } = require("electron");
@@ -75,7 +76,7 @@ app.whenReady().then(async () => {
       await render("legacy", path.join(dir, "ic_launcher.png"), 48 * x);
       await render("round", path.join(dir, "ic_launcher_round.png"), 48 * x);
     }
-    await render("store", path.join(ANDROID, "store-listing", "icon-512.png"), 512);
+    await render("store", path.join(ANDROID, "build", "icon-512.png"), 512);
   } catch (e) {
     console.error(e);
     process.exitCode = 1;

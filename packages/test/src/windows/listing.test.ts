@@ -1,33 +1,16 @@
-import { readdirSync, readFileSync } from "node:fs";
+import { readdirSync } from "node:fs";
 import { LANGUAGES } from "@uom/i18n";
 import { describe, expect, it } from "vitest";
+import { field, parseCaptions, reader, shotNames } from "../listing";
 
 const offered = LANGUAGES.map((l) => l.id as string).sort();
 // The listing and what it's made from, in the Windows app.
 const LISTING = new URL("../../../../apps/windows/store-listing/", import.meta.url);
-const read = (file: string) => readFileSync(new URL(file, LISTING), "utf8").replaceAll("\r\n", "\n");
+const read = reader(LISTING);
 
 type Captions = { region?: string; tagline: string; facts: string[]; shots: Record<string, { title: string; text: string }> };
-
-/** captions.js is a page's script, so read it as text; what's inside the braces is JSON. */
-function captions(): Record<string, Captions> {
-  const text = read("./generator/captions.js");
-  return JSON.parse(text.slice(text.indexOf("= {") + 2, text.lastIndexOf("}") + 1));
-}
-
-/** The shots shots.html lists, by name. */
-function shots() {
-  const list = /const SHOTS = \{(.*?)\n {6}\};/s.exec(read("./generator/shots.html"))![1];
-  return [...list.matchAll(/^\s*"?([\w-]+)"?: \{/gm)].map((m) => m[1]).sort();
-}
-
-/** A listing's field: the code block under its heading. */
-function field(listing: string, heading: string) {
-  const found = new RegExp(`^### ${heading}\\n+\`\`\`\\n(.*?)\\n\`\`\``, "ms").exec(listing);
-  if (!found) throw new Error(`No ${heading}`);
-  return found[1];
-}
-
+const captions = () => parseCaptions<Captions>(read("./generator/captions.js"));
+const shots = () => shotNames(read("./generator/shots.html"));
 const listing = (id: string) => read(`./localization/${id}.md`);
 
 describe("the Store listing", () => {

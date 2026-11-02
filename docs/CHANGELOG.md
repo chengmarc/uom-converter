@@ -9,6 +9,11 @@ match the release tags (`v<version>`).
 
 ### Changed
 
+- the Android app's Google Play listing is in Spanish, German and French as well as English: one file per
+  language in `store-listing/localization/`, and what's entered once in `store-listing/SUBMISSION.md`, was
+  `store-listing/LISTING.md`
+- the Google Play images and icon are rendered per language into `dist/<language>/`, was tracked in `store-listing/`
+- the Android app's tablet screenshots are the app alone at 9:16, as Google asks, was a caption over a framed tablet
 - the Windows app's shell is in `shell/` and its page directly in `src/`, as in the Android app, was
   `src/main/` and `src/renderer/`
 - the `.appx`'s tile icons are rendered into `build/packaging/appx/` by `npm run windows:appx`, was tracked in

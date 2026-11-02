@@ -54,7 +54,7 @@ mean the same in every app:
 
 | Folder | Holds |
 |---|---|
-| `dist/` | What ships, and nothing else: the website as deployed, the Windows installer, `.appx` and Store images, the Android `.aab` |
+| `dist/` | What ships, and nothing else: the website as deployed, the Windows installer, `.appx` and Store images, the Android `.aab` and Play images |
 | `build/` | Intermediates, always safe to delete: the built page inside the Windows and Android apps (`build/web/`), electron-builder's full output, store screenshot captures |
 
 The Android app's `native/` (the Android Studio project) also has `build/` folders: Gradle's
