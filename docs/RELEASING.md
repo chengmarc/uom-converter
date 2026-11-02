@@ -1,9 +1,9 @@
 # Releasing
 
-How the source tree becomes the two release files: an installer for GitHub Releases, and an
-`.appx` for the Microsoft Store. electron-builder builds both from
-[packaging/electron-builder.config.cjs](../apps/windows/packaging/electron-builder.config.cjs), into `apps/windows/dist/`. Commands run from
-the repo root.
+How the source tree becomes the three release files: an installer for GitHub Releases, an `.appx`
+for the Microsoft Store, and an `.aab` for Google Play. electron-builder builds the first two from
+[packaging/electron-builder.config.cjs](../apps/windows/packaging/electron-builder.config.cjs), into `apps/windows/dist/`, and Gradle builds
+the `.aab` into `apps/android/dist/`. Commands run from the repo root.
 
 ← Back to the [README](../README.md).
 
@@ -12,7 +12,8 @@ the repo root.
 1. **Freeze the scope.** Don't mix feature work into the release pass.
 2. **Choose the version** (`1.2.0`, say). The git tag `v<version>` is the version of record;
    bump `version` in the root `package.json` to match: run `npm version <version> --no-git-tag-version`,
-   which also updates `package-lock.json`. It sets the Store package version (`<version>.0`).
+   which also updates `package-lock.json`. It sets the Store package version (`<version>.0`) and
+   Google Play's versionCode (1.2.3 is 10203).
 3. **Write it up.** Move the entries under `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md) into a
    dated `[<version>]` section. That section is also the GitHub release's description (step 9),
    so write it for people downloading the app.
@@ -28,6 +29,7 @@ the repo root.
 
    ```
    npm run windows:assets
+   npm run android:store
    ```
 
 6. **Build:**
@@ -35,6 +37,7 @@ the repo root.
    ```
    npm run windows:dist   # UOM-Converter-setup.exe
    npm run windows:appx   # UOM-Converter-<version>.appx
+   npm run android:aab    # UOM-Converter-<version>.aab, signed with the upload key (below)
    ```
 
 7. **Try it out.** Install with the setup exe, ideally on a machine that hasn't run the app before:
@@ -43,7 +46,12 @@ the repo root.
    - clicking a result copies it
    - the window reopens where you left it
    - it uninstalls cleanly from Settings → Apps
-8. **Commit and tag** once the installer checks out:
+
+   Then `npm run android:run` on a phone or an emulator:
+   - it starts, and a converter opens from the home screen with its example's answer
+   - changing region, language and theme in Settings takes effect
+   - tapping a result copies it
+8. **Commit and tag** once both check out:
 
    ```
    git add -A
@@ -63,7 +71,7 @@ the repo root.
    The README's download badge points at `releases/latest/download/UOM-Converter-setup.exe`, so it
    fetches the new installer as soon as the release is published. That only works while the file
    name has no version in it.
-10. **Submit to the Store** (below).
+10. **Submit to the Store and Google Play** (below).
 
 ## Microsoft Store
 
@@ -71,15 +79,27 @@ The Store takes the `.appx` and signs it itself, so it needs no code-signing cer
 rejects unsigned exe installers, so the installer is for GitHub only and the `.appx` is never
 published there.
 
-1. **One time:** copy the three values under Partner Center → the app → Product identity into
-   `appx` in [packaging/electron-builder.config.cjs](../apps/windows/packaging/electron-builder.config.cjs): `identityName`, `publisher` (`CN=…`) and `publisherDisplayName`.
-   Until then they hold placeholders, and the Store rejects a package whose identity doesn't match.
+1. **Identity:** `identityName`, `publisher` (`CN=…`) and `publisherDisplayName` in `appx` in
+   [packaging/electron-builder.config.cjs](../apps/windows/packaging/electron-builder.config.cjs) are the three values under Partner Center → the app → Product identity.
+   The Store rejects a package whose identity doesn't match.
 2. **Build** with `npm run windows:appx`.
 3. **Upload** `apps/windows/dist/UOM-Converter-<version>.appx` in a new Partner Center
    submission, after `npm run windows:assets` has rendered its images. How to fill in every other
    field (privacy policy, `runFullTrust` justification, certification notes, and a listing per
    language) is in
    [apps/windows/store-listing/SUBMISSION.md](../apps/windows/store-listing/SUBMISSION.md). Rewrite
+   "What's new in this version" in every file in `store-listing/localization/` first.
+
+## Google Play
+
+Play takes only bundles signed with the app's upload key, and never the same versionCode twice: once
+a bundle is uploaded, even to testing, a fix to it needs a new version.
+
+1. **Build** with `npm run android:aab`, with the upload key set as
+   [the Android app's README](../apps/android/README.md#build-a-release-for-google-play) says.
+2. **Upload** `apps/android/dist/UOM-Converter-<version>.aab` in a new Play Console release, after
+   `npm run android:store` has rendered its images. How to fill in the release and every other field
+   is in [apps/android/store-listing/SUBMISSION.md](../apps/android/store-listing/SUBMISSION.md). Rewrite
    "What's new in this version" in every file in `store-listing/localization/` first.
 
 ## Reference
@@ -99,9 +119,17 @@ Only these are copied there. Everything else electron-builder makes (`win-unpack
 files, `builder-debug.yml`) stays in `apps/windows/build/electron-builder/`, with the other
 intermediates, and isn't published.
 
+In `apps/android/dist/`:
+
+| File | Published to |
+|---|---|
+| `UOM-Converter-<version>.aab` | Google Play (Play Console) only |
+| `UOM-Converter-debug.apk` | Nowhere: a debug build, from `npm run android:apk` |
+| `<language>/` | The Play listing's images, from `npm run android:store`, uploaded in Play Console |
+
 ### Where the images come from
 
-`npm run windows:assets` runs [store-listing/generator/render.cjs](../apps/windows/store-listing/generator/render.cjs), which renders from
+The Android app's are in [its README](../apps/android/README.md#refresh-the-play-listing-images). `npm run windows:assets` runs [store-listing/generator/render.cjs](../apps/windows/store-listing/generator/render.cjs), which renders from
 `packages/brand/app-icon.svg` and the built page (paths below are in `apps/windows/`):
 
 | Output | Used for |

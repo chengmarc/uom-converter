@@ -7,40 +7,10 @@ match the release tags (`v<version>`).
 
 ## [Unreleased]
 
-### Changed
+## [1.3.0] - 2026-11-02
 
-- the website's home page opens on a strip of photos with no captions or links, the category bar being the way to
-  a topic, then the Windows app card
-- the Windows app card has a button to download the installer, and sits at the top of the side menu
-- topic and converter pages open on the photo alone, was a tinted band with the title and breadcrumb on it
-- the website's breadcrumb runs Converters, topic, converter on every page, ending on the page shown
-- the website's header and footer have the same small links: Home, Privacy, Source code, Report a problem
-- the website's footer lists the Android app, which goes to the Windows app until it's on Google Play
-- the website's background is grey with diagonal stripes and the page lifted off it, was a photo under a navy wash
-- the Android app's Google Play listing is in Spanish, German and French as well as English: one file per
-  language in `store-listing/localization/`, and what's entered once in `store-listing/SUBMISSION.md`, was
-  `store-listing/LISTING.md`
-- the Google Play images and icon are rendered per language into `dist/<language>/`, was tracked in `store-listing/`
-- the Android app's tablet screenshots are the app alone at 9:16, as Google asks, was a caption over a framed tablet
-- the Windows app's shell is in `shell/` and its page directly in `src/`, as in the Android app, was
-  `src/main/` and `src/renderer/`
-- the `.appx`'s tile icons are rendered into `build/packaging/appx/` by `npm run windows:appx`, was tracked in
-  `packaging/appx/`
-- the Windows app's theme setting is a row of buttons, like the region's, was a dropdown
-- the Windows app's Store listing is in Spanish, German and French as well as English: one file per
-  language in `store-listing/localization/`, and what's entered once in `store-listing/SUBMISSION.md`,
-  was `store-listing/LISTING.md`
-- the Windows Store images are rendered per language into `dist/<language>/`, was tracked
-  in `store-listing/`. Git keeps only the README's screenshots, in `docs/screenshots/`
-
-### Fixed
-
-- the Windows app's search box fits its prompt in Spanish and French, and its shortcut hint says Strg F in German
-- in the Android app, long German names hyphenate on the home screen, where they were cut mid-word
-- the Windows Store screenshots show the app at its real size. Rendering them after the Android images
-  left the app at half size
-
-## [1.3.0] - 2026-10-31
+The first installer on GitHub since 1.1.0, so it also brings 1.2.0's changes, such as Spanish, German and
+French: see the [changelog](https://github.com/chengmarc/uom-converter/blob/main/docs/CHANGELOG.md).
 
 ### Added
 
@@ -96,10 +66,21 @@ match the release tags (`v<version>`).
   gap on top of a power of ten
 - Ohm's law shows values under 1 in mA and mW
 - a motor's speed on the other frequency keeps the same r/min below synchronous
+- the website's home page opens on a strip of photos with no captions or links, the category bar being the way to
+  a topic, then the Windows app card
+- the website's Windows app card has a button to download the installer, and sits at the top of the side menu
+- the website's topic and converter pages open on the photo alone, was a tinted band with the title and breadcrumb on it
+- the website's breadcrumb runs Converters, topic, converter on every page, ending on the page shown
+- the website's header and footer have the same small links: Home, Privacy, Source code, Report a problem
+- the website's footer lists the Android app, which goes to the Windows app until it's on Google Play
+- the website's background is grey with diagonal stripes and the page lifted off it, was a photo under a navy wash
+- the Windows app's Microsoft Store listing and the Android app's Google Play listing are in Spanish, German and
+  French as well as English
 
 ### Fixed
 
 - the Windows app's search box fits its prompt in Spanish and French, and its shortcut hint says Strg F in German
+- in the Android app, long German names hyphenate on the home screen, where they were cut mid-word
 - long labels on choice buttons wrap instead of being cut off, and the captions under the mm² to
   AWG cross-sections no longer run into each other
 - wire coils and reels count whole pulls: three 300 ft pulls need three 500 ft spools, not two
@@ -128,7 +109,6 @@ match the release tags (`v<version>`).
 
 ### Fixed
 
-- the Windows app's search box fits its prompt in Spanish and French, and its shortcut hint says Strg F in German
 - in the US and Canada, a number with a comma that doesn't separate thousands, such as
   "7,4", is an error instead of being read as 74
 
@@ -144,7 +124,6 @@ match the release tags (`v<version>`).
 
 ### Fixed
 
-- the Windows app's search box fits its prompt in Spanish and French, and its shortcut hint says Strg F in German
 - the E/C/M price heading reads "per 1,000 (M)" instead of "per 1,000 (m)", which looked
   like metres
 

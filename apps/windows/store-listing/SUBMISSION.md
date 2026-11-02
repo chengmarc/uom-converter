@@ -87,5 +87,5 @@ Export listing and Import listings in Partner Center take all the languages at o
 - **Notes for certification:**
 
   ```
-  No account, sign-in or internet connection is needed, and there's nothing to set up. The app opens on a converter with a worked example already filled in and its answer shown. To try another: 1. Click Electrician in the row at the top, and US next to Region. 2. Click Voltage drop in the left sidebar; it shows 5.15 % for 12 AWG over 100 ft at 16 A and 120 V, and 8 AWG as the smallest wire within 3 %. 3. Click any result to copy it, or press Ctrl+F and type "price" to find the price converters. The app runs on any Windows 10 (1809) or later PC; it has no hardware requirements.
+  No account, sign-in or internet connection is needed, and there's nothing to set up. The app opens on a converter with a worked example already filled in and its answer shown. To try another: 1. Click Electrician in the row at the top, and US next to Region. 2. Click Voltage drop in the left sidebar; it shows 5.37 % for 12 AWG over 100 ft at 16 A and 120 V, and 8 AWG as the smallest wire within 3 %. 3. Click any result to copy it, or press Ctrl+F and type "price" to find the price converters. The app runs on any Windows 10 (1809) or later PC; it has no hardware requirements.
   ```

@@ -89,8 +89,8 @@ To add a converter or a topic, see [@uom/converters](packages/converters/README.
 
 ## Releasing
 
-Windows releases follow the [release guide](docs/RELEASING.md): the `.exe` files go
-on GitHub Releases, the `.appx` to the Microsoft Store. Changes are listed in the
+Releases follow the [release guide](docs/RELEASING.md): the installer goes on GitHub
+Releases, the `.appx` to the Microsoft Store and the `.aab` to Google Play. Changes are listed in the
 [changelog](docs/CHANGELOG.md), and each app keeps its own privacy policy: the [website](https://uom-converter.com/privacy), the
 [Windows app](apps/windows/store-listing/PRIVACY.md) and the
 [Android app](apps/android/store-listing/PRIVACY.md).
