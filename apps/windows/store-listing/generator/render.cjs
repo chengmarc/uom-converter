@@ -72,15 +72,15 @@ async function capture(win, file, expected, rect) {
   console.log(`${path.relative(WINDOWS, file)}  ${w}×${h}`);
 }
 
-/** The icon centred on a transparent (or solid) canvas of exactly width × height pixels. */
-async function renderIcon(file, width, height, share, background = "transparent") {
+/** The icon centred on a transparent canvas of exactly width × height pixels. */
+async function renderIcon(file, width, height, share) {
   // Windows keeps even offscreen windows between a minimum size and the screen's: images taller
   // than a 1080p screen are laid out at half size and rendered at 2× (they're all even sizes),
   // and tiny ones are cut from a larger window.
   const scale = Math.max(width, height) > 1000 ? 2 : 1;
   const [w, h] = [width / scale, height / scale];
   const size = Math.round(Math.min(w, h) * share);
-  const html = `<!doctype html><html><body style="margin:0;width:${w}px;height:${h}px;display:grid;place-items:center;background:${background};overflow:hidden">
+  const html = `<!doctype html><html><body style="margin:0;width:${w}px;height:${h}px;display:grid;place-items:center;background:transparent;overflow:hidden">
     <img src="data:image/svg+xml;base64,${Buffer.from(ICON).toString("base64")}" width="${size}" height="${size}"></body></html>`;
   const win = offscreen(Math.max(w, 64), Math.max(h, 64), scale);
   await win.loadURL(`data:text/html;base64,${Buffer.from(html).toString("base64")}`);

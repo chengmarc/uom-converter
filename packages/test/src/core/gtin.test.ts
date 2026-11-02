@@ -9,19 +9,16 @@ describe("check digit", () => {
 });
 
 describe("parseGtin", () => {
-  it("accepts a UPC-A and derives every form", () => {
+  it("accepts a UPC-A and gives its GTIN-14", () => {
     const r = parseGtin("036000291452");
     expect(r.valid).toBe(true);
-    expect(r.kind).toBe("UPC-A");
     expect(r.gtin14).toBe("00036000291452");
-    expect(r.ean13).toBe("0036000291452");
-    expect(r.upcA).toBe("036000291452");
   });
 
-  it("accepts an EAN-13 with no UPC-A form", () => {
+  it("accepts an EAN-13", () => {
     const r = parseGtin("4006381333931");
     expect(r.valid).toBe(true);
-    expect(r.upcA).toBeUndefined();
+    expect(r.gtin14).toBe("04006381333931");
   });
 
   it("rejects a bad check digit and says what it should be", () => {
@@ -36,17 +33,14 @@ describe("parseGtin", () => {
     }
   });
 
-  it("restores leading zeros stripped by Excel, with a warning", () => {
+  it("restores leading zeros stripped by Excel", () => {
     const r = parseGtin("36000291452");
     expect(r.valid).toBe(true);
-    expect(r.upcA).toBe("036000291452");
-    expect(r.warnings[0]).toMatch(/leading zero/);
+    expect(r.gtin14).toBe("00036000291452");
   });
 
-  it("suggests a check digit for an 11-digit UPC body", () => {
-    const r = parseGtin("03600029145");
-    expect(r.valid).toBe(false);
-    expect(r.suggestion).toBe("036000291452");
+  it("refuses an 11-digit UPC body with no check digit", () => {
+    expect(parseGtin("03600029145").valid).toBe(false);
   });
 
   it("refuses Excel scientific notation", () => {
@@ -55,22 +49,13 @@ describe("parseGtin", () => {
     expect(r.errors[0]).toMatch(/scientific notation/);
   });
 
-  it("reads 8 digits starting with 0 or 1 as UPC-E, and gives its UPC-A", () => {
-    const r = parseGtin("04252614");
-    expect(r.kind).toBe("UPC-E");
-    expect(r.upcA).toBe("042100005264");
+  it("reads 8 digits starting with 0 or 1 as UPC-E", () => {
+    expect(parseGtin("04252614").gtin14).toBe("00042100005264");
   });
 
-  it("flags restricted-circulation and coupon prefixes", () => {
-    const store = "2" + "0000012345";
-    expect(parseGtin(store + checkDigit(store)).warnings[0]).toMatch(/Restricted/);
-    const coupon = "5" + "0000012345";
-    expect(parseGtin(coupon + checkDigit(coupon)).warnings[0]).toMatch(/Coupon/);
-  });
-
-  it("notes GS1 Canada prefixes", () => {
-    const ca = "754000000001";
-    expect(parseGtin(ca + checkDigit(ca)).notes.join()).toMatch(/GS1 Canada/);
+  it("reads 8 digits starting otherwise as a GTIN-8", () => {
+    const gtin8 = "9638507";
+    expect(parseGtin(gtin8 + checkDigit(gtin8)).gtin14).toBe("00000096385074");
   });
 
   it("rejects junk", () => {
@@ -90,14 +75,13 @@ describe("UPC-E expansion rules", () => {
 });
 
 describe("case/pack GTIN-14", () => {
-  it("builds a pack GTIN and parses it back to the inner item", () => {
+  it("builds a pack GTIN that parses back", () => {
     const pack = makePackGtin14("036000291452", 1);
     expect(pack).toHaveLength(14);
     expect(pack[0]).toBe("1");
     const r = parseGtin(pack);
     expect(r.valid).toBe(true);
-    expect(r.indicator).toBe(1);
-    expect(r.likelyInnerItem).toBe("0036000291452");
+    expect(r.gtin14).toBe(pack);
   });
 
   it("rejects bad indicators", () => {

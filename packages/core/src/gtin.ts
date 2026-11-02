@@ -7,25 +7,10 @@
 
 import { t } from "@uom/i18n";
 
-type GtinKind = "GTIN-8" | "UPC-E" | "UPC-A" | "EAN-13" | "GTIN-14";
-
 interface GtinResult {
   valid: boolean;
-  kind?: GtinKind;
   gtin14?: string;
-  /** Only when the code fits in 12 digits (GTIN-14 starts with "00"). */
-  upcA?: string;
-  /** Only when the code fits in 13 digits (GTIN-14 starts with "0"). */
-  ean13?: string;
-  /** GTIN-14 indicator digit (1-8 = packaging level, 9 = variable measure). */
-  indicator?: number;
-  /** For case/pack GTIN-14s: the likely inner item (common convention, not guaranteed). */
-  likelyInnerItem?: string;
   errors: string[];
-  warnings: string[];
-  notes: string[];
-  /** A best-guess corrected code, when the input looks recoverable. */
-  suggestion?: string;
 }
 
 /** GS1 mod-10 check digit for a code body (everything except the check digit). */
@@ -82,7 +67,7 @@ export function makePackGtin14(itemGtin: string, indicator: number): string {
 const SCIENTIFIC = /^\d(\.\d+)?e\+?\d+$/i;
 
 export function parseGtin(raw: string): GtinResult {
-  const r: GtinResult = { valid: false, errors: [], warnings: [], notes: [] };
+  const r: GtinResult = { valid: false, errors: [] };
   let s = raw.trim();
 
   if (SCIENTIFIC.test(s)) {
@@ -107,83 +92,17 @@ export function parseGtin(raw: string): GtinResult {
     return r;
   }
 
-  let kind: GtinKind;
-  let normalized = s;
-
-  // 8 digits starting with 0 or 1 are usually UPC-E in North America.
-  if (s.length === 8 && /^[01]/.test(s)) {
-    kind = "UPC-E";
-    normalized = expandUpcE(s);
-    r.notes.push(`UPC-E expanded to UPC-A ${normalized}`);
-  } else if (s.length === 8) {
-    kind = "GTIN-8";
-  } else if (s.length === 12) {
-    kind = "UPC-A";
-  } else if (s.length === 13) {
-    kind = "EAN-13";
-  } else if (s.length === 14) {
-    kind = "GTIN-14";
-  } else {
-    // 9-11 digits (or <8): almost always a UPC-A whose leading zeros Excel stripped.
-    kind = "UPC-A";
-    normalized = s.padStart(12, "0");
-    r.warnings.push(
-      `Only ${s.length} digits: restored ${12 - s.length} leading zero(s), likely stripped by a spreadsheet.`,
-    );
-  }
-
+  // 8 digits starting with 0 or 1 are usually UPC-E in North America. Anything else short is
+  // padded like the rest: a UPC-A under 12 digits has usually had its leading zeros stripped by Excel.
+  const normalized = s.length === 8 && /^[01]/.test(s) ? expandUpcE(s) : s;
   const gtin14 = normalized.padStart(14, "0");
   if (!hasValidCheckDigit(gtin14)) {
     const expected = checkDigit(gtin14.slice(0, 13));
     r.errors.push(t("Bad check digit: last digit is {last}, expected {expected}", { last: gtin14[13], expected }));
-    if (s.length === 11) {
-      // 11 digits could also be a full UPC-A body with the check digit dropped.
-      r.suggestion = s + checkDigit(s);
-      r.notes.push(`If this is a UPC missing its check digit, the full UPC-A is ${r.suggestion}`);
-    }
-    r.kind = kind;
     return r;
   }
 
   r.valid = true;
-  r.kind = kind;
   r.gtin14 = gtin14;
-  if (kind !== "GTIN-8") {
-    if (gtin14.startsWith("00")) r.upcA = gtin14.slice(2);
-    if (gtin14.startsWith("0")) r.ean13 = gtin14.slice(1);
-  }
-
-  const indicator = Number(gtin14[0]);
-  if (indicator >= 1 && indicator <= 8) {
-    r.indicator = indicator;
-    const innerBody = "0" + gtin14.slice(1, 13);
-    r.likelyInnerItem = (innerBody + checkDigit(innerBody)).replace(/^0/, "");
-    r.notes.push(
-      `Indicator ${indicator}: case/pack-level GTIN. Inner item is usually ${r.likelyInnerItem} (convention, verify with supplier).`,
-    );
-  } else if (indicator === 9) {
-    r.indicator = 9;
-    r.notes.push("Indicator 9: variable-measure trade item.");
-  }
-
-  addPrefixNotes(r, gtin14);
   return r;
-}
-
-function addPrefixNotes(r: GtinResult, gtin14: string): void {
-  if (r.kind === "GTIN-8") return; // GTIN-8 prefixes follow a different allocation.
-  const p = Number(gtin14.slice(1, 4)); // GS1 prefix of the 13-digit form
-  if ((p >= 20 && p <= 29) || (p >= 40 && p <= 49) || (p >= 200 && p <= 299)) {
-    r.warnings.push(
-      "Restricted-circulation prefix: an internal/in-store code, not a globally unique GTIN.",
-    );
-  } else if ((p >= 50 && p <= 59) || (p >= 981 && p <= 999)) {
-    r.warnings.push("Coupon/voucher prefix: not a product GTIN.");
-  } else if (p === 754 || p === 755) {
-    r.notes.push("Issued by GS1 Canada (prefix reflects the issuing office, not country of origin).");
-  } else if (p <= 19 || (p >= 30 && p <= 39) || (p >= 60 && p <= 139)) {
-    r.notes.push("Issued by GS1 US (prefix reflects the issuing office, not country of origin).");
-  } else if (p === 750) {
-    r.notes.push("Issued by GS1 Mexico (prefix reflects the issuing office, not country of origin).");
-  }
 }
