@@ -16,6 +16,7 @@ match the release tags (`v<version>`).
 - the website's breadcrumb runs Converters, topic, converter on every page, ending on the page shown
 - the website's header and footer have the same small links: Home, Privacy, Source code, Report a problem
 - the website's footer lists the Android app, which goes to the Windows app until it's on Google Play
+- the website's background is grey with diagonal stripes and the page lifted off it, was a photo under a navy wash
 - the Android app's Google Play listing is in Spanish, German and French as well as English: one file per
   language in `store-listing/localization/`, and what's entered once in `store-listing/SUBMISSION.md`, was
   `store-listing/LISTING.md`

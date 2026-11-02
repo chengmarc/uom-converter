@@ -494,7 +494,7 @@ tr.hit td { background: var(--sunken); color: var(--accent); font-weight: 600; }
 }
 
 /* ---------- Period details ----------
-   What a long-lived supplier's site keeps from each redesign: a fixed-width page on grey, a strip of
+   What a long-lived supplier's site keeps from each redesign: a fixed-width page on hatched grey, a strip of
    small links over the header, gradient bars and panel headings, glossy buttons and inset fields,
    form boxes titled on their border, Verdana for the small print, underlined links that turn purple
    once visited, "»" before menu links, "You are here:" and "Back to top". Kept together here, laid
@@ -503,6 +503,8 @@ tr.hit td { background: var(--sunken); color: var(--accent); font-weight: 600; }
 :root {
   --page: #dde2e8;
   --page-edge: #c3cad3;
+  --hatch: rgb(0 0 0 / 0.11);
+  --page-shadow: -8px 0 16px -8px rgb(0 0 0 / 0.2), 8px 0 16px -8px rgb(0 0 0 / 0.2);
   --small: Verdana, Tahoma, Geneva, sans-serif;
   --visited: #6a2d8f;
   --bar-top: #fbfcfd;
@@ -514,6 +516,8 @@ tr.hit td { background: var(--sunken); color: var(--accent); font-weight: 600; }
   :root {
     --page: #0c0e11;
     --page-edge: #2a3038;
+    --hatch: rgb(255 255 255 / 0.08);
+    --page-shadow: -8px 0 16px -8px rgb(0 0 0 / 0.7), 8px 0 16px -8px rgb(0 0 0 / 0.7);
     --visited: #c39be0;
     --bar-top: #2b3138;
     --bar-bottom: #21262c;
@@ -522,24 +526,11 @@ tr.hit td { background: var(--sunken); color: var(--accent); font-weight: 600; }
   }
 }
 
-/* 1. The page: a fixed-width column on grey. Everything full-width before stops at its edges. */
-body { background: var(--page); }
-/* Where there's grey to see, the trade behind the page: a pylon and its lines at dusk (@uom/brand's
-   backdrop, as behind the Store images), held still as the page scrolls, under navy so the page
-   stays in front. The tower falls in the left margin, sky and lines in the right. */
-@media (min-width: 1180px) {
-  body {
-    --backdrop-wash: 0.55;
-    background:
-      linear-gradient(rgb(var(--brand-rgb) / var(--backdrop-wash)), rgb(var(--brand-rgb) / var(--backdrop-wash))),
-      url("@uom/brand/photos/backdrop-2560.webp") left center / cover no-repeat fixed,
-      var(--page);
-  }
-}
-@media (min-width: 1180px) and (prefers-color-scheme: dark) {
-  body { --backdrop-wash: 0.8; }
-}
-.site-header, main, .site-footer { width: 100%; max-width: 1100px; margin-inline: auto; }
+/* 1. The page: a fixed-width column on grey hatched like a drawing, lifted off it by a shadow down
+   each side. Everything full-width before stops at its edges. */
+/* Multiples of √2: on the diagonal, the stripes land on whole pixels, 3 wide and 12 apart, so they don't shimmer. */
+body { background: repeating-linear-gradient(45deg, var(--hatch) 0 2.121px, transparent 2.121px 8.485px), var(--page); }
+.site-header, main, .site-footer { width: 100%; max-width: 1100px; margin-inline: auto; box-shadow: var(--page-shadow); }
 main { background: var(--surface); border-inline: 1px solid var(--page-edge); }
 
 /* 2. Small links over the header, between pipes, on a darker strip of the navy. */

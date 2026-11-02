@@ -29,7 +29,7 @@ const main = document.querySelector<HTMLElement>("#main")!;
 // ---------- Photos ----------
 
 // Every size of every topic photo (@uom/ui/photos), for srcset to choose from; not the backdrop,
-// which style.css puts beside the page.
+// which only the app stores' images use.
 const photo = photoLibrary(
   import.meta.glob<string>(["@uom/brand/photos/*.webp", "!**/backdrop-*.webp"], {
     eager: true,
