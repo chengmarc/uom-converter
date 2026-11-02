@@ -5,6 +5,7 @@
 # apps/windows/store-listing/generator/render.cjs (`npm run windows:assets`), from @uom/brand's app-icon.svg and the built app
 apps/windows/shell/icon.png linguist-generated
 docs/screenshots/*.png linguist-generated
+docs/social-preview.png linguist-generated
 packages/brand/rendered/*.png linguist-generated
 
 # apps/android/scripts/render-icons.cjs (`npm run android:icons`), from @uom/brand's app-icon.svg

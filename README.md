@@ -6,14 +6,14 @@
   <a href="https://apps.microsoft.com/detail/9PHZQBV736JC"><img src="docs/badges/badge-microsoft-store.svg" height="50"></a>
   <h1>UOM Converter - Unit Converter for Electrical Industry</h1>
 
-  <img src="docs/screenshots/screenshot-1-promo.png">
+  <img src="docs/social-preview.png">
 
 </div>
 
 ## Screenshots
 
+<img src="docs/screenshots/screenshot-1-promo.png">
 <img src="docs/screenshots/screenshot-2-voltage-drop.png">
-<img src="docs/screenshots/screenshot-3-price-units.png">
 <img src="docs/screenshots/screenshot-5-reels.png">
 
 ## Quick start

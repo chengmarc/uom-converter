@@ -3,6 +3,7 @@
 //   build/packaging/appx/  tile and taskbar icons packed into the MSIX (electron-builder's buildResources)
 //   dist/<language>/       images uploaded to Partner Center, one folder per language: store logos and screenshots
 //   docs/screenshots/      the README's screenshots, in English
+//   docs/social-preview.png  GitHub's social preview, from social.html, which also heads the README
 //   @uom/brand's rendered/ the icon at 256 and the share image (the promo shot), which the website uses too
 // The icons come from @uom/brand's app-icon.svg; screenshots from the built page, captured into build/shots/ and
 // framed by shots.html, in each language of captions.js.
@@ -17,6 +18,7 @@ const { pathToFileURL } = require("node:url");
 const WINDOWS = path.join(__dirname, "..", "..");
 const DIST = path.join(WINDOWS, "dist");
 const README_SHOTS = path.join(WINDOWS, "..", "..", "docs", "screenshots");
+const SOCIAL_PREVIEW = path.join(WINDOWS, "..", "..", "docs", "social-preview.png");
 const BUILD = path.join(WINDOWS, "build");
 const PAGE = path.join(BUILD, "web");
 const TILES_DIR = path.join(BUILD, "packaging", "appx");
@@ -25,7 +27,7 @@ const ICON_256 = require.resolve("@uom/brand/icon-256.png");
 const SHARE = require.resolve("@uom/brand/share.png");
 const SCALES = [100, 200];
 /** The shots the README shows. */
-const IN_README = ["promo", "voltage-drop", "price-units", "reels"];
+const IN_README = ["promo", "voltage-drop", "reels"];
 
 /**
  * The MSIX images Windows 11 uses: [name, width, height, share of the shorter side the icon
@@ -142,7 +144,12 @@ async function renderListing() {
       }
     }
   }
+  // After the shots: it shows the promo shot's capture. GitHub's size, under its 1 MB limit.
+  await renderPage("social.html", SOCIAL_PREVIEW, 1280, 640, 1, fillCount(count));
 }
+
+/** Fills the converter count into a page's first fact. */
+const fillCount = (count) => `document.querySelector("#count").textContent = document.querySelector("#count").textContent.replace("{count}", "${count}")`;
 
 /** One screenshot: the app captured in `language` (and `region`, over the shot's own), then framed by shots.html. */
 async function renderShot(language, name, { query, theme, scrollTo }, region, file, count) {
@@ -164,8 +171,7 @@ async function renderShot(language, name, { query, theme, scrollTo }, region, fi
   })`);
   await capture(page, path.join(BUILD, "shots", language, `${name}.png`), expected);
   page.destroy();
-  const fillCount = `document.querySelector("#count").textContent = document.querySelector("#count").textContent.replace("{count}", "${count}")`;
-  await renderPage(`shots.html#${language}.${name}`, file, width, height, scale, fillCount);
+  await renderPage(`shots.html#${language}.${name}`, file, width, height, scale, fillCount(count));
 }
 
 /**
