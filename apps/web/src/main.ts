@@ -14,7 +14,7 @@ import { el } from "@uom/ui/dom";
 import { photoLibrary, TOPIC_SLOTS } from "@uom/ui/photos";
 import { HOME, idFromPath, PAGES, PRIVACY, topicFromPath, TOPIC_PAGES } from "./pages";
 import { PRIVACY_HTML } from "./privacy";
-import { NAME, registerOffline, STORE_URL } from "./site";
+import { EXE_URL, NAME, registerOffline, STORE_URL } from "./site";
 
 // The site's base path, from SITE_URL in scripts/site.ts.
 declare const __SITE_BASE__: string;
@@ -151,27 +151,18 @@ function audienceSelect() {
 }
 
 /**
- * Across the top of the home page: a strip of the topics' photos, each linked to its topic with
- * its name on it, as a supplier's site opens on its product lines. A topic without a photo yet
- * shows its name on the brand colour.
+ * Across the top of the home page: a strip of the topics' photos, as a supplier's site opens on its
+ * product lines. Decorative: the category bar above it is how you get to a topic.
  */
 function categoryStrip(): HTMLElement {
-  const strip = el("nav", "category-strip");
-  strip.setAttribute("aria-label", "Topics");
-  const list = el("ul");
+  const strip = el("div", "category-strip");
   for (const t of TOPICS) {
-    const a = link(topicPath(t), "");
     const img = photo(`${TOPIC_SLOTS[t]}-thumb`, "(max-width: 640px) 9rem, 15vw", "");
     if (img) {
       img.setAttribute("fetchpriority", "high");
-      a.append(img);
+      strip.append(img);
     }
-    a.append(el("span", undefined, t));
-    const li = el("li");
-    li.append(a);
-    list.append(li);
   }
-  strip.append(list);
   return strip;
 }
 
@@ -184,6 +175,7 @@ function homeView(missing: boolean): Node[] {
     );
   } else {
     intro.append(
+      crumbs([], "Converters"),
       el("h1", undefined, "Unit conversions for the electrical trade"),
       el(
         "p",
@@ -219,7 +211,7 @@ function homeView(missing: boolean): Node[] {
   refreshLists();
 
   dir.append(toTop());
-  return [categoryStrip(), intro, dir, windowsApp()];
+  return [categoryStrip(), windowsApp(), intro, dir];
 }
 
 /** The Windows app, in a line: what it is and where to get it. */
@@ -232,8 +224,9 @@ function windowsApp() {
 
 /**
  * The Windows app, as a card from a newer era than the page around it (.app-card in style.css):
- * its icon, what it is, and a button to the Store with Microsoft's logo. On the home page, and at
- * the foot of every converter page's menu, where it stacks.
+ * its icon, what it is, a button to the Store with Microsoft's logo, and a lesser one for the
+ * installer. Under the home page's photos, and at the top of the menu on every topic and converter
+ * page, where it stacks.
  */
 function appBox() {
   const card = el("div", "app-card");
@@ -247,7 +240,7 @@ function appBox() {
   const text = el("div", "app-card-text");
   text.append(
     el("p", "app-card-eyebrow", "Windows app · Free"),
-    el("h2", "app-card-title", "Every converter, in its own window"),
+    el("p", "app-card-title", "Every converter, in its own window"),
     el("p", "app-card-lede", "The same converters as this site, working offline."),
   );
 
@@ -255,9 +248,33 @@ function appBox() {
   get.rel = "noopener";
   get.prepend(microsoftLogo());
 
-  inner.append(icon, text, get);
+  const exe = link(EXE_URL, "Download .exe", "app-card-cta app-card-cta-exe");
+  exe.rel = "noopener";
+  exe.prepend(downloadIcon());
+
+  const actions = el("div", "app-card-actions");
+  actions.append(get, exe);
+
+  inner.append(icon, text, actions);
   card.append(inner);
   return card;
+}
+
+/** An arrow down to a line. */
+function downloadIcon() {
+  const ns = "http://www.w3.org/2000/svg";
+  const icon = document.createElementNS(ns, "svg");
+  icon.setAttribute("viewBox", "0 0 24 24");
+  icon.setAttribute("aria-hidden", "true");
+  const path = document.createElementNS(ns, "path");
+  path.setAttribute("d", "M12 3v12m-5-5 5 5 5-5M4 20h16");
+  path.setAttribute("fill", "none");
+  path.setAttribute("stroke", "currentColor");
+  path.setAttribute("stroke-width", "2.25");
+  path.setAttribute("stroke-linecap", "round");
+  path.setAttribute("stroke-linejoin", "round");
+  icon.append(path);
+  return icon;
 }
 
 /** Microsoft's four squares, in their colours (as on the Store badge in docs/badges/). */
@@ -286,7 +303,7 @@ function sidebar(current: { id?: string; topic?: Topic }) {
   side.setAttribute("aria-label", "Converters");
   const picker = audienceSelect();
   const nav = el("nav");
-  side.append(picker.pick, nav, appBox());
+  side.append(appBox(), picker.pick, nav);
   refreshLists = () => {
     picker.sync();
     nav.replaceChildren(
@@ -306,8 +323,11 @@ function sidebar(current: { id?: string; topic?: Topic }) {
   return side;
 }
 
-/** The trail from the home page to the page shown, which isn't in it: its <h1> follows. */
-function crumbs(trail: HTMLAnchorElement[]) {
+/**
+ * Where a page sits: Converters (the home page), then a topic, then a converter. The trail leading
+ * to the page, then the page shown, by name: only the links ahead of it go anywhere.
+ */
+function crumbs(trail: HTMLAnchorElement[], current: string) {
   const nav = el("nav", "crumbs");
   nav.setAttribute("aria-label", "Breadcrumb");
   const ol = el("ol");
@@ -316,6 +336,9 @@ function crumbs(trail: HTMLAnchorElement[]) {
     li.append(a);
     ol.append(li);
   }
+  const here = el("li", undefined, current);
+  here.setAttribute("aria-current", "page");
+  ol.append(here);
   nav.append(el("span", "crumbs-label", "You are here:"), ol);
   return nav;
 }
@@ -327,21 +350,14 @@ function toTop() {
   return p;
 }
 
-/**
- * The band across the top of a topic's pages: its photo under the brand colour, the breadcrumb,
- * and a title, white on it. `title` is the topic page's <h1>, or on a converter's page the
- * topic's name (the converter's own <h1> follows the band).
- */
-function categoryBand(topic: Topic, trail: HTMLAnchorElement[], title: HTMLElement, alt = ""): HTMLElement {
-  const band = el("section", "category-band");
+/** The band across the top of a topic's pages: its photo. */
+function categoryBand(topic: Topic, alt = ""): HTMLElement {
+  const band = el("div", "category-band");
   const img = photo(`${TOPIC_SLOTS[topic]}-banner`, "100vw", alt, "category-photo");
   if (img) {
     img.setAttribute("fetchpriority", "high");
     band.append(img);
   }
-  const inner = el("div", "wrap category-inner");
-  inner.append(crumbs(trail), title);
-  band.append(inner);
   return band;
 }
 
@@ -349,12 +365,10 @@ function converterView(id: string): Node[] {
   const conv = byId.get(id)!;
   const layout = el("div", "doc-layout wrap");
   const side = sidebar({ id });
-  const title = el("p", "category-title");
-  title.append(link(topicPath(conv.topic), TOPIC_PAGES[conv.topic].heading));
-  const band = categoryBand(conv.topic, [link(BASE, "Converters"), link(topicPath(conv.topic), conv.topic)], title);
+  const band = categoryBand(conv.topic);
 
   const article = el("article", "doc");
-  article.append(panel(id));
+  article.append(crumbs([link(BASE, "Converters"), link(topicPath(conv.topic), conv.topic)], conv.title), panel(id));
   const worked = workedExamples(conv);
   if (worked) article.append(worked);
 
@@ -414,11 +428,10 @@ function topicView(topic: Topic): Node[] {
   const layout = el("div", "doc-layout wrap");
   const side = sidebar({ topic });
 
-  const h1 = el("h1", "topic-h1", page.heading);
-  const band = categoryBand(topic, [link(BASE, "Converters")], h1, page.photo);
+  const band = categoryBand(topic, page.photo);
 
   const article = el("article", "doc topic-page");
-  article.append(el("p", "lede", page.intro), tiles(convs));
+  article.append(crumbs([link(BASE, "Converters")], topic), el("h1", "topic-h1", page.heading), el("p", "lede", page.intro), tiles(convs));
 
   // One answer from each converter: the first example, as the converter works it out.
   const answers = el("section", "answers");
@@ -458,7 +471,7 @@ function privacyView(): Node[] {
   const page = el("div", "wrap privacy");
   const policy = el("article");
   policy.innerHTML = PRIVACY_HTML;
-  page.append(crumbs([link(BASE, "Converters")]), policy);
+  page.append(crumbs([link(BASE, "Converters")], "Privacy"), policy);
   return [page];
 }
 
@@ -573,7 +586,7 @@ window.addEventListener("popstate", render);
 
 document.querySelectorAll<HTMLAnchorElement>("a[data-home]").forEach((a) => (a.href = BASE));
 document.querySelectorAll<HTMLAnchorElement>("a[data-privacy]").forEach((a) => (a.href = privacyPath));
-document.querySelectorAll<HTMLAnchorElement>("#get-app, #footer-app").forEach((a) => (a.href = STORE_URL));
+document.querySelectorAll<HTMLAnchorElement>("#footer-app, #footer-android").forEach((a) => (a.href = STORE_URL));
 document.querySelector("#footer-year")!.textContent = String(new Date().getFullYear());
 document.querySelector("#footer-topic-list")!.replaceChildren(
   ...TOPICS.map((t) => {

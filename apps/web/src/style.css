@@ -85,16 +85,11 @@ a { color: var(--accent); }
 
 /* ---------- Home ---------- */
 
-/* The topics' photos side by side, each square, with its name on a bar. */
-.category-strip ul { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); margin: 0; padding: 0; list-style: none; }
-.category-strip li { min-width: 0; }
-.category-strip a { position: relative; display: block; aspect-ratio: 1; overflow: hidden; background: var(--brand); color: var(--brand-ink); text-decoration: none; }
-.category-strip li + li a { border-left: 2px solid #ffffff; }
-.category-strip img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.category-strip span { position: absolute; left: 0; right: 0; bottom: 0; padding: 0.5rem 0.75rem; background: rgb(var(--brand-rgb) / 0.85); font-weight: 700; font-size: 0.95rem; }
-.category-strip a:hover span { background: var(--accent); text-decoration: underline; }
+/* The topics' photos side by side, each square. A narrow screen shows the ones that fit. */
+.category-strip { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); column-gap: 2px; overflow: hidden; }
+.category-strip img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; }
 @media (max-width: 640px) {
-  .category-strip ul { grid-auto-columns: 9rem; overflow-x: auto; }
+  .category-strip { grid-auto-columns: 9rem; }
 }
 
 .home-intro { padding-block: 1.75rem 0; }
@@ -125,7 +120,7 @@ a { color: var(--accent); }
    shadow, the app's icon as a tile, and a pill button with Microsoft's logo; the period rules
    further down leave it alone. The icon and Microsoft's squares keep their own colours, as the
    icon does everywhere. In a row when there's room (40rem), stacked in the menu. */
-.app-note { margin-block: 2rem 3rem; }
+.app-note { margin-block: 1.25rem; }
 .app-card { container: app-card / inline-size; font-family: var(--modern); }
 .app-card-inner {
   display: grid;
@@ -143,6 +138,7 @@ a { color: var(--accent); }
 .app-card-eyebrow { margin: 0; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.02em; color: var(--accent); }
 .app-card-title { margin: 0; font-size: 1.2rem; font-weight: 650; line-height: 1.15; letter-spacing: -0.02em; color: var(--text); text-wrap: balance; }
 .app-card-lede { margin: 0; max-width: 42ch; color: var(--muted); font-size: 0.95rem; line-height: 1.5; }
+.app-card-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
 .app-card-cta {
   display: inline-flex;
   align-items: center;
@@ -162,6 +158,9 @@ a { color: var(--accent); }
 .app-card-cta:hover { color: var(--accent-ink); box-shadow: var(--lifted-hover); transform: translateY(-1px); }
 .app-card-cta:focus-visible { outline-offset: 3px; }
 .app-card-cta svg { flex: none; display: block; width: 18px; height: 18px; }
+/* The installer, second to the Store. */
+.app-card-cta-exe, .app-card-cta-exe:hover { background: var(--surface); color: var(--accent); box-shadow: inset 0 0 0 1px var(--line); }
+.app-card-cta-exe:hover { box-shadow: inset 0 0 0 1px var(--accent); }
 
 @container app-card (min-width: 20rem) {
   .app-card-title { font-size: 1.5rem; }
@@ -172,10 +171,12 @@ a { color: var(--accent); }
   .app-card-text { gap: 0.75rem; }
   .app-card-title { font-size: clamp(1.6rem, 3.2cqi, 2.1rem); }
   .app-card-lede { font-size: 1.02rem; }
+  .app-card-actions { flex-direction: column; align-items: stretch; }
+  .app-card-cta { justify-content: center; }
 }
 
-/* At the foot of the menu. */
-.side .app-card { margin-top: 1.25rem; }
+/* At the top of the menu. */
+.side .app-card { margin-bottom: 1.25rem; }
 
 /* ---------- A converter's page ---------- */
 
@@ -195,7 +196,10 @@ a { color: var(--accent); }
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--line-strong) transparent;
-  padding-right: 0.25rem;
+  /* Room for the card's shadow, which the scrolling would clip, and between it and the scrollbar. */
+  margin-inline: -0.75rem -1rem;
+  padding: 0.25rem 1rem 1.25rem 0.75rem;
+  scrollbar-gutter: stable;
 }
 .side-role { display: grid; gap: 0.35rem; margin-bottom: 1.5rem; font-size: 0.85rem; color: var(--muted); }
 .side-role select {
@@ -226,18 +230,8 @@ a { color: var(--accent); }
 .side-group a[aria-current] { border-left-color: var(--accent); background: var(--sunken); color: var(--text); font-weight: 700; }
 
 /* The band across the top of a topic's pages (categoryBand in main.ts): the topic's photo, full
-   width and hard-edged, under the brand colour, with the breadcrumb and title in white. */
-.category-band { position: relative; isolation: isolate; background: var(--brand); color: var(--brand-ink); }
-.category-photo { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; }
-.category-band::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgb(var(--brand-rgb) / 0.93) 0%, rgb(var(--brand-rgb) / 0.85) 50%, rgb(var(--brand-rgb) / 0.6) 100%); }
-.category-inner { padding-block: 1.5rem 1.75rem; }
-.category-band .crumbs { margin-bottom: 0.6rem; }
-.category-band .crumbs-label { color: var(--brand-ink); }
-.category-band .crumbs a { color: var(--brand-ink); }
-.category-band .crumbs li + li::before { color: var(--brand-ink); }
-.category-title { margin: 0; font-size: 1.6rem; font-weight: 700; line-height: 1.2; }
-.category-title a, .category-title a:hover { color: var(--brand-ink); text-decoration: none; }
-.category-title a:hover { text-decoration: underline; }
+   width and hard-edged. */
+.category-photo { display: block; width: 100%; height: clamp(8rem, 16vw, 12rem); object-fit: cover; }
 
 .crumbs { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.4rem; margin: 0 0 1rem; font-size: 0.85rem; }
 .crumbs-label { color: var(--muted); }
@@ -259,7 +253,7 @@ a { color: var(--accent); }
 /* A topic's page (topicView in main.ts): heading, introduction, its converters, an answer from each. */
 .topic-title a { color: inherit; text-decoration: none; }
 .topic-title a:hover { text-decoration: underline; }
-.topic-h1 { display: flex; align-items: center; gap: 0.6rem; margin: 0; font-size: 2rem; line-height: 1.15; }
+.topic-h1 { display: flex; align-items: center; gap: 0.6rem; margin: 0 0 0.75rem; font-size: 2rem; line-height: 1.15; }
 .topic-page .lede { max-width: 75ch; margin: 0 0 2rem; font-size: 1rem; color: var(--text); }
 /* An entry with a thumbnail (the other topics): the picture beside the title and text. */
 .tile.has-thumb { grid-template-columns: 4.5rem minmax(0, 1fr); column-gap: 1rem; }
@@ -593,7 +587,6 @@ main { background: var(--surface); border-inline: 1px solid var(--page-edge); }
 /* 9. Links underlined, and purple once visited. */
 .tile .tile-title, .side-group > a, .answers a, .crumbs a, .site-footer nav a { text-decoration: underline; }
 .tile:visited .tile-title, .side-group > a:visited, .answers a:visited, .crumbs a:visited { color: var(--visited); }
-.category-band .crumbs a:visited { color: var(--brand-ink); }
 .side-group > a[aria-current] { color: var(--text); text-decoration: none; }
 
 /* 10. "»" before menu and footer links. */

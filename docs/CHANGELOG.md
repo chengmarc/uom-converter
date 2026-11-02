@@ -9,6 +9,13 @@ match the release tags (`v<version>`).
 
 ### Changed
 
+- the website's home page opens on a strip of photos with no captions or links, the category bar being the way to
+  a topic, then the Windows app card
+- the Windows app card has a button to download the installer, and sits at the top of the side menu
+- topic and converter pages open on the photo alone, was a tinted band with the title and breadcrumb on it
+- the website's breadcrumb runs Converters, topic, converter on every page, ending on the page shown
+- the website's header and footer have the same small links: Home, Privacy, Source code, Report a problem
+- the website's footer lists the Android app, which goes to the Windows app until it's on Google Play
 - the Android app's Google Play listing is in Spanish, German and French as well as English: one file per
   language in `store-listing/localization/`, and what's entered once in `store-listing/SUBMISSION.md`, was
   `store-listing/LISTING.md`

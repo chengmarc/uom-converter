@@ -36,10 +36,6 @@ details[open] > :not(summary) { animation: page-in 200ms var(--motion-ease) back
 .row:active { transform: scale(0.98); transition: transform 80ms var(--motion-ease); }
 .segmented span { transition: background-color 140ms var(--motion-ease), color 140ms var(--motion-ease); }
 
-/* The website's home page: a topic's photo leans in on hover. */
-.category-strip img { transition: transform 400ms var(--motion-ease); }
-.category-strip a:hover img { transform: scale(1.04); }
-
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
