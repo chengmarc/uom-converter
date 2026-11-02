@@ -1,11 +1,11 @@
-import { smallestSizeForAmps, type WiringCode } from "@uom/core/ampacity";
+import { smallestSizeForAmps } from "@uom/core/ampacity";
 import { cecDwelling, necDwelling } from "@uom/core/dwelling";
 import { amount, fmt } from "./format";
-import { byRegion, type Converter, type RegionExamples, type Row, type Values } from "./model";
+import { codeField, readCode } from "./electrical-fields";
+import { byRegion, type Converter, type RegionExamples, type Row } from "./model";
 import { invalid, isNum } from "./checks";
 import { t } from "@uom/i18n";
 
-const code = (v: Values) => v.str("code") as WiringCode;
 const LOADS = ["range", "ac", "heat", "hot", "ev", "other"];
 
 export const serviceLoad: Converter = {
@@ -29,17 +29,8 @@ export const serviceLoad: Converter = {
     ],
   })),
   fields: [
-    {
-      kind: "choice",
-      id: "code",
-      label: "Wiring code",
-      value: (v) => (v.region === "ca" ? "cec" : "nec"),
-      options: [
-        { value: "nec", label: "NEC" },
-        { value: "cec", label: "CEC" },
-      ],
-    },
-    { kind: "number", id: "area", label: (v) => (code(v) === "cec" ? "Living area (basement at 75%)" : "Living area"), suffix: (v) => (code(v) === "cec" ? "m²" : "ft²"), placeholder: (v) => (code(v) === "cec" ? "150" : "2000") },
+    codeField(),
+    { kind: "number", id: "area", label: (v) => (readCode(v) === "cec" ? "Living area (basement at 75%)" : "Living area"), suffix: (v) => (readCode(v) === "cec" ? "m²" : "ft²"), placeholder: (v) => (readCode(v) === "cec" ? "150" : "2000") },
     { kind: "number", id: "range", label: "Electric range", suffix: "W", optional: true },
     { kind: "number", id: "ac", label: "Air conditioning", suffix: "W", optional: true },
     { kind: "number", id: "heat", label: "Electric heating", suffix: "W", optional: true },
@@ -75,7 +66,7 @@ export const serviceLoad: Converter = {
     ]);
     if (bad.length) return { error: "Enter numbers; the living area is above 0.", fields: bad };
     if (!isNum(area)) return undefined;
-    const wiring = code(v);
+    const wiring = readCode(v);
     const watts = (id: string) => v.num(id) ?? 0;
     const loads = { area, range: watts("range"), airConditioning: watts("ac"), heating: watts("heat"), hotLoads: watts("hot"), evCharger: watts("ev"), otherLoads: watts("other") };
     const w = (n: number) => amount(n, 0, " W");

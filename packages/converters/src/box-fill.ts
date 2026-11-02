@@ -1,19 +1,20 @@
-import { BOX_WIRE_SIZES, boxFill, type BoxCode, CONDUCTOR_ALLOWANCE } from "@uom/core/boxfill";
+import type { WiringCode } from "@uom/core/ampacity";
+import { BOX_WIRE_SIZES, boxFill, CONDUCTOR_ALLOWANCE } from "@uom/core/boxfill";
 import { CM3_PER_IN3 } from "@uom/core/units";
 import { fmt, plain } from "./format";
+import { codeField, readCode } from "./electrical-fields";
 import { byRegion, type Converter, type RegionExamples, type Row, type Status, type Values } from "./model";
 import { gauge } from "./visual";
 import { invalid } from "./checks";
 import { t } from "@uom/i18n";
 
-const boxCode = (v: Values) => v.str("code") as BoxCode;
 const boxUnit = (v: Values) => v.str("unit") as "in3" | "ml";
 const conductorField = (size: string) => `c${size}`;
 
 /** A volume in the code's own unit, as both in³ and mL. */
-const toMl = (code: BoxCode, n: number) => (code === "nec" ? n * CM3_PER_IN3 : n);
-const toIn3 = (code: BoxCode, n: number) => (code === "nec" ? n : n / CM3_PER_IN3);
-const inBoth = (code: BoxCode, n: number) => ({
+const toMl = (code: WiringCode, n: number) => (code === "nec" ? n * CM3_PER_IN3 : n);
+const toIn3 = (code: WiringCode, n: number) => (code === "nec" ? n : n / CM3_PER_IN3);
+const inBoth = (code: WiringCode, n: number) => ({
   value: code === "nec" ? `${fmt(n, 2)} in³` : `${fmt(n, 1)} mL`,
   detail: code === "nec" ? `${fmt(toMl(code, n), 1)} mL` : `${fmt(toIn3(code, n), 2)} in³`,
   copy: plain(n, 2),
@@ -42,16 +43,7 @@ export const boxFillConverter: Converter = {
     ],
   })),
   fields: [
-    {
-      kind: "choice",
-      id: "code",
-      label: "Wiring code",
-      value: (v) => (v.region === "ca" ? "cec" : "nec"),
-      options: [
-        { value: "nec", label: "NEC" },
-        { value: "cec", label: "CEC" },
-      ],
-    },
+    codeField(),
     { kind: "number", id: "box", label: "Box volume", suffix: (v) => (boxUnit(v) === "in3" ? "in³" : "mL"), placeholder: (v) => (boxUnit(v) === "in3" ? "18" : "295"), optional: true },
     ...BOX_WIRE_SIZES.map((size) => ({ kind: "number" as const, id: conductorField(size), label: () => t("{size} AWG conductors", { size }), placeholder: "0", optional: true })),
     { kind: "number", id: "devices", label: "Switches and receptacles", placeholder: "0", optional: true },
@@ -80,7 +72,7 @@ export const boxFillConverter: Converter = {
     },
   ],
   compute(v) {
-    const code = boxCode(v);
+    const code = readCode(v);
     const box = v.num("box");
     const count = (id: string) => v.num(id) ?? 0;
     const whole = (id: string) => Number.isNaN(v.num(id)) || !Number.isInteger(count(id));

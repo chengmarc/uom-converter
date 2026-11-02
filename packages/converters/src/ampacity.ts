@@ -1,12 +1,12 @@
-import { conductorAmpacity, type TempRating, type WiringCode } from "@uom/core/ampacity";
+import { conductorAmpacity, type TempRating } from "@uom/core/ampacity";
 import { buildingSizesFor, conductorInfo } from "@uom/core/conductors";
 import { amount, fmt } from "./format";
+import { codeField, readCode } from "./electrical-fields";
 import { byRegion, type Converter, type RegionExamples, type Row, type Status, type Values } from "./model";
 import { invalid, isNum } from "./checks";
 import { metalField, readMetal } from "./wire";
 import { t } from "@uom/i18n";
 
-const wiringCode = (v: Values) => v.str("code") as WiringCode;
 const rating = (v: Values, id: string) => Number(v.str(id)) as TempRating;
 
 export const ampacity: Converter = {
@@ -61,17 +61,7 @@ export const ampacity: Converter = {
         { value: "90", label: "90 °C" },
       ],
     },
-    {
-      kind: "choice",
-      id: "code",
-      label: "Wiring code",
-      advanced: true,
-      value: (v) => (v.region === "ca" ? "cec" : "nec"),
-      options: [
-        { value: "nec", label: "NEC" },
-        { value: "cec", label: "CEC" },
-      ],
-    },
+    codeField(true),
   ],
   compute(v) {
     const raw = v.str("size");
@@ -95,7 +85,7 @@ export const ampacity: Converter = {
       insulation,
       ambientC: ambientC!,
       conductors: count!,
-      code: wiringCode(v),
+      code: readCode(v),
       terminal: terminalChoice === "auto" ? undefined : (Number(terminalChoice) as TempRating),
     });
     if (!a) return { error: t("No rating for {size} {metal} at {insulation} °C in {ambient} °C.", { size: c.label, metal, insulation, ambient: fmt(ambientC!, 1) }), fields: ["size", "ambient", "insulation"] };

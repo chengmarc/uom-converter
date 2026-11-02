@@ -139,7 +139,7 @@ export const vdrop: Converter = {
     const d = voltageDrop({ ...run, areaMm2 });
     const { r, x } = conductorImpedance({ ...setup, areaMm2 });
     // North American sizes also have to carry the load; IEC ampacity isn't in here yet.
-    const forAmps = sys === "na" ? smallestSizeForAmps(amps / sets!, { metal, insulation: 75, ambientC: 30, conductors: 3, code: v.region === "ca" ? "cec" : "nec" }) : undefined;
+    const forAmps = sys === "na" ? smallestSizeForAmps(amps / sets!, { metal, insulation: 75, ambientC: 30, conductors: 3, code: regionInfo(v.region).wiringCode }) : undefined;
     const naSizes = buildingSizesFor(metal);
     const fit =
       sys === "na"

@@ -1,5 +1,6 @@
-// Phase and voltage fields for the converters that work on a supply (load, fault, pf, vdrop).
+// Phase, voltage and wiring code fields for the converters that work on a supply (load, fault, pf, vdrop).
 
+import type { WiringCode } from "@uom/core/ampacity";
 import type { Phase } from "@uom/core/electrical";
 import { regionInfo } from "./regions";
 import type { Values } from "./model";
@@ -31,3 +32,19 @@ export const voltsField = (label: string, preset: "loadVolts" | "branchVolts" = 
   value: (v: Values) => regionInfo(v.region)[preset],
   list: (v: Values) => regionInfo(v.region).volts,
 });
+
+/** The wiring code to work by, preset to the region's. */
+export const codeField = (advanced = false) => ({
+  kind: "choice" as const,
+  id: "code",
+  label: "Wiring code",
+  value: (v: Values) => regionInfo(v.region).wiringCode,
+  advanced,
+  options: [
+    { value: "nec", label: "NEC" },
+    { value: "cec", label: "CEC" },
+  ],
+});
+
+/** The code chosen in a codeField. */
+export const readCode = (v: Values) => v.str("code") as WiringCode;

@@ -2,7 +2,7 @@ import { cecTransformerPrimary, kvaToAmps, necTransformerProtection, nextTransfo
 import { amount, fmt } from "./format";
 import { byRegion, type Converter, type RegionExamples, type Row } from "./model";
 import { invalid, isNum } from "./checks";
-import { phaseField, phaseName, readPhase } from "./electrical-fields";
+import { codeField, phaseField, phaseName, readCode, readPhase } from "./electrical-fields";
 import { t } from "@uom/i18n";
 
 const amps = (a: number | undefined) => (a === undefined ? { value: t("Under 15 A or over 2000 A"), copy: "" } : { value: `${a} A`, copy: String(a) });
@@ -33,17 +33,7 @@ export const transformer: Converter = {
     { kind: "number", id: "primary", label: "Primary voltage", suffix: "V", placeholder: "480" },
     { kind: "number", id: "secondary", label: "Secondary voltage", suffix: "V", placeholder: "208" },
     phaseField("3"),
-    {
-      kind: "choice",
-      id: "code",
-      label: "Wiring code",
-      advanced: true,
-      value: (v) => (v.region === "ca" ? "cec" : "nec"),
-      options: [
-        { value: "nec", label: "NEC" },
-        { value: "cec", label: "CEC" },
-      ],
-    },
+    codeField(true),
   ],
   compute(v) {
     const kva = v.num("kva");
@@ -66,7 +56,7 @@ export const transformer: Converter = {
       { label: "Next common size", detail: "dry-type, check the maker's list", value: next === undefined ? t("Over the usual sizes") : `${fmt(next, 1)} kVA`, copy: next === undefined ? "" : String(next) },
     ];
     const g = t("Overcurrent protection");
-    if (v.str("code") === "cec") {
+    if (readCode(v) === "cec") {
       rows.push(
         { group: g, label: "Primary device", detail: "125% of primary current, next size up", ...amps(cecTransformerPrimary(ip)) },
         { group: g, label: "Secondary conductors", detail: "at least 125% of secondary current", ...amount(is * 1.25, 1, " A") },
@@ -84,7 +74,7 @@ export const transformer: Converter = {
       rows,
       formula: [
         phase === 3 ? "Amps = kVA × 1,000 ÷ (√3 × volts)." : "Amps = kVA × 1,000 ÷ volts.",
-        v.str("code") === "cec"
+        readCode(v) === "cec"
           ? "CEC: primary device at 125% of rated primary current, or the next size up."
           : "NEC, primary only: 125% from 9 A (next size up), 167% from 2 A, 300% under 2 A. With secondary protection: primary up to 250%, secondary 125%, or 167% under 9 A.",
       ],

@@ -1,14 +1,13 @@
-import { smallestSizeForAmps, type WiringCode } from "@uom/core/ampacity";
+import { smallestSizeForAmps } from "@uom/core/ampacity";
 import { ratingAtLeast } from "@uom/core/ratings";
 import { amount, fmt } from "./format";
-import { byRegion, type Converter, type RegionExamples, type Values } from "./model";
+import { byRegion, type Converter, type RegionExamples } from "./model";
+import { regionInfo } from "./regions";
 import { invalid, isNum } from "./checks";
 import { phaseField, phaseName, readPhase, voltsField } from "./electrical-fields";
 import { metalField, readMetal } from "./wire";
 import { ampsToKva } from "@uom/core/electrical";
 import { t } from "@uom/i18n";
-
-const codeOf = (v: Values): WiringCode => (v.region === "ca" ? "cec" : "nec");
 
 export const evCharger: Converter = {
   id: "ev-charger",
@@ -48,7 +47,7 @@ export const evCharger: Converter = {
     const phase = readPhase(v);
     const continuous = a * 1.25;
     const breaker = ratingAtLeast(continuous);
-    const size = breaker === undefined ? undefined : smallestSizeForAmps(breaker, { metal: readMetal(v), insulation: 75, ambientC: 30, conductors: 3, code: codeOf(v) });
+    const size = breaker === undefined ? undefined : smallestSizeForAmps(breaker, { metal: readMetal(v), insulation: 75, ambientC: 30, conductors: 3, code: regionInfo(v.region).wiringCode });
     return {
       heading: t("{amps} A charger at {volts} V {phase}", { amps: fmt(a, 1), volts: fmt(volts!, 1), phase: phaseName(phase) }),
       rows: [

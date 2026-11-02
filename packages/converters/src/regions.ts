@@ -1,3 +1,4 @@
+import type { WiringCode } from "@uom/core/ampacity";
 import type { Region } from "@uom/core/region";
 import type { NumberStyle } from "./format";
 
@@ -6,6 +7,8 @@ interface RegionInfo {
   label: string;
   /** The wiring code notes should cite. */
   code: string;
+  /** The code a converter with NEC and CEC rules starts on, and the one a converter with no choice uses. */
+  wiringCode: WiringCode;
   number: NumberStyle;
   hz: 50 | 60;
   /** Voltages offered in voltage fields, most common first. */
@@ -23,6 +26,7 @@ export const REGIONS: RegionInfo[] = [
     id: "us",
     label: "US",
     code: "NEC",
+    wiringCode: "nec",
     number: { locale: "en-US", decimalComma: false, currency: "$", currencyAfter: false },
     hz: 60,
     volts: ["120", "208", "240", "277", "480"],
@@ -34,6 +38,7 @@ export const REGIONS: RegionInfo[] = [
     id: "ca",
     label: "Canada",
     code: "CEC",
+    wiringCode: "cec",
     number: { locale: "en-CA", decimalComma: false, currency: "$", currencyAfter: false },
     hz: 60,
     volts: ["120", "208", "240", "347", "600"],
@@ -45,6 +50,7 @@ export const REGIONS: RegionInfo[] = [
     id: "eu",
     label: "Europe",
     code: "IEC 60364",
+    wiringCode: "nec",
     number: { locale: "de-DE", decimalComma: true, currency: "€", currencyAfter: true },
     hz: 50,
     volts: ["230", "400", "690"],

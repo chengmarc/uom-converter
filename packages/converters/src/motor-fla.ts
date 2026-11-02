@@ -1,9 +1,8 @@
-import type { WiringCode } from "@uom/core/ampacity";
 import { MOTOR_HP, motorCircuit, motorFullLoadAmps, motorOverloadAmps } from "@uom/core/motors";
 import { amount, fmt } from "./format";
 import { byRegion, type Converter, type RegionExamples, type Row } from "./model";
 import { isNum } from "./checks";
-import { phaseField, phaseName, readPhase, voltsField } from "./electrical-fields";
+import { codeField, phaseField, phaseName, readCode, readPhase, voltsField } from "./electrical-fields";
 import { t } from "@uom/i18n";
 
 export const motorFla: Converter = {
@@ -50,17 +49,7 @@ export const motorFla: Converter = {
         { value: "low", label: "Under 1.15" },
       ],
     },
-    {
-      kind: "choice",
-      id: "code",
-      label: "Wiring code",
-      advanced: true,
-      value: (v) => (v.region === "ca" ? "cec" : "nec"),
-      options: [
-        { value: "nec", label: "NEC" },
-        { value: "cec", label: "CEC" },
-      ],
-    },
+    codeField(true),
   ],
   compute(v) {
     const hp = v.str("hp");
@@ -71,7 +60,7 @@ export const motorFla: Converter = {
     const phase = readPhase(v);
     const fla = motorFullLoadAmps(hp, volts, phase);
     if (fla === undefined) return { error: t("The tables have no {hp} hp {phase} motor at {volts} V.", { hp, phase: phaseName(phase), volts: fmt(volts, 1) }), fields: ["hp", "volts", "phase"] };
-    const code = v.str("code") as WiringCode;
+    const code = readCode(v);
     const c = motorCircuit(fla, code);
     const g = t("Most protection allowed");
     const device = (label: string, amps: number | undefined, percent: number): Row => ({ group: g, label, detail: t("{pct}% of table current", { pct: percent }), value: amps === undefined ? t("Over 1000 A") : `${amps} A`, copy: amps === undefined ? "" : String(amps) });
