@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import type { Plugin } from "vite";
 
 const ICON = fileURLToPath(new URL("./app-icon.svg", import.meta.url));
-/** The photos' folder, for the plugin below and for checks that the files are there (@uom/ui's photos.test.ts). */
+/** The photos' folder, for the plugin below and for checks that the files are there (@uom/test's ui/photos.test.ts). */
 export const PHOTOS = fileURLToPath(new URL("./photos", import.meta.url));
 
 /**

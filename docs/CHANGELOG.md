@@ -7,6 +7,24 @@ match the release tags (`v<version>`).
 
 ## [Unreleased]
 
+### Changed
+
+- the Windows app's shell is in `shell/` and its page directly in `src/`, as in the Android app, was
+  `src/main/` and `src/renderer/`
+- the `.appx`'s tile icons are rendered into `build/packaging/appx/` by `npm run windows:appx`, was tracked in
+  `packaging/appx/`
+- the Windows app's theme setting is a row of buttons, like the region's, was a dropdown
+- the Windows app's Store listing is in Spanish, German and French as well as English: one file per
+  language in `store-listing/localization/`, and what's entered once in `store-listing/SUBMISSION.md`,
+  was `store-listing/LISTING.md`
+- the Windows Store images are rendered per language into `dist/<language>/`, was tracked
+  in `store-listing/`. Git keeps only the README's screenshots, in `docs/screenshots/`
+
+### Fixed
+
+- the Windows Store screenshots show the app at its real size. Rendering them after the Android images
+  left the app at half size
+
 ## [1.3.0] - 2026-10-31
 
 ### Added

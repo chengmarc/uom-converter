@@ -1,6 +1,6 @@
 <!doctype html>
-<!-- The Store's box art (1:1) and poster art (9:16): render.cjs loads this page at each size.
-     Everything is sized from the shorter side, so one layout serves both. -->
+<!-- The Store's box art (1:1) and poster art (9:16): render.cjs loads this page at each size, once per language, named
+     by the hash (#de). Everything is sized from the shorter side, so one layout serves both. -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -50,6 +50,12 @@
   <body>
     <img src="../../../../packages/brand/app-icon.svg" alt="" />
     <h1>UOM Converter</h1>
-    <p>For the <em>electrical</em> trade</p>
+    <p id="tagline"></p>
+    <script src="captions.js"></script>
+    <script>
+      const language = location.hash.slice(1);
+      document.documentElement.lang = language;
+      document.getElementById("tagline").innerHTML = CAPTIONS[language].tagline;
+    </script>
   </body>
 </html>

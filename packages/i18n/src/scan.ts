@@ -1,6 +1,6 @@
 // Finds every English string the apps show, by reading their source: t("…") calls anywhere, and the
 // fields a converter or a page declares as text, which the apps pass through t() as they draw them.
-// For the tests, in Node; catalogues.test.ts checks each language against this list.
+// For the tests, in Node; @uom/test's ui/translations.test.ts checks each language against this list.
 
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -17,7 +17,7 @@ const CALLS: Record<string, number> = { linear: 1, voltsField: 0 };
 
 const sources = (dir: string) =>
   readdirSync(join(REPO, dir))
-    .filter((f) => f.endsWith(".ts") && !f.endsWith(".test.ts"))
+    .filter((f) => f.endsWith(".ts"))
     .map((f) => join(REPO, dir, f));
 
 /** Strings in an expression, skipping the ones it only compares against ("mm2" in v.str("sys") === "mm2"). */
@@ -63,7 +63,7 @@ export function messages(): Set<string> {
   for (const f of sources("packages/converters/src")) scanTs(f, true, out);
   for (const f of ["converter", "visuals", "audiences", "search", "theme"]) scanTs(join(REPO, "packages/ui/src", `${f}.ts`), true, out);
   for (const f of sources("packages/core/src")) scanTs(f, false, out);
-  for (const f of ["apps/android/src/main.ts", "apps/windows/src/renderer/main.ts"]) scanTs(join(REPO, f), false, out);
-  for (const f of ["apps/android/src/index.html", "apps/windows/src/renderer/index.html"]) scanHtml(join(REPO, f), out);
+  for (const f of ["apps/android/src/main.ts", "apps/windows/src/main.ts"]) scanTs(join(REPO, f), false, out);
+  for (const f of ["apps/android/src/index.html", "apps/windows/src/index.html"]) scanHtml(join(REPO, f), out);
   return new Set([...out].filter((s) => !neutral(s)));
 }

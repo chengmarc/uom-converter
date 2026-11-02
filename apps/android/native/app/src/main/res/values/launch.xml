@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- The page's background (the bg token in packages/brand/tokens.css), so launch blends into it. theme.test.ts checks it matches. -->
+    <!-- The page's background (the bg token in packages/brand/tokens.css), so launch blends into it. @uom/test's android/theme.test.ts checks it matches. -->
     <color name="launch_background">#F6F7F9</color>
 </resources>

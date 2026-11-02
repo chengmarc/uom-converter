@@ -1,7 +1,7 @@
 /* The website, dressed as an established supplier's site rather than a product launch: a navy
    header and footer, system fonts, white pages with grey panels, square-ish corners, flat borders
    and no shadows, photos as hard-edged bands under the brand colour. The converters' layout is
-   shared with the Windows app (apps/windows/src/renderer/style.css), which keeps its own look.
+   shared with the Windows app (apps/windows/src/style.css), which keeps its own look.
    Corners: 3px on controls (inputs, buttons, chips), 4px on panels and images. */
 
 /* The colours, the same in every app: --brand (navy: the header, footer and photo bands), --accent,

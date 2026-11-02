@@ -88,7 +88,7 @@ export const TOOLS: Converter[] = [
   packaging,
 ];
 
-/** Each converter by its id (audiences.test.ts checks every id an audience lists is here). */
+/** Each converter by its id (@uom/test's ui/audiences.test.ts checks every id an audience lists is here). */
 export const byId = new Map(TOOLS.map((t) => [t.id, t]));
 
 /** Topics in the order of their first converter. */

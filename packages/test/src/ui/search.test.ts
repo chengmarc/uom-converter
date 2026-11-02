@@ -1,0 +1,37 @@
+import { describe, expect, it } from "vitest";
+import { AUDIENCES, EVERYTHING } from "@uom/ui/audiences";
+import { search } from "@uom/ui/search";
+
+const ids = (query: string, audience = EVERYTHING) => search(query, audience, "us").map((t) => t.id);
+const electrician = AUDIENCES.find((a) => a.id === "electrician")!;
+
+describe("search", () => {
+  it("finds a converter only when every word typed matches", () => {
+    expect(ids("voltage drop")).toEqual(["vdrop"]);
+    expect(ids("voltage zzz")).toEqual([]);
+  });
+
+  it("ignores case", () => {
+    expect(ids("VOLTAGE DROP")).toEqual(["vdrop"]);
+  });
+
+  it("finds a converter by its description", () => {
+    // "Metal price" says copper only in its description.
+    expect(ids("copper")).toContain("metal");
+  });
+
+  it("lists name matches before description matches", () => {
+    // Price per E/C/M says wire only in its description ("Wire is usually priced per M feet");
+    // conduit is under "Wire & conduit".
+    const found = ids("wire");
+    expect(found.indexOf("conduit")).toBeLessThan(found.indexOf("price"));
+  });
+
+  it("lists the audience's converters first, in the audience's order", () => {
+    // Wire price isn't on the electrician's list, so it comes after everything that is.
+    const wire = ids("wire", electrician);
+    expect(wire.indexOf("ampacity")).toBeLessThan(wire.indexOf("awg"));
+    expect(wire.indexOf("awg")).toBeLessThan(wire.indexOf("conduit"));
+    expect(wire.indexOf("reels")).toBeLessThan(wire.indexOf("wire-price"));
+  });
+});

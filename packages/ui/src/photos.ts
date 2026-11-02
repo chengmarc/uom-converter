@@ -12,7 +12,7 @@ import { el } from "./dom";
 
 /**
  * Each topic's photos: "<slot>-banner", cut 6:1 for a band across a page, and "<slot>-thumb",
- * square. Typed, so a new topic can't ship without them; photos.test.ts checks the files are there.
+ * square. Typed, so a new topic can't ship without them; @uom/test's ui/photos.test.ts checks the files are there.
  */
 export const TOPIC_SLOTS: Record<Topic, string> = {
   "Power & loads": "power-and-loads",

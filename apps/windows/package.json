@@ -5,12 +5,12 @@
   "private": true,
   "license": "Apache-2.0",
   "type": "module",
-  "main": "src/main/main.cjs",
+  "main": "shell/main.cjs",
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "start": "vite build && electron .",
     "dist": "vite build && electron-builder --config packaging/electron-builder.config.cjs --win",
-    "appx": "vite build && electron-builder --config packaging/electron-builder.config.cjs --win appx",
+    "appx": "vite build && electron store-listing/generator/render.cjs --tiles && electron-builder --config packaging/electron-builder.config.cjs --win appx",
     "assets": "vite build && electron store-listing/generator/render.cjs"
   },
   "devDependencies": {

@@ -6,15 +6,15 @@
   <a href="https://apps.microsoft.com/detail/9PHZQBV736JC"><img src="docs/badges/badge-microsoft-store.svg" height="50"></a>
   <h1>UOM Converter - Unit Converter for Electrical Industry</h1>
 
-  <img src="apps/windows/store-listing/desktop/screenshot-1-promo.png">
+  <img src="docs/screenshots/screenshot-1-promo.png">
 
 </div>
 
 ## Screenshots
 
-<img src="apps/windows/store-listing/desktop/screenshot-2-voltage-drop.png">
-<img src="apps/windows/store-listing/desktop/screenshot-3-price-units.png">
-<img src="apps/windows/store-listing/desktop/screenshot-5-reels.png">
+<img src="docs/screenshots/screenshot-2-voltage-drop.png">
+<img src="docs/screenshots/screenshot-3-price-units.png">
+<img src="docs/screenshots/screenshot-5-reels.png">
 
 ## Quick start
 
@@ -39,11 +39,12 @@ packages/
   ui/            @uom/ui: a converter drawn as HTML (form, result, diagrams), the roles and the
                  icons, for the apps built on a web page; each styles it its own way
   i18n/          @uom/i18n: the Windows and Android apps' text in other languages: t() and the translations
+  test/          @uom/test: every test, in a folder for the package or app it checks
   brand/         @uom/brand: the look every app shares: colours, the app icon (every app's icons are
                  made from it), the topic photos, and the rendered icon and share image
 apps/
   web/           the website: header, home page, a page per converter, footer, and its build
-  windows/       the Electron app: its page (src/renderer/) and shell (src/main/), Store assets
+  windows/       the Electron app: its page (src/) and shell (shell/), Store assets
   android/       the app screens (src/), the Capacitor native project (native/), icons
 ```
 
@@ -53,7 +54,7 @@ mean the same in every app:
 
 | Folder | Holds |
 |---|---|
-| `dist/` | What ships, and nothing else: the website as deployed, the Windows installer and `.appx`, the Android `.aab` |
+| `dist/` | What ships, and nothing else: the website as deployed, the Windows installer, `.appx` and Store images, the Android `.aab` |
 | `build/` | Intermediates, always safe to delete: the built page inside the Windows and Android apps (`build/web/`), electron-builder's full output, store screenshot captures |
 
 The Android app's `native/` (the Android Studio project) also has `build/` folders: Gradle's

@@ -1,6 +1,6 @@
 // Live preview of the Windows app: Vite's dev server for the page, and Electron showing it, so a
 // saved change appears in the window at once. Closing the window stops both. `npm run windows:dev`.
-// Changes to src/main/ need the window closed and the command run again.
+// Changes to shell/ need the window closed and the command run again.
 
 import { spawn } from "node:child_process";
 import { createRequire } from "node:module";

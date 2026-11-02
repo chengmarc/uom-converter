@@ -22,7 +22,7 @@ heading: t("{volts} V line-to-line equals", { volts: fmt(n, 2) }),
 Text in an app's own HTML is marked `data-t`, or `data-t-placeholder`, `data-t-aria-label` and
 `data-t-title` for those attributes.
 
-Then run `npm test`: `packages/ui/src/translations.test.ts` lists what each language is missing, and
+Then run `npm test`: `packages/test/src/ui/translations.test.ts` lists what each language is missing, and
 anything left over. Add those lines to `src/<language>.ts`.
 
 ### Offer a held language
@@ -36,10 +36,12 @@ their own, in `packages/converters/src/regions.ts`.
 1. **Add it to `LANGUAGES`** in `src/index.ts`, with the name people know it by in that language.
 2. **Write `src/<id>.ts`** and add it to `CATALOGUES` in `src/catalogues.ts`. `npm test` lists every
    string it needs.
-3. **Add its menus** to `TEXT` in `apps/windows/src/main/menus.cjs`.
+3. **Add its menus** to `TEXT` in `apps/windows/shell/menus.cjs`.
 4. **List it for the stores:** `appx.languages` and `nsis.installerLanguages` in
    `apps/windows/packaging/electron-builder.config.cjs`, and
    `apps/android/native/app/src/main/res/xml/locales_config.xml`.
+5. **Write its Windows Store listing:** `apps/windows/store-listing/localization/<id>.md`, and its
+   words in `apps/windows/store-listing/generator/captions.js`. `npm test` fails until both exist.
 
 ## Explanation
 
@@ -75,4 +77,4 @@ text built without `t()`.
 | `src/zh.ts`, `ja.ts`, `es.ts`, `de.ts`, `fr.ts` | The translations, English → translated |
 | `src/scan.ts` | `messages()`: every string to translate, read from the source. For tests only |
 | `../ui/src/language.ts` | `chosenLanguage()`, `chooseLanguage()`, and translating an app's HTML |
-| `../ui/src/translations.test.ts` | The checks on every language |
+| `../test/src/ui/translations.test.ts` | The checks on every language |

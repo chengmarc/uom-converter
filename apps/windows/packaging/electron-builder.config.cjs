@@ -15,10 +15,10 @@ const electron = path.dirname(require.resolve("electron/package.json"));
 module.exports = {
   appId: "com.uomconverter.app",
   extraMetadata: { name: "uom-converter", version },
-  files: ["build/web/**", "src/main/**", "!**/*.test.ts", "package.json"],
+  files: ["build/web/**", "shell/**", "package.json"],
   directories: {
     output: "build/electron-builder",
-    buildResources: "packaging",
+    buildResources: "build/packaging",
   },
   afterAllArtifactBuild: ({ artifactPaths }) => {
     const dist = path.join(__dirname, "..", "dist");
@@ -30,7 +30,7 @@ module.exports = {
   electronDist: path.join(electron, "dist"),
   win: {
     target: ["nsis"],
-    icon: "src/main/icon.png",
+    icon: "shell/icon.png",
   },
   nsis: {
     oneClick: false,

@@ -28,7 +28,7 @@ deploy.
 
 Edit its entry in `src/pages.ts`: `PAGES` by converter id, `TOPIC_PAGES` by topic, `HOME`. Titles
 are at most 60 characters and descriptions at most 160, so search results show them whole
-(`src/pages.test.ts` checks). The slug is the page's address: changing it breaks links to the old
+(`packages/test/src/web/pages.test.ts` checks). The slug is the page's address: changing it breaks links to the old
 one.
 
 ### Build it for another address

@@ -76,9 +76,11 @@ published there.
    Until then they hold placeholders, and the Store rejects a package whose identity doesn't match.
 2. **Build** with `npm run windows:appx`.
 3. **Upload** `apps/windows/dist/UOM-Converter-<version>.appx` in a new Partner Center
-   submission. Every other field (listing text, images in their numbered order, privacy policy,
-   `runFullTrust` justification, certification notes) is in
-   [apps/windows/store-listing/LISTING.md](../apps/windows/store-listing/LISTING.md), ready to paste.
+   submission, after `npm run windows:assets` has rendered its images. How to fill in every other
+   field (privacy policy, `runFullTrust` justification, certification notes, and a listing per
+   language) is in
+   [apps/windows/store-listing/SUBMISSION.md](../apps/windows/store-listing/SUBMISSION.md). Rewrite
+   "What's new in this version" in every file in `store-listing/localization/` first.
 
 ## Reference
 
@@ -91,6 +93,7 @@ In `apps/windows/dist/`:
 | `UOM-Converter-setup.exe` | GitHub Releases |
 | `UOM-Converter-<version>.appx` | Microsoft Store (Partner Center) only |
 | `RELEASE_NOTES.md` | The GitHub release's description (from `packaging/release-notes.cjs`) |
+| `<language>/` | The Store listing's images, from `npm run windows:assets`, uploaded in Partner Center |
 
 Only these are copied there. Everything else electron-builder makes (`win-unpacked/`, `.blockmap`
 files, `builder-debug.yml`) stays in `apps/windows/build/electron-builder/`, with the other
@@ -103,7 +106,8 @@ intermediates, and isn't published.
 
 | Output | Used for |
 |---|---|
-| `src/main/icon.png` | The window, taskbar and installer icon |
-| `packaging/appx/` | Start, tile and taskbar icons inside the `.appx` |
-| `store-listing/`, `store-listing/desktop/` | Partner Center: store logo, box and poster art (designed in `store-listing/generator/logo.html`), and in `desktop/` the screenshots (captions in `store-listing/generator/shots.html`, around captures of the app in `build/shots/`) |
+| `shell/icon.png` | The window, taskbar and installer icon |
+| `build/packaging/appx/` | Start, tile and taskbar icons inside the `.appx`, also rendered by `npm run windows:appx`. Not in git |
+| `dist/<language>/` | Partner Center, one folder per language: store logo, box and poster art (designed in `store-listing/generator/logo.html`), and the screenshots (laid out in `store-listing/generator/shots.html`, with the words in `captions.js`, around captures of the app in `build/shots/`). Not in git |
+| `docs/screenshots/` (at the repo root) | The README: the English screenshots it shows |
 | `packages/brand/rendered/` (at the repo root) | The website: `icon-256.png` (its install icon) and `share.png` (the preview when a link is shared, published as `og.png`), copies of the 256 px tile icon and the promo screenshot |

@@ -100,7 +100,7 @@ only its own files.
 
 **What shows before the page.** The splash colour (`launch.xml`, light and night) and the web
 view's background (`capacitor.config.ts`) are the page's `--bg`, so opening the app doesn't
-flash another colour. `src/theme.test.ts` checks they match `@uom/brand`'s tokens.
+flash another colour. `packages/test/src/android/theme.test.ts` checks they match `@uom/brand`'s tokens.
 
 **One version.** The version is the root `package.json`'s; Google Play's versionCode is worked out
 from it in `native/app/build.gradle` (1.2.3 is 10203).

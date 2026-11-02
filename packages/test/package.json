@@ -1,0 +1,13 @@
+{
+  "name": "@uom/test",
+  "description": "Every test in the repo, in a folder for the package or app it checks.",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "@uom/brand": "*",
+    "@uom/converters": "*",
+    "@uom/core": "*",
+    "@uom/i18n": "*",
+    "@uom/ui": "*"
+  }
+}

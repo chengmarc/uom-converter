@@ -14,7 +14,7 @@ export interface Page {
   description: string;
 }
 
-/** By converter id. pages.test.ts checks every converter has a page and slugs are unique. */
+/** By converter id. @uom/test's web/pages.test.ts checks every converter has a page and slugs are unique. */
 export const PAGES: Record<string, Page> = {
   price: {
     slug: "pricing/price-per-each-c-m",
@@ -242,7 +242,7 @@ export interface TopicPage extends Page {
   photo: string;
 }
 
-/** By topic, in the order the converters list them. pages.test.ts checks every topic has one. */
+/** By topic, in the order the converters list them. @uom/test's web/pages.test.ts checks every topic has one. */
 export const TOPIC_PAGES: Record<Topic, TopicPage> = {
   "Power & loads": {
     slug: "power-and-loads",

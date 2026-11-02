@@ -3,10 +3,8 @@
 # them in diffs and leaves them out of the language stats. Change the source and re-run, not these.
 
 # apps/windows/store-listing/generator/render.cjs (`npm run windows:assets`), from @uom/brand's app-icon.svg and the built app
-apps/windows/src/main/icon.png linguist-generated
-apps/windows/packaging/appx/*.png linguist-generated
-apps/windows/store-listing/*.png linguist-generated
-apps/windows/store-listing/desktop/*.png linguist-generated
+apps/windows/shell/icon.png linguist-generated
+docs/screenshots/*.png linguist-generated
 packages/brand/rendered/*.png linguist-generated
 
 # apps/android/scripts/render-icons.cjs (`npm run android:icons`), from @uom/brand's app-icon.svg

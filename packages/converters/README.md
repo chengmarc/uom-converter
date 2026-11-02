@@ -20,10 +20,10 @@ reads and shows numbers with. Every app draws converters its own way; nothing he
    Everything view orders topics by their first converter.
 3. **Give it a page on the website:** an entry in `PAGES` in `apps/web/src/pages.ts`, with a slug,
    a title of at most 60 characters and a description of at most 160.
-   `apps/web/src/pages.test.ts` fails until it has one.
+   `packages/test/src/web/pages.test.ts` fails until it has one.
 4. **List it for the audiences that use it** in `packages/ui/src/audiences.ts`. A converter that no
    audience lists appears only under Everything.
-5. **Run `npm test`.** `src/index.test.ts` works out every example in every region. If the
+5. **Run `npm test`.** `packages/test/src/converters/index.test.ts` works out every example in every region. If the
    converter makes a judgment of its own (a good/warn/bad status, a refusal), add a test for that
    rule there, named after it.
 6. **Translate it.** `npm test` lists its new text until every language in
@@ -38,7 +38,7 @@ Add it to `Topic` in `src/model.ts`; TypeScript then asks for the rest, each a `
 
 - its icon: `TOPICS` in `packages/ui/src/icons.ts`
 - its photos: `TOPIC_SLOTS` in `packages/ui/src/photos.ts`, cut by `packages/brand/photos.mjs`
-  (`packages/ui/src/photos.test.ts` checks the files are there)
+  (`packages/test/src/ui/photos.test.ts` checks the files are there)
 - its page: `TOPIC_PAGES` in `apps/web/src/pages.ts`
 
 ### Check a change
@@ -65,7 +65,7 @@ example's settings and no page at all: the tests and the website's worked exampl
 
 **One number style at a time.** The app calls `setNumberStyle()` with the region's style before
 drawing, and everything formats and parses through `format.ts`. That's module state, so a test
-that reads or shows numbers sets the style first (`output()` in `src/index.test.ts`). Labels,
+that reads or shows numbers sets the style first (`output()` in `packages/test/src/converters/index.test.ts`). Labels,
 examples and defaults can be `Dyn` (worked out when drawn) so their numbers come out in the
 region's format.
 
