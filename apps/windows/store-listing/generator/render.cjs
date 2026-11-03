@@ -3,7 +3,8 @@
 //   build/packaging/appx/  tile and taskbar icons packed into the MSIX (electron-builder's buildResources)
 //   dist/<language>/       images uploaded to Partner Center, one folder per language: store logos and screenshots
 //   docs/screenshots/      the README's screenshots, in English
-//   docs/social-preview.png  GitHub's social preview, from social.html, which also heads the README
+//   docs/social-preview.png  GitHub's social preview, from social.html, which also heads the README. It shows the
+//                        Android app too, so `npm run android:store` has to have captured it first
 //   @uom/brand's rendered/ the icon at 256 and the share image (the promo shot), which the website uses too
 // The icons come from @uom/brand's app-icon.svg; screenshots from the built page, captured into build/shots/ and
 // framed by shots.html, in each language of captions.js.
@@ -19,6 +20,8 @@ const WINDOWS = path.join(__dirname, "..", "..");
 const DIST = path.join(WINDOWS, "dist");
 const README_SHOTS = path.join(WINDOWS, "..", "..", "docs", "screenshots");
 const SOCIAL_PREVIEW = path.join(WINDOWS, "..", "..", "docs", "social-preview.png");
+/** The Android app's home screen on a phone, which the social preview shows beside the window. */
+const ANDROID_HOME = path.join(WINDOWS, "..", "android", "build", "shots", "en", "phone", "home.png");
 const BUILD = path.join(WINDOWS, "build");
 const PAGE = path.join(BUILD, "web");
 const TILES_DIR = path.join(BUILD, "packaging", "appx");
@@ -102,6 +105,8 @@ async function renderTiles() {
 }
 
 async function renderListing() {
+  // Before anything is rendered, not after: the social preview would otherwise go without the phone.
+  if (!fs.existsSync(ANDROID_HOME)) throw new Error(`No ${path.relative(WINDOWS, ANDROID_HOME)}: run \`npm run android:store\` first, which captures it`);
   fs.rmSync(README_SHOTS, { recursive: true, force: true });
 
   protocol.handle("app", (request) => {

@@ -25,11 +25,12 @@ the `.aab` into `apps/android/dist/`. Commands run from the repo root.
    ```
 
 5. **Refresh the images** if the app's look, the icon or the screenshots' converters changed. This
-   also re-renders the website's icon and share image (below), which go live with its next deploy:
+   also re-renders the website's icon and share image (below), which go live with its next deploy.
+   Android first: the social preview, made with the Windows images, shows its phone capture:
 
    ```
-   npm run windows:assets
    npm run android:store
+   npm run windows:assets
    ```
 
 6. **Build:**

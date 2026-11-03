@@ -1,7 +1,8 @@
 <!doctype html>
 <!-- GitHub's social preview, the card shown when the repo's link is shared: render.cjs loads this page at 1280 × 640 into
      docs/social-preview.png, which is uploaded in the repo's Settings. GitHub crops a little off the edges in places,
-     so everything stays 40px clear of them. The app is the promo shot's capture, and the words are in captions.js. -->
+     so everything stays 40px clear of them. It shows both apps: the Windows window is the promo shot's capture, and
+     the phone is the Android app's home screen, captured by `npm run android:store`. The words are in captions.js. -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -13,29 +14,30 @@
       /* The grid fades out behind the app. */
       body::after { mask-image: linear-gradient(90deg, #000 0%, rgba(0, 0, 0, 0.5) 34%, transparent 52%); }
 
-      .caption { position: absolute; left: 64px; top: 0; bottom: 0; width: 450px; display: flex; flex-direction: column; justify-content: center; }
-      .caption img { width: 112px; height: 112px; margin-left: -4px; filter: drop-shadow(0 10px 20px rgba(8, 10, 60, 0.5)); }
-      h1 { margin: 26px 0 0; font-size: 60px; line-height: 1; font-weight: 760; letter-spacing: -0.03em; font-variation-settings: "opsz" 32; }
-      .caption p { margin: 14px 0 0; font-size: 28px; font-weight: 520; color: rgba(255, 255, 255, 0.85); }
+      .caption { position: absolute; left: 56px; top: 0; bottom: 0; width: 340px; display: flex; flex-direction: column; justify-content: center; }
+      .caption img { width: 88px; height: 88px; margin-left: -3px; filter: drop-shadow(0 8px 16px rgba(8, 10, 60, 0.5)); }
+      h1 { margin: 20px 0 0; font-size: 46px; line-height: 1; font-weight: 760; letter-spacing: -0.03em; font-variation-settings: "opsz" 32; }
+      .caption p { margin: 10px 0 0; font-size: 22px; font-weight: 520; color: rgba(255, 255, 255, 0.85); }
       .caption p em { font-style: normal; color: var(--bolt); }
+      .caption .platforms { margin-top: 8px; font-size: 18px; font-weight: 600; color: #fff; }
 
-      .facts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 30px; }
+      .facts { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 22px; }
       .facts span {
-        padding: 6px 13px;
+        padding: 5px 11px;
         border-radius: 999px;
-        font-size: 15px;
+        font-size: 13px;
         font-weight: 560;
         background: rgba(255, 255, 255, 0.12);
         border: 1px solid rgba(255, 255, 255, 0.22);
       }
 
-      /* The app window, as in shots.html: 1400 × 860 at half size, whole, with Windows 11's corners and a deep shadow. */
+      /* The app window, as in shots.html: 1400 × 860 at 0.52, whole, with Windows 11's corners and a deep shadow. */
       .window {
         position: absolute;
-        left: 540px;
-        top: 105px;
+        left: 420px;
+        top: 92px;
         width: 1400px;
-        transform: scale(0.5);
+        transform: scale(0.52);
         transform-origin: top left;
         border-radius: 18px;
         overflow: hidden;
@@ -50,6 +52,22 @@
       /* The minimize, maximize and close buttons Windows draws over the page's own title bar. */
       .caption-buttons { position: absolute; top: 0; right: 0; display: flex; color: #1c1b19; }
       .caption-buttons i { width: 46px; height: 40px; display: grid; place-items: center; font: normal 10px "Segoe Fluent Icons", "Segoe MDL2 Assets"; }
+
+      /* The phone, in the Play screenshots' slim black bezel (the Android app's shots.html), whole and in front of the
+         window's right edge, clear of its answer. */
+      .phone {
+        position: absolute;
+        left: 1056px;
+        top: 206px;
+        padding: 6px;
+        border-radius: 26px;
+        background: #0d0f12;
+        box-shadow:
+          0 0 0 1px rgba(255, 255, 255, 0.18),
+          0 30px 70px rgba(5, 8, 50, 0.65),
+          0 10px 24px rgba(5, 8, 50, 0.4);
+      }
+      .phone img { display: block; width: 172px; border-radius: 22px; }
     </style>
   </head>
   <body>
@@ -57,12 +75,14 @@
       <img src="../../../../packages/brand/app-icon.svg" alt="" />
       <h1>UOM Converter</h1>
       <p id="tagline"></p>
+      <p class="platforms">Windows · Android</p>
       <div class="facts" id="facts"></div>
     </div>
     <div class="window">
       <img src="../../build/shots/en/promo.png" alt="" />
       <div class="caption-buttons"><i>&#xE921;</i><i>&#xE922;</i><i>&#xE8BB;</i></div>
     </div>
+    <div class="phone"><img src="../../../android/build/shots/en/phone/home.png" alt="" /></div>
 
     <script src="captions.js"></script>
     <script>
