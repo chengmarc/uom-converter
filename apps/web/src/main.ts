@@ -14,7 +14,7 @@ import { el } from "@uom/ui/dom";
 import { photoLibrary, TOPIC_SLOTS } from "@uom/ui/photos";
 import { HOME, idFromPath, PAGES, PRIVACY, topicFromPath, TOPIC_PAGES } from "./pages";
 import { PRIVACY_HTML } from "./privacy";
-import { EXE_URL, NAME, registerOffline, STORE_URL } from "./site";
+import { EXE_URL, NAME, PLAY_URL, registerOffline, STORE_URL } from "./site";
 
 // The site's base path, from SITE_URL in scripts/site.ts.
 declare const __SITE_BASE__: string;
@@ -586,7 +586,8 @@ window.addEventListener("popstate", render);
 
 document.querySelectorAll<HTMLAnchorElement>("a[data-home]").forEach((a) => (a.href = BASE));
 document.querySelectorAll<HTMLAnchorElement>("a[data-privacy]").forEach((a) => (a.href = privacyPath));
-document.querySelectorAll<HTMLAnchorElement>("#footer-app, #footer-android").forEach((a) => (a.href = STORE_URL));
+document.querySelector<HTMLAnchorElement>("#footer-app")!.href = STORE_URL;
+document.querySelector<HTMLAnchorElement>("#footer-android")!.href = PLAY_URL;
 document.querySelector("#footer-year")!.textContent = String(new Date().getFullYear());
 document.querySelector("#footer-topic-list")!.replaceChildren(
   ...TOPICS.map((t) => {

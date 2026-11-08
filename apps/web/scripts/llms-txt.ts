@@ -2,7 +2,7 @@
 
 import type { Topic } from "@uom/converters/model";
 import { HOME, TOPIC_PAGES, type Page } from "../src/pages";
-import { NAME, STORE_URL } from "../src/site";
+import { NAME, PLAY_URL, STORE_URL } from "../src/site";
 import { SITE_URL } from "./site";
 
 const REPO_URL = "https://github.com/chengmarc/uom-converter";
@@ -37,6 +37,7 @@ export function llmsTxt(converters: { page: Page; topic?: Topic }[], regions: st
     `## Optional\n\n` +
       [
         item("Windows app", STORE_URL, "the same converters as a free Windows app from the Microsoft Store, working offline"),
+        item("Android app", PLAY_URL, "the same converters as a free Android app on Google Play, working offline"),
         item("Source code", REPO_URL, "the website and apps, open source under the Apache 2.0 license"),
         item("Privacy", `${SITE_URL}privacy`, "what the website does and doesn't collect"),
         item("Sitemap", `${SITE_URL}sitemap.xml`, "every page's address"),

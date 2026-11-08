@@ -7,6 +7,10 @@ match the release tags (`v<version>`).
 
 ## [Unreleased]
 
+### Changed
+
+- the Android app is on Google Play, and the website's footer links to it there
+
 ## [1.3.0] - 2026-11-02
 
 The first installer on GitHub since 1.1.0, so it also brings 1.2.0's changes, such as Spanish, German and

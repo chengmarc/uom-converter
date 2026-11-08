@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { token } from "@uom/brand/tokens";
 import { HOME, type Page } from "../src/pages";
-import { NAME, STORE_URL } from "../src/site";
+import { NAME, PLAY_URL, STORE_URL } from "../src/site";
 import type { Drawn } from "./prerender";
 import { BASE, esc, SITE_URL } from "./site";
 
@@ -77,7 +77,7 @@ function app(page: Page, url: string): object {
     browserRequirements: "Requires JavaScript",
     isAccessibleForFree: true,
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-    ...(page.slug ? {} : { sameAs: [STORE_URL] }),
+    ...(page.slug ? {} : { sameAs: [STORE_URL, PLAY_URL] }),
   };
 }
 
