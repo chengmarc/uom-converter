@@ -14,6 +14,8 @@ match the release tags (`v<version>`).
   `render.cjs` in `promo/generator/`, the text, `SUBMISSION.md` and `PRIVACY.md` in `promo/listing/`, and the store
   images in `promo/out/store/microsoft-store/<language>/` and `promo/out/store/google-play/<language>/`, was
   `dist/<language>/`, so `dist/` holds only what ships
+- nothing in an app's `promo/out/` is kept in git: the store images, the social preview and the portfolio
+  tile are made again whenever they're needed
 - GitHub's social preview is `apps/windows/promo/out/social-preview.png`, beside the Windows app's store
   images, was `docs/social-preview.png`, and shows the README's badges; `npm run windows:assets` also draws a square
   portfolio tile, `apps/windows/promo/out/portfolio.png`

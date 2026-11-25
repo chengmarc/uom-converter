@@ -2,7 +2,7 @@
 
 How to fill in a Play Console submission for the Android app, in the order Console asks. What's entered once for the
 app is here, to paste. What's entered per language is that language's listing: its text in `localization/<code>.md`,
-and its images in `apps/android/dist/<code>/`, made by `npm run android:store` and not kept in git. The package is
+and its images in `apps/android/promo/out/store/google-play/<code>/`, made by `npm run android:store` and not kept in git. The package is
 `com.chengmarc.uomconverter`; the bundle is built and signed as [the README](../README.md#build-a-release-for-google-play) says.
 
 ← Back to the [Android app's README](../README.md).
@@ -58,7 +58,7 @@ asks store assets to avoid them. Play has no keywords field; search reads the na
 
 ### Graphics
 
-From `apps/android/dist/<code>/`. A language with none shows the default language's.
+From `apps/android/promo/out/store/google-play/<code>/`. A language with none shows the default language's.
 
 - **App icon:** `icon-512.png`, 512 × 512. It has no words, so it's the same in every language.
 - **Feature graphic:** `feature-graphic.png`, 1024 × 500.

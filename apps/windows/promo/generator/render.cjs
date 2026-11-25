@@ -21,7 +21,7 @@ const { pathToFileURL } = require("node:url");
 const WINDOWS = path.join(__dirname, "..", "..");
 const DIST = path.join(WINDOWS, "promo", "out", "store", "microsoft-store");
 const README_SHOTS = path.join(WINDOWS, "..", "..", "docs", "screenshots");
-// The repo-wide images, kept with the Windows app's, which draws them; git keeps these two.
+// The repo-wide images, beside the Windows app's, which draws them. Uploaded by hand, so not in git.
 const SOCIAL_PREVIEW = path.join(WINDOWS, "promo", "out", "social-preview.png");
 const PORTFOLIO = path.join(WINDOWS, "promo", "out", "portfolio.png");
 /** The Android app's home screen on a phone, which the social preview and the portfolio tile show beside the window. */

@@ -4,6 +4,6 @@ dist
 packages/brand/originals/
 build
 
-# Each app's store images, made again for each submission (promo/generator/render.cjs). The rest of the Windows
-# app's promo/out/, the repo-wide images it draws (GitHub's social preview, the portfolio tile), is kept.
-apps/*/promo/out/store/
+# The images each app's promo/generator/render.cjs makes, all uploaded by hand (the store images, and the Windows
+# app's GitHub social preview and portfolio tile): made again whenever they're needed, never kept.
+apps/*/promo/out/
