@@ -7,8 +7,6 @@
   <a href="https://play.google.com/store/apps/details?id=com.chengmarc.uomconverter"><img src="docs/badges/badge-google-play.svg" height="50"></a>
   <h1>UOM Converter - Unit Converter for Electrical Industry</h1>
 
-  <img src="docs/social-preview.png">
-
 </div>
 
 ## Screenshots
