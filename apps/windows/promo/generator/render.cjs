@@ -4,11 +4,9 @@
 //   promo/out/store/microsoft-store/<language>/  images uploaded to Partner Center, one folder per language: store
 //                        logos and screenshots (gitignored: made again for each submission)
 //   docs/screenshots/      the README's screenshots, in English
-//   promo/out/github/social-preview.png  GitHub's social preview, from social.html, uploaded in the
-//                        repo's Settings. It shows the Android app too, so `npm run android:store` has to have
-//                        captured it first
-//   promo/out/portfolio/portfolio.png  a square tile for a job profile's portfolio, from
-//                        portfolio.html, with both apps too
+//   promo/out/social-preview.png  GitHub's social preview, from social.html, uploaded in the repo's Settings. It
+//                        shows the Android app too, so `npm run android:store` has to have captured it first
+//   promo/out/portfolio.png  a square tile for a job profile's portfolio, from portfolio.html, with both apps too
 //   @uom/brand's rendered/ the icon at 256 and the share image (the promo shot), which the website uses too
 // The icons come from @uom/brand's app-icon.svg; screenshots from the built page, captured into build/shots/ and
 // framed by shots.html, in each language of captions.js.
@@ -24,8 +22,8 @@ const WINDOWS = path.join(__dirname, "..", "..");
 const DIST = path.join(WINDOWS, "promo", "out", "store", "microsoft-store");
 const README_SHOTS = path.join(WINDOWS, "..", "..", "docs", "screenshots");
 // The repo-wide images, kept with the Windows app's, which draws them; git keeps these two.
-const SOCIAL_PREVIEW = path.join(WINDOWS, "promo", "out", "github", "social-preview.png");
-const PORTFOLIO = path.join(WINDOWS, "promo", "out", "portfolio", "portfolio.png");
+const SOCIAL_PREVIEW = path.join(WINDOWS, "promo", "out", "social-preview.png");
+const PORTFOLIO = path.join(WINDOWS, "promo", "out", "portfolio.png");
 /** The Android app's home screen on a phone, which the social preview and the portfolio tile show beside the window. */
 const ANDROID_HOME = path.join(WINDOWS, "..", "android", "build", "shots", "en", "phone", "home.png");
 const BUILD = path.join(WINDOWS, "build");

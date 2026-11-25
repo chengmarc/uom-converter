@@ -139,6 +139,6 @@ The Android app's are in [its README](../apps/android/README.md#refresh-the-play
 | `build/packaging/appx/` | Start, tile and taskbar icons inside the `.appx`, also rendered by `npm run windows:appx`. Not in git |
 | `promo/out/store/microsoft-store/<language>/` | Partner Center, one folder per language: store logo, box and poster art (designed in `promo/generator/logo.html`), and the screenshots (laid out in `promo/generator/shots.html`, with the words in `captions.js`, around captures of the app in `build/shots/`). Not in git |
 | `docs/screenshots/` (at the repo root) | The README: the English screenshots it shows |
-| `promo/out/github/social-preview.png` | GitHub's social preview, designed in `promo/generator/social.html`. If it changes, upload it again in the repo's Settings → Social preview |
-| `promo/out/portfolio/portfolio.png` | A square tile for a job profile's portfolio, designed in `promo/generator/portfolio.html`, with both apps |
+| `promo/out/social-preview.png` | GitHub's social preview, designed in `promo/generator/social.html`. If it changes, upload it again in the repo's Settings → Social preview |
+| `promo/out/portfolio.png` | A square tile for a job profile's portfolio, designed in `promo/generator/portfolio.html`, with both apps |
 | `packages/brand/rendered/` (at the repo root) | The website: `icon-256.png` (its install icon) and `share.png` (the preview when a link is shared, published as `og.png`), copies of the 256 px tile icon and the promo screenshot |
