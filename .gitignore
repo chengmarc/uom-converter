@@ -3,7 +3,4 @@ dist
 .wrangler
 packages/brand/originals/
 build
-
-# The images each app's promo/generator/render.cjs makes, all uploaded by hand (the store images, and the Windows
-# app's GitHub social preview and portfolio tile): made again whenever they're needed, never kept.
 apps/*/promo/out/

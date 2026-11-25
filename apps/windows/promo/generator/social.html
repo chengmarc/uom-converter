@@ -1,7 +1,7 @@
 <!doctype html>
 <!-- GitHub's social preview, the card shown when the repo's link is shared: render.cjs loads this page at 1280 × 640 into
      apps/windows/promo/out/social-preview.png, which is uploaded in the repo's Settings. GitHub crops a little off the edges in places,
-     so everything stays 40px clear of them. It shows both apps: the Windows window is the promo shot's capture, and
+     so the words and badges stay 40px clear of them; the window runs off the right, so the card has no empty margin. It shows both apps: the Windows window is the promo shot's capture, and
      the phone is the Android app's home screen, captured by `npm run android:store`. The words are in captions.js. -->
 <html lang="en">
   <head>
@@ -14,34 +14,25 @@
       /* The grid fades out behind the app. */
       body::after { mask-image: linear-gradient(90deg, #000 0%, rgba(0, 0, 0, 0.5) 34%, transparent 52%); }
 
-      .caption { position: absolute; left: 56px; top: 0; bottom: 0; width: 340px; display: flex; flex-direction: column; justify-content: center; }
-      .caption img { width: 88px; height: 88px; margin-left: -3px; filter: drop-shadow(0 8px 16px rgba(8, 10, 60, 0.5)); }
-      h1 { margin: 20px 0 0; font-size: 46px; line-height: 1; font-weight: 760; letter-spacing: -0.03em; font-variation-settings: "opsz" 32; }
-      .caption p { margin: 10px 0 0; font-size: 22px; font-weight: 520; color: rgba(255, 255, 255, 0.85); }
+      .caption { position: absolute; left: 56px; top: 0; bottom: 0; width: 400px; display: flex; flex-direction: column; justify-content: center; }
+      /* The icon only: .caption img would also size the badges. */
+      .caption > img { width: 104px; height: 104px; margin-left: -3px; filter: drop-shadow(0 8px 16px rgba(8, 10, 60, 0.5)); }
+      h1 { margin: 22px 0 0; font-size: 56px; line-height: 1; font-weight: 760; letter-spacing: -0.03em; font-variation-settings: "opsz" 32; }
+      .caption p { margin: 12px 0 0; font-size: 28px; font-weight: 520; color: rgba(255, 255, 255, 0.85); }
       .caption p em { font-style: normal; color: var(--bolt); }
-      .caption .platforms { margin-top: 8px; font-size: 18px; font-weight: 600; color: #fff; }
+      .caption .platforms { margin-top: 8px; font-size: 23px; font-weight: 600; color: #fff; }
 
-      .facts { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 22px; }
-      .facts span {
-        padding: 5px 11px;
-        border-radius: 999px;
-        font-size: 13px;
-        font-weight: 560;
-        background: rgba(255, 255, 255, 0.12);
-        border: 1px solid rgba(255, 255, 255, 0.22);
-      }
+      /* The README's badges, in its order, under the platforms. */
+      .badges { display: flex; gap: 8px; margin-top: 32px; align-items: center; }
+      .badges img { display: block; height: 41px; }
 
-      /* The README's badges, in its order, under the facts. */
-      .badges { display: flex; gap: 7px; margin-top: 16px; align-items: center; }
-      .badges img { display: block; height: 36px; }
-
-      /* The app window, as in shots.html: 1400 × 860 at 0.52, whole, with Windows 11's corners and a deep shadow. */
+      /* The app window, as in shots.html: 1400 × 860 at 0.64, off the right, with Windows 11's corners and a deep shadow. */
       .window {
         position: absolute;
-        left: 420px;
-        top: 92px;
+        left: 490px;
+        top: 56px;
         width: 1400px;
-        transform: scale(0.52);
+        transform: scale(0.64);
         transform-origin: top left;
         border-radius: 18px;
         overflow: hidden;
@@ -57,21 +48,21 @@
       .caption-buttons { position: absolute; top: 0; right: 0; display: flex; color: #1c1b19; }
       .caption-buttons i { width: 46px; height: 40px; display: grid; place-items: center; font: normal 10px "Segoe Fluent Icons", "Segoe MDL2 Assets"; }
 
-      /* The phone, in the Play screenshots' slim black bezel (the Android app's shots.html), whole and in front of the
-         window's right edge, clear of its answer. */
+      /* The phone, in the Play screenshots' slim black bezel (the Android app's shots.html), in front of the window's
+         right edge, low enough to leave its answer clear, and off the bottom. */
       .phone {
         position: absolute;
-        left: 1056px;
-        top: 206px;
-        padding: 6px;
-        border-radius: 26px;
+        left: 1036px;
+        top: 312px;
+        padding: 7px;
+        border-radius: 31px;
         background: #0d0f12;
         box-shadow:
           0 0 0 1px rgba(255, 255, 255, 0.18),
           0 30px 70px rgba(5, 8, 50, 0.65),
           0 10px 24px rgba(5, 8, 50, 0.4);
       }
-      .phone img { display: block; width: 172px; border-radius: 22px; }
+      .phone img { display: block; width: 214px; border-radius: 26px; }
     </style>
   </head>
   <body>
@@ -80,7 +71,6 @@
       <h1>UOM Converter</h1>
       <p id="tagline"></p>
       <p class="platforms">Windows · Android</p>
-      <div class="facts" id="facts"></div>
       <div class="badges"><img src="../../../../docs/badges/badge-download.svg" alt=""><img src="../../../../docs/badges/badge-microsoft-store.svg" alt=""><img src="../../../../docs/badges/badge-google-play.svg" alt=""></div>
     </div>
     <div class="window">
@@ -92,8 +82,6 @@
     <script src="captions.js"></script>
     <script>
       document.getElementById("tagline").innerHTML = CAPTIONS.en.tagline;
-      // The first is the converter count, which render.cjs fills in from @uom/converters.
-      document.getElementById("facts").innerHTML = CAPTIONS.en.facts.map((f, i) => `<span${i ? "" : ' id="count"'}>${f}</span>`).join("");
     </script>
   </body>
 </html>
