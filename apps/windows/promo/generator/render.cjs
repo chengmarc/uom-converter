@@ -155,7 +155,8 @@ async function renderListing() {
   }
   // After the shots: it shows the promo shot's capture. GitHub's size, under its 1 MB limit.
   await renderPage("social.html", SOCIAL_PREVIEW, 1280, 640, 1, fillCount(count));
-  await renderPage("portfolio.html", PORTFOLIO, 1080, 1080, 1);
+  // At 2x in a 540 px window: Windows won't open a 1080 px one on a screen whose work area is shorter.
+  await renderPage("portfolio.html", PORTFOLIO, 540, 540, 2);
 }
 
 /** Fills the converter count into a page's first fact. */

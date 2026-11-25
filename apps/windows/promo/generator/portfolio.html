@@ -51,6 +51,9 @@
     const w = el.getBoundingClientRect().width;
     if (w > room) el.style.fontSize = size * room / w + "px";
   }
+  // Laid out at 1080 CSS pixels, then scaled to the window: render.cjs draws it in a 540 px window at 2x, since
+  // Windows won't open one taller than the screen's work area.
+  document.documentElement.style.zoom = innerWidth / 1080;
 </script>
 </body>
 </html>
