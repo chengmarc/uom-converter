@@ -1,5 +1,5 @@
 // Renders Google Play's listing images from the app's own sources, so they never drift from it, one folder per language
-// in dist/<language>/, in each language of captions.js:
+// in promo/out/store/google-play/<language>/ (gitignored: made again for each submission), in each language of captions.js:
 //   icon-512.png         render-icons.cjs's, the same in every language
 //   feature-graphic.png  1024 × 500, from feature.html
 //   <device>-<n>-<shot>.png   phone, tablet7 and tablet10 screenshots, 1080 × 1920, in upload order: shots.html (which
@@ -13,7 +13,7 @@ const path = require("node:path");
 const { pathToFileURL } = require("node:url");
 
 const ANDROID = path.join(__dirname, "..", "..");
-const DIST = path.join(ANDROID, "dist");
+const DIST = path.join(ANDROID, "promo", "out", "store", "google-play");
 const BUILD = path.join(ANDROID, "build");
 const PAGE = path.join(BUILD, "web");
 

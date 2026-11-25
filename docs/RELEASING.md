@@ -88,8 +88,8 @@ published there.
    submission, after `npm run windows:assets` has rendered its images. How to fill in every other
    field (privacy policy, `runFullTrust` justification, certification notes, and a listing per
    language) is in
-   [apps/windows/store-listing/SUBMISSION.md](../apps/windows/store-listing/SUBMISSION.md). Rewrite
-   "What's new in this version" in every file in `store-listing/localization/` first.
+   [apps/windows/promo/listing/SUBMISSION.md](../apps/windows/promo/listing/SUBMISSION.md). Rewrite
+   "What's new in this version" in every file in `promo/listing/localization/` first.
 
 ## Google Play
 
@@ -100,8 +100,8 @@ a bundle is uploaded, even to testing, a fix to it needs a new version.
    [the Android app's README](../apps/android/README.md#build-a-release-for-google-play) says.
 2. **Upload** `apps/android/dist/UOM-Converter-<version>.aab` in a new Play Console release, after
    `npm run android:store` has rendered its images. How to fill in the release and every other field
-   is in [apps/android/store-listing/SUBMISSION.md](../apps/android/store-listing/SUBMISSION.md). Rewrite
-   "What's new in this version" in every file in `store-listing/localization/` first.
+   is in [apps/android/promo/listing/SUBMISSION.md](../apps/android/promo/listing/SUBMISSION.md). Rewrite
+   "What's new in this version" in every file in `promo/listing/localization/` first.
 
 ## Reference
 
@@ -130,14 +130,15 @@ In `apps/android/dist/`:
 
 ### Where the images come from
 
-The Android app's are in [its README](../apps/android/README.md#refresh-the-play-listing-images). `npm run windows:assets` runs [store-listing/generator/render.cjs](../apps/windows/store-listing/generator/render.cjs), which renders from
+The Android app's are in [its README](../apps/android/README.md#refresh-the-play-listing-images). `npm run windows:assets` runs [promo/generator/render.cjs](../apps/windows/promo/generator/render.cjs), which renders from
 `packages/brand/app-icon.svg` and the built page (paths below are in `apps/windows/`):
 
 | Output | Used for |
 |---|---|
 | `shell/icon.png` | The window, taskbar and installer icon |
 | `build/packaging/appx/` | Start, tile and taskbar icons inside the `.appx`, also rendered by `npm run windows:appx`. Not in git |
-| `dist/<language>/` | Partner Center, one folder per language: store logo, box and poster art (designed in `store-listing/generator/logo.html`), and the screenshots (laid out in `store-listing/generator/shots.html`, with the words in `captions.js`, around captures of the app in `build/shots/`). Not in git |
+| `promo/out/store/microsoft-store/<language>/` | Partner Center, one folder per language: store logo, box and poster art (designed in `promo/generator/logo.html`), and the screenshots (laid out in `promo/generator/shots.html`, with the words in `captions.js`, around captures of the app in `build/shots/`). Not in git |
 | `docs/screenshots/` (at the repo root) | The README: the English screenshots it shows |
-| `docs/social-preview.png` (at the repo root) | The top of the README, and GitHub's social preview, designed in `store-listing/generator/social.html`. If it changes, upload it again in the repo's Settings → Social preview |
+| `promo/out/github/social-preview.png` (at the repo root) | GitHub's social preview, designed in `promo/generator/social.html`. If it changes, upload it again in the repo's Settings → Social preview |
+| `promo/out/portfolio/portfolio.png` (at the repo root) | A square tile for a job profile's portfolio, designed in `promo/generator/portfolio.html`, with both apps |
 | `packages/brand/rendered/` (at the repo root) | The website: `icon-256.png` (its install icon) and `share.png` (the preview when a link is shared, published as `og.png`), copies of the 256 px tile icon and the promo screenshot |

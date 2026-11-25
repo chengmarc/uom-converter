@@ -2,16 +2,17 @@
 # the README, the website's build) and need Electron or the photo originals to make. GitHub folds
 # them in diffs and leaves them out of the language stats. Change the source and re-run, not these.
 
-# apps/windows/store-listing/generator/render.cjs (`npm run windows:assets`), from @uom/brand's app-icon.svg and the built app
+# apps/windows/promo/generator/render.cjs (`npm run windows:assets`), from @uom/brand's app-icon.svg and the built app
 apps/windows/shell/icon.png linguist-generated
 docs/screenshots/*.png linguist-generated
-docs/social-preview.png linguist-generated
+promo/out/github/*.png linguist-generated
+promo/out/portfolio/*.png linguist-generated
 packages/brand/rendered/*.png linguist-generated
 
 # apps/android/scripts/render-icons.cjs (`npm run android:icons`), from @uom/brand's app-icon.svg
 apps/android/native/app/src/main/res/mipmap-*/*.png linguist-generated
 
-# apps/android/store-listing/generator/render.cjs (`npm run android:store`), from @uom/brand's store look and the built app
+# apps/android/promo/generator/render.cjs (`npm run android:store`), from @uom/brand's store look and the built app
 
 # Written by `cap sync` (npm run android:sync), always with LF. Change Capacitor's plugins, not these.
 apps/android/native/app/capacitor.build.gradle eol=lf linguist-generated

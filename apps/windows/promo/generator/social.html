@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- GitHub's social preview, the card shown when the repo's link is shared: render.cjs loads this page at 1280 × 640 into
-     docs/social-preview.png, which is uploaded in the repo's Settings. GitHub crops a little off the edges in places,
+     promo/out/github/social-preview.png (at the repo root), which is uploaded in the repo's Settings. GitHub crops a little off the edges in places,
      so everything stays 40px clear of them. It shows both apps: the Windows window is the promo shot's capture, and
      the phone is the Android app's home screen, captured by `npm run android:store`. The words are in captions.js. -->
 <html lang="en">
@@ -30,6 +30,10 @@
         background: rgba(255, 255, 255, 0.12);
         border: 1px solid rgba(255, 255, 255, 0.22);
       }
+
+      /* The README's badges, in its order, under the facts. */
+      .badges { display: flex; gap: 7px; margin-top: 16px; align-items: center; }
+      .badges img { display: block; height: 36px; }
 
       /* The app window, as in shots.html: 1400 × 860 at 0.52, whole, with Windows 11's corners and a deep shadow. */
       .window {
@@ -77,6 +81,7 @@
       <p id="tagline"></p>
       <p class="platforms">Windows · Android</p>
       <div class="facts" id="facts"></div>
+      <div class="badges"><img src="../../../../docs/badges/badge-download.svg" alt=""><img src="../../../../docs/badges/badge-microsoft-store.svg" alt=""><img src="../../../../docs/badges/badge-google-play.svg" alt=""></div>
     </div>
     <div class="window">
       <img src="../../build/shots/en/promo.png" alt="" />

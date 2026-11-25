@@ -10,6 +10,15 @@ match the release tags (`v<version>`).
 ### Changed
 
 - the Android app is on Google Play, and the website's footer links to it there
+- each app's store listing and the images designed for it are in its `promo/`, was `store-listing/`: the pages and
+  `render.cjs` in `promo/generator/`, the text, `SUBMISSION.md` and `PRIVACY.md` in `promo/listing/`, and the store
+  images in `promo/out/store/microsoft-store/<language>/` and `promo/out/store/google-play/<language>/`, was
+  `dist/<language>/`, so `dist/` holds only what ships
+- GitHub's social preview is `promo/out/github/social-preview.png` at the repo root, was `docs/social-preview.png`,
+  and shows the README's badges; `npm run windows:assets` also draws a square portfolio tile,
+  `promo/out/portfolio/portfolio.png`
+- the Android app's privacy policy is at `apps/android/promo/listing/PRIVACY.md`, and the app's Privacy link and
+  the Play listing point there
 
 ## [1.3.0] - 2026-11-02
 

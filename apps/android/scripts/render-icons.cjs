@@ -5,7 +5,7 @@
 //     ic_launcher_monochrome                 the glyph alone, for Android 13's themed icons
 //     ic_launcher, ic_launcher_round         whole icons for launchers without adaptive icons
 //   build/icon-512.png                       the Play listing icon (Play rounds the corners itself), which
-//                                            store-listing/generator/render.cjs copies to each language's folder
+//                                            promo/generator/render.cjs copies to each language's folder
 // Run with `npm run android:icons`.
 
 const { app, BrowserWindow } = require("electron");

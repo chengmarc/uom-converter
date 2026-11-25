@@ -5,13 +5,13 @@ import { field, parseCaptions, reader, shotNames } from "../listing";
 
 const offered = LANGUAGES.map((l) => l.id as string).sort();
 // The listing and what it's made from, in the Android app.
-const LISTING = new URL("../../../../apps/android/store-listing/", import.meta.url);
+const LISTING = new URL("../../../../apps/android/promo/", import.meta.url);
 const read = reader(LISTING);
 
 type Captions = { region?: string; tagline: string; shots: Record<string, { title: string; text: string }> };
 const captions = () => parseCaptions<Captions>(read("./generator/captions.js"));
 const shots = () => shotNames(read("./generator/shots.html"));
-const listing = (id: string) => read(`./localization/${id}.md`);
+const listing = (id: string) => read(`./listing/localization/${id}.md`);
 
 /** Words Google asks store assets to avoid, by language. */
 const PROMOTIONAL: Record<string, RegExp> = {
@@ -23,7 +23,7 @@ const PROMOTIONAL: Record<string, RegExp> = {
 
 describe("the Google Play listing", () => {
   it("has text and captions for the languages the app offers", () => {
-    const files = readdirSync(new URL("./localization/", LISTING)).map((f) => f.replace(".md", ""));
+    const files = readdirSync(new URL("./listing/localization/", LISTING)).map((f) => f.replace(".md", ""));
     expect(files.sort()).toEqual(offered);
     expect(Object.keys(captions()).sort()).toEqual(offered);
   });

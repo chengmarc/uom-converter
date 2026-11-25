@@ -5,17 +5,17 @@ import { field, parseCaptions, reader, shotNames } from "../listing";
 
 const offered = LANGUAGES.map((l) => l.id as string).sort();
 // The listing and what it's made from, in the Windows app.
-const LISTING = new URL("../../../../apps/windows/store-listing/", import.meta.url);
+const LISTING = new URL("../../../../apps/windows/promo/", import.meta.url);
 const read = reader(LISTING);
 
 type Captions = { region?: string; tagline: string; facts: string[]; shots: Record<string, { title: string; text: string }> };
 const captions = () => parseCaptions<Captions>(read("./generator/captions.js"));
 const shots = () => shotNames(read("./generator/shots.html"));
-const listing = (id: string) => read(`./localization/${id}.md`);
+const listing = (id: string) => read(`./listing/localization/${id}.md`);
 
 describe("the Store listing", () => {
   it("has text and captions for the languages the app offers", () => {
-    const files = readdirSync(new URL("./localization/", LISTING)).map((f) => f.replace(".md", ""));
+    const files = readdirSync(new URL("./listing/localization/", LISTING)).map((f) => f.replace(".md", ""));
     expect(files.sort()).toEqual(offered);
     expect(Object.keys(captions()).sort()).toEqual(offered);
   });

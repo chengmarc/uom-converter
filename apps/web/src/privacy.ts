@@ -1,5 +1,5 @@
 // The website's privacy policy, drawn at /privacy. The Windows and Android apps keep their own, in
-// their store-listing/ folders. It's written here, not typed by anyone, so it goes in as HTML.
+// their promo/listing/ folders. It's written here, not typed by anyone, so it goes in as HTML.
 
 export const PRIVACY_HTML = `
 <h1>Privacy Policy</h1>

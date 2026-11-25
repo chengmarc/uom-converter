@@ -1,10 +1,14 @@
 // Renders every image derived from the app's own sources, so they never drift from it:
 //   shell/icon.png         the desktop window, taskbar and installer icon
 //   build/packaging/appx/  tile and taskbar icons packed into the MSIX (electron-builder's buildResources)
-//   dist/<language>/       images uploaded to Partner Center, one folder per language: store logos and screenshots
+//   promo/out/store/microsoft-store/<language>/  images uploaded to Partner Center, one folder per language: store
+//                        logos and screenshots (gitignored: made again for each submission)
 //   docs/screenshots/      the README's screenshots, in English
-//   docs/social-preview.png  GitHub's social preview, from social.html, which also heads the README. It shows the
-//                        Android app too, so `npm run android:store` has to have captured it first
+//   promo/out/github/social-preview.png (at the repo root)  GitHub's social preview, from social.html, uploaded in the
+//                        repo's Settings. It shows the Android app too, so `npm run android:store` has to have
+//                        captured it first
+//   promo/out/portfolio/portfolio.png (at the repo root)  a square tile for a job profile's portfolio, from
+//                        portfolio.html, with both apps too
 //   @uom/brand's rendered/ the icon at 256 and the share image (the promo shot), which the website uses too
 // The icons come from @uom/brand's app-icon.svg; screenshots from the built page, captured into build/shots/ and
 // framed by shots.html, in each language of captions.js.
@@ -17,10 +21,11 @@ const path = require("node:path");
 const { pathToFileURL } = require("node:url");
 
 const WINDOWS = path.join(__dirname, "..", "..");
-const DIST = path.join(WINDOWS, "dist");
+const DIST = path.join(WINDOWS, "promo", "out", "store", "microsoft-store");
 const README_SHOTS = path.join(WINDOWS, "..", "..", "docs", "screenshots");
-const SOCIAL_PREVIEW = path.join(WINDOWS, "..", "..", "docs", "social-preview.png");
-/** The Android app's home screen on a phone, which the social preview shows beside the window. */
+const SOCIAL_PREVIEW = path.join(WINDOWS, "..", "..", "promo", "out", "github", "social-preview.png");
+const PORTFOLIO = path.join(WINDOWS, "..", "..", "promo", "out", "portfolio", "portfolio.png");
+/** The Android app's home screen on a phone, which the social preview and the portfolio tile show beside the window. */
 const ANDROID_HOME = path.join(WINDOWS, "..", "android", "build", "shots", "en", "phone", "home.png");
 const BUILD = path.join(WINDOWS, "build");
 const PAGE = path.join(BUILD, "web");
@@ -105,7 +110,7 @@ async function renderTiles() {
 }
 
 async function renderListing() {
-  // Before anything is rendered, not after: the social preview would otherwise go without the phone.
+  // Before anything is rendered, not after: the social preview and the portfolio tile would otherwise go without the phone.
   if (!fs.existsSync(ANDROID_HOME)) throw new Error(`No ${path.relative(WINDOWS, ANDROID_HOME)}: run \`npm run android:store\` first, which captures it`);
   fs.rmSync(README_SHOTS, { recursive: true, force: true });
 
@@ -151,6 +156,7 @@ async function renderListing() {
   }
   // After the shots: it shows the promo shot's capture. GitHub's size, under its 1 MB limit.
   await renderPage("social.html", SOCIAL_PREVIEW, 1280, 640, 1, fillCount(count));
+  await renderPage("portfolio.html", PORTFOLIO, 1080, 1080, 1);
 }
 
 /** Fills the converter count into a page's first fact. */

@@ -48,7 +48,7 @@ apps/
 ```
 
 Inside an app, `src/` is its source, `scripts/` its helpers (icon renderers, the Gradle runner),
-`store-listing/` its listing in the app store, and its tools' configs sit at its root. Two folders, never in git,
+`promo/` its app store listing and the images designed for it, and its tools' configs sit at its root. Two folders, never in git,
 mean the same in every app:
 
 | Folder | Holds |
@@ -91,8 +91,8 @@ To add a converter or a topic, see [@uom/converters](packages/converters/README.
 Releases follow the [release guide](docs/RELEASING.md): the installer goes on GitHub
 Releases, the `.appx` to the Microsoft Store and the `.aab` to Google Play. Changes are listed in the
 [changelog](docs/CHANGELOG.md), and each app keeps its own privacy policy: the [website](https://uom-converter.com/privacy), the
-[Windows app](apps/windows/store-listing/PRIVACY.md) and the
-[Android app](apps/android/store-listing/PRIVACY.md).
+[Windows app](apps/windows/promo/listing/PRIVACY.md) and the
+[Android app](apps/android/promo/listing/PRIVACY.md).
 
 ## License
 

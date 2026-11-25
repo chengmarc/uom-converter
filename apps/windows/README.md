@@ -33,30 +33,30 @@ try it out, tag, then GitHub Releases and Partner Center.
 npm run windows:assets
 ```
 
-Builds the page and runs `store-listing/generator/render.cjs`, which redraws every image made from
+Builds the page and runs `promo/generator/render.cjs`, which redraws every image made from
 `@uom/brand`'s `app-icon.svg` and the built page: the window and tile icons, the Store listing
 images in every language, the README's screenshots, and the website's icon and share image in
-`packages/brand/rendered/`. Look over the screenshots in `dist/<language>/` before
+`packages/brand/rendered/`. Look over the screenshots in `promo/out/store/microsoft-store/<language>/` before
 uploading them. The release guide's
 [image table](../../docs/RELEASING.md#where-the-images-come-from) lists every output.
 
 ### Change a Store screenshot
 
-Each shot is an entry in `SHOTS` in `store-listing/generator/shots.html`: the role, region and
+Each shot is an entry in `SHOTS` in `promo/generator/shots.html`: the role, region and
 converter it opens on (`query`). `scrollTo` scrolls that part of the converter to the top, so its
-answer stays inside the frame. Its words are in `store-listing/generator/captions.js`, one set per language, and a
+answer stays inside the frame. Its words are in `promo/generator/captions.js`, one set per language, and a
 language's `region` replaces the shot's own. Then refresh the images (above).
 
 ### Change the Store listing
 
-Edit every language's file in `store-listing/localization/`, which holds the text entered per
-language, and `store-listing/generator/captions.js` if the images make the same claim.
-`store-listing/SUBMISSION.md` holds what's entered once. `npm test` checks every language against
+Edit every language's file in `promo/listing/localization/`, which holds the text entered per
+language, and `promo/generator/captions.js` if the images make the same claim.
+`promo/listing/SUBMISSION.md` holds what's entered once. `npm test` checks every language against
 Partner Center's limits.
 
 ### Change the privacy policy
 
-Edit [store-listing/PRIVACY.md](store-listing/PRIVACY.md), the plain text pasted into Partner Center.
+Edit [promo/listing/PRIVACY.md](promo/listing/PRIVACY.md), the plain text pasted into Partner Center.
 The website and the Android app keep their own.
 
 ## Explanation
@@ -77,7 +77,7 @@ and region. Each converter is drawn by
 Windows 11 22H2 and later the frame shows Acrylic through the page's transparent parts.
 
 **What it keeps.** The role, region and language in the page's storage, and the window's size and position
-in `window-state.json`, both in the app's data folder (see [PRIVACY.md](store-listing/PRIVACY.md)).
+in `window-state.json`, both in the app's data folder (see [PRIVACY.md](promo/listing/PRIVACY.md)).
 
 ## Reference
 
@@ -89,11 +89,11 @@ in `window-state.json`, both in the app's data folder (see [PRIVACY.md](store-li
 | `packaging/electron-builder.config.cjs` | Installer and `.appx` settings, including the Store identity |
 | `build/packaging/appx/` | The `.appx` tile icons, rendered by `npm run windows:appx`. Not in git |
 | `packaging/release-notes.cjs` | A version's changelog section, for the GitHub release |
-| `store-listing/generator/render.cjs` | `npm run windows:assets`: every rendered image |
-| `store-listing/generator/shots.html`, `store-listing/generator/logo.html` | The designed screenshots, box art and poster art |
-| `store-listing/generator/captions.js` | The words on those images, per language |
-| `store-listing/SUBMISSION.md` | How to fill in Partner Center, and what's entered once |
-| `store-listing/localization/` | Each language's Store listing text |
-| `store-listing/PRIVACY.md` | The privacy policy as plain text for Partner Center |
+| `promo/generator/render.cjs` | `npm run windows:assets`: every rendered image |
+| `promo/generator/shots.html`, `promo/generator/logo.html` | The designed screenshots, box art and poster art |
+| `promo/generator/captions.js` | The words on those images, per language |
+| `promo/listing/SUBMISSION.md` | How to fill in Partner Center, and what's entered once |
+| `promo/listing/localization/` | Each language's Store listing text |
+| `promo/listing/PRIVACY.md` | The privacy policy as plain text for Partner Center |
 | `dist/` | What ships: the installer, the `.appx` and the release notes (not in git) |
 | `build/` | Intermediates, safe to delete: the built page (`web/`), electron-builder's full output, store screenshot captures (not in git) |

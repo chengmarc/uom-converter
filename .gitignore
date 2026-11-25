@@ -3,3 +3,7 @@ dist
 .wrangler
 packages/brand/originals/
 build
+
+# Each app's store images, made again for each submission (promo/generator/render.cjs). The repo-wide promo/out/
+# (GitHub's social preview, the portfolio tile) is uploaded by hand and kept.
+apps/*/promo/out/
