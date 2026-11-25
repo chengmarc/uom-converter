@@ -35,7 +35,7 @@ npm run windows:assets
 
 Builds the page and runs `promo/generator/render.cjs`, which redraws every image made from
 `@uom/brand`'s `app-icon.svg` and the built page: the window and tile icons, the Store listing
-images in every language, the README's screenshots, and the website's icon and share image in
+images in every language, the README's screenshot, and the website's icon and share image in
 `packages/brand/rendered/`. Look over the screenshots in `promo/out/store/microsoft-store/<language>/` before
 uploading them. The release guide's
 [image table](../../docs/RELEASING.md#where-the-images-come-from) lists every output.

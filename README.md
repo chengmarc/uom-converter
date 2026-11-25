@@ -9,11 +9,9 @@
 
 </div>
 
-## Screenshots
+## Screenshot
 
 <img src="docs/screenshots/screenshot-1-promo.png">
-<img src="docs/screenshots/screenshot-2-voltage-drop.png">
-<img src="docs/screenshots/screenshot-5-reels.png">
 
 ## Quick start
 

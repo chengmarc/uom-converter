@@ -3,7 +3,7 @@
 //   build/packaging/appx/  tile and taskbar icons packed into the MSIX (electron-builder's buildResources)
 //   promo/out/store/microsoft-store/<language>/  images uploaded to Partner Center, one folder per language: store
 //                        logos and screenshots (gitignored: made again for each submission)
-//   docs/screenshots/      the README's screenshots, in English
+//   docs/screenshots/      the README's screenshot, in English
 //   promo/out/social-preview.png  GitHub's social preview, from social.html, uploaded in the repo's Settings. It
 //                        shows the Android app too, so `npm run android:store` has to have captured it first
 //   promo/out/portfolio.png  a square tile for a job profile's portfolio, from portfolio.html, with both apps too
@@ -33,8 +33,8 @@ const ICON = fs.readFileSync(require.resolve("@uom/brand/app-icon.svg"), "utf8")
 const ICON_256 = require.resolve("@uom/brand/icon-256.png");
 const SHARE = require.resolve("@uom/brand/share.png");
 const SCALES = [100, 200];
-/** The shots the README shows. */
-const IN_README = ["promo", "voltage-drop", "reels"];
+/** The shot the README shows. */
+const IN_README = ["promo"];
 
 /**
  * The MSIX images Windows 11 uses: [name, width, height, share of the shorter side the icon
