@@ -37,6 +37,10 @@ const SHOT = { width: 360, height: 640, scale: 3 };
  */
 const HYPHENATED = ["Spannungs-fall", "Hausan-schluss-größe", "Strombe-lastbarkeit", "Blindleistungs-kompensation", "Transforma-torauslegung", "Beleuch-tungsplanung", "Beleuch-tungsstärke", "Verpa-ckungsebenen", "Spezifi-kationswert", "Dimension-nement"];
 
+/** The app's photos, hidden: the topic banners and the cards' thumbnails. The Windows app's portfolio tile shows the home
+ * screen without them (its portfolio.html says why), as home-nophoto.png. */
+const NO_PHOTOS = `img[src*=".webp"], img[srcset*=".webp"] { display: none !important; }`;
+
 protocol.registerSchemesAsPrivileged([{ scheme: "app", privileges: { standard: true, secure: true, supportFetchAPI: true } }]);
 
 function offscreen(width, height, scale = 1) {
@@ -71,8 +75,8 @@ async function renderPage(page, file, width, height, scale, query = {}) {
   win.destroy();
 }
 
-/** The built page as the app shows it on `device`, in `language` and `region`, set up as the shot says. */
-async function captureApp(language, region, name, device, { audience, recent = [], hash, scrollTo }) {
+/** The built page as the app shows it on `device`, in `language` and `region`, set up as the shot says; `css` is added to it. */
+async function captureApp(language, region, name, device, { audience, recent = [], hash, scrollTo }, css = "") {
   const screen = DEVICES[device];
   // Windows keeps even an offscreen window within the screen's height: a taller screen is a window half the size,
   // at twice the density, with the page zoomed out to 50% so it still lays out at the device's CSS size.
@@ -91,7 +95,7 @@ async function captureApp(language, region, name, device, { audience, recent = [
     localStorage.setItem("uom.recent", ${JSON.stringify(JSON.stringify(recent))});`);
   await load(`app://uom/index.html${hash}`);
   // A phone draws no scrollbar; Chromium on the desktop does.
-  await win.webContents.insertCSS("::-webkit-scrollbar { display: none; }");
+  await win.webContents.insertCSS(`::-webkit-scrollbar { display: none; } ${css}`);
   await win.webContents.executeJavaScript(`for (const word of ${JSON.stringify(HYPHENATED)}) for (const e of document.querySelectorAll(".card-title")) e.textContent = e.textContent.replace(word.replaceAll("-", ""), word.replaceAll("-", "\u00ad"));`);
   // By element, not by pixels: text wraps differently in each language. Under the app bar, which stays put. Room below
   // the page, out of the shot, lets a short page scroll as far as a long one.
@@ -136,6 +140,7 @@ app.whenReady().then(async () => {
     for (const [device, screen] of Object.entries(DEVICES)) {
       for (const [i, [name, shot]] of shots.entries()) {
         await captureApp(language, region ?? shot.region, name, device, shot);
+        if (language === "en" && device === "phone" && name === "home") await captureApp(language, region ?? shot.region, "home-nophoto", device, shot, NO_PHOTOS);
         const file = path.join(dir, `${device}-${i + 1}-${name}.png`);
         await renderPage(`shots.html#${language}.${name}`, file, SHOT.width, SHOT.height, SHOT.scale, { device, width: String(screen.width), status: String(screen.status) });
       }

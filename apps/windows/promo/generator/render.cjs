@@ -26,6 +26,10 @@ const SOCIAL_PREVIEW = path.join(WINDOWS, "promo", "out", "social-preview.png");
 const PORTFOLIO = path.join(WINDOWS, "promo", "out", "portfolio.png");
 /** The Android app's home screen on a phone, which the social preview and the portfolio tile show beside the window. */
 const ANDROID_HOME = path.join(WINDOWS, "..", "android", "build", "shots", "en", "phone", "home.png");
+/** The same with the app's photos hidden, for the portfolio tile, which has none (portfolio.html says why). */
+const ANDROID_HOME_NO_PHOTOS = path.join(WINDOWS, "..", "android", "build", "shots", "en", "phone", "home-nophoto.png");
+/** The app's photos, hidden: the topic banners and the cards' thumbnails. */
+const NO_PHOTOS = `img[src*=".webp"], img[srcset*=".webp"] { display: none !important; }`;
 const BUILD = path.join(WINDOWS, "build");
 const PAGE = path.join(BUILD, "web");
 const TILES_DIR = path.join(BUILD, "packaging", "appx");
@@ -110,7 +114,9 @@ async function renderTiles() {
 
 async function renderListing() {
   // Before anything is rendered, not after: the social preview and the portfolio tile would otherwise go without the phone.
-  if (!fs.existsSync(ANDROID_HOME)) throw new Error(`No ${path.relative(WINDOWS, ANDROID_HOME)}: run \`npm run android:store\` first, which captures it`);
+  for (const shot of [ANDROID_HOME, ANDROID_HOME_NO_PHOTOS]) {
+    if (!fs.existsSync(shot)) throw new Error(`No ${path.relative(WINDOWS, shot)}: run \`npm run android:store\` first, which captures it`);
+  }
   fs.rmSync(README_SHOTS, { recursive: true, force: true });
 
   protocol.handle("app", (request) => {
@@ -144,6 +150,8 @@ async function renderListing() {
     for (const [i, [name, shot]] of shots.entries()) {
       const file = path.join(dir, `screenshot-${i + 1}-${name}.png`);
       await renderShot(language, name, shot, region, file, count);
+      // The promo shot again without the app's photos, for the portfolio tile: only the capture, not framed.
+      if (language === "en" && name === "promo") await captureApp(language, "promo-nophoto", shot, region, NO_PHOTOS);
       if (language === "en") {
         if (name === "promo") fs.copyFileSync(file, SHARE);
         if (IN_README.includes(name)) {
@@ -163,8 +171,15 @@ async function renderListing() {
 const fillCount = (count) => `document.querySelector("#count").textContent = document.querySelector("#count").textContent.replace("{count}", "${count}")`;
 
 /** One screenshot: the app captured in `language` (and `region`, over the shot's own), then framed by shots.html. */
-async function renderShot(language, name, { query, theme, scrollTo }, region, file, count) {
+async function renderShot(language, name, shot, region, file, count) {
   const { width, height, scale } = SHOT_SIZE;
+  await captureApp(language, name, shot, region);
+  await renderPage(`shots.html#${language}.${name}`, file, width, height, scale, fillCount(count));
+}
+
+/** The app as a shot sets it up, captured into build/shots/<language>/<name>.png; `css` is added to its page. */
+async function captureApp(language, name, { query, theme, scrollTo }, region, css = "") {
+  const { scale } = SHOT_SIZE;
   const expected = { width: APP_SIZE.width * scale, height: APP_SIZE.height * scale };
   nativeTheme.themeSource = theme;
   const page = offscreen(APP_SIZE.width, APP_SIZE.height, scale);
@@ -175,6 +190,7 @@ async function renderShot(language, name, { query, theme, scrollTo }, region, fi
   page.webContents.setZoomFactor(1);
   // As in the real window (main.cjs): the frame is translucent over Windows 11's Acrylic, which shots.html draws.
   await page.webContents.executeJavaScript(`document.documentElement.classList.add("desktop")`);
+  if (css) await page.webContents.insertCSS(css);
   // By element, not by pixels: text wraps differently in each language. Waits out the page's ease-in, which moves it.
   if (scrollTo) await page.webContents.executeJavaScript(`new Promise((r) => setTimeout(r, 400)).then(() => {
     const content = document.querySelector("#content");
@@ -182,7 +198,6 @@ async function renderShot(language, name, { query, theme, scrollTo }, region, fi
   })`);
   await capture(page, path.join(BUILD, "shots", language, `${name}.png`), expected);
   page.destroy();
-  await renderPage(`shots.html#${language}.${name}`, file, width, height, scale, fillCount(count));
 }
 
 /**
